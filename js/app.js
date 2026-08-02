@@ -136,6 +136,95 @@ function generateDeck() {
 function categoryFor(card) {
   return state.categories.find((x) => x.id === card.visual.primary_category);
 }
+function renderFrontCard(card) {
+  const cat = categoryFor(card);
+
+  return `
+    <article class="play-card card-front">
+
+      <div
+        class="card-band"
+        style="background:${cat.color}"
+      >
+        <span class="category-icon">${cat.icon}</span>
+        <span class="category-name">${cat.name}</span>
+      </div>
+
+      <div class="card-body">
+        <div>
+
+          <div class="card-icon">
+            ${cat.icon}
+          </div>
+
+          <p class="card-prompt">
+            ${escapeHtml(card.content.prompt)}
+          </p>
+
+          ${
+            card.content.instruction
+              ? `
+                <p class="card-instruction">
+                  ${escapeHtml(card.content.instruction)}
+                </p>
+              `
+              : ""
+          }
+
+        </div>
+      </div>
+
+      <div class="card-footer">
+        <span>
+          ${state.manifest.deck_code}
+          ·
+          ${card.deck_position}/${state.generated.length}
+        </span>
+      </div>
+
+    </article>
+  `;
+}
+function renderBackCard() {
+  return `
+    <article class="play-card card-back">
+
+      <div
+        class="punch-safe punch-safe-back"
+        title="Optional hole-punch safe area"
+      ></div>
+
+      <div class="card-back-content">
+
+        <div
+          class="trail-talk-compass"
+          aria-hidden="true"
+        >
+          ✥
+        </div>
+
+        <h3>TRAIL TALK</h3>
+
+        <p class="card-back-tagline">
+          Real Questions. Real Connections.
+        </p>
+
+        <div
+          class="trail-line"
+          aria-hidden="true"
+        >
+          - - - - - - - - - - 🚩
+        </div>
+
+        <p class="card-back-brand">
+          Overlanding Atlas
+        </p>
+
+      </div>
+
+    </article>
+  `;
+}
 function renderSummary() {
   const el = byId("deck-summary"),
     m = state.manifest;
@@ -202,51 +291,10 @@ function renderOutput() {
     frontGrid.className = "card-grid";
 
     cards.forEach((card) => {
-      const cat = categoryFor(card);
-
-      frontGrid.insertAdjacentHTML(
-        "beforeend",
-        `
-          <article class="play-card card-front">
-
-            <div
-              class="card-band"
-              style="background: ${cat.color}"
-            >
-              <span class="category-icon">${cat.icon}</span>
-              <span class="category-name">${cat.name}</span>
-            </div>
-
-            <div class="card-body">
-              <div>
-                <div class="card-icon">${cat.icon}</div>
-
-                <p class="card-prompt">
-                  ${escapeHtml(card.content.prompt)}
-                </p>
-
-                ${
-                  card.content.instruction
-                    ? `
-                      <p class="card-instruction">
-                        ${escapeHtml(card.content.instruction)}
-                      </p>
-                    `
-                    : ""
-                }
-              </div>
-            </div>
-
-            <div class="card-footer">
-              <span>
-                ${state.manifest.deck_code}
-                ·
-                ${card.deck_position}/${state.generated.length}
-              </span>
-            </div>
-          </article>
-        `,
-      );
+        frontGrid.insertAdjacentHTML(
+            "beforeend",
+            renderFrontCard(card)
+        );
     });
 
     frontPage.appendChild(frontGrid);
@@ -264,37 +312,10 @@ function renderOutput() {
     backGrid.className = "card-grid";
 
     cards.forEach(() => {
-      backGrid.insertAdjacentHTML(
-        "beforeend",
-        `
-          <article class="play-card card-back">
-            <div
-              class="punch-safe punch-safe-back"
-              title="Optional hole-punch safe area"
-            ></div>
-
-            <div class="card-back-content">
-              <div class="trail-talk-compass" aria-hidden="true">
-                ✥
-              </div>
-
-              <h3>TRAIL TALK</h3>
-
-              <p class="card-back-tagline">
-                Real Questions. Real Connections.
-              </p>
-
-              <div class="trail-line" aria-hidden="true">
-                - - - - - - - - - - 🚩
-              </div>
-
-              <p class="card-back-brand">
-                Overlanding Atlas
-              </p>
-            </div>
-          </article>
-        `,
-      );
+        backGrid.insertAdjacentHTML(
+            "beforeend",
+            renderBackCard()
+        );
     });
 
     backPage.appendChild(backGrid);
