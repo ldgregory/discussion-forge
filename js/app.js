@@ -1,3 +1,10 @@
+import {
+  chunkArray,
+  escapeHtml,
+  randomCode,
+  seededShuffle,
+} from "./utils.js";
+
 const state = {
   cards: [],
   categories: [],
@@ -41,43 +48,6 @@ function selectedValues(n) {
   return [...document.querySelectorAll(`input[name="${n}"]:checked`)].map(
     (x) => x.value,
   );
-}
-function xmur3(t) {
-  let h = 1779033703 ^ t.length;
-  for (let i = 0; i < t.length; i++) {
-    h = Math.imul(h ^ t.charCodeAt(i), 3432918353);
-    h = (h << 13) | (h >>> 19);
-  }
-  return function () {
-    h = Math.imul(h ^ (h >>> 16), 2246822507);
-    h = Math.imul(h ^ (h >>> 13), 3266489909);
-    return (h ^= h >>> 16) >>> 0;
-  };
-}
-function mulberry32(s) {
-  return function () {
-    let t = (s += 0x6d2b79f5);
-    t = Math.imul(t ^ (t >>> 15), t | 1);
-    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
-}
-function seededShuffle(items, seedText) {
-  const random = mulberry32(xmur3(seedText)()),
-    copy = [...items];
-  for (let i = copy.length - 1; i > 0; i--) {
-    const j = Math.floor(random() * (i + 1));
-    [copy[i], copy[j]] = [copy[j], copy[i]];
-  }
-  return copy;
-}
-function randomCode(length = 6) {
-  const a = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-  let r = "";
-  crypto
-    .getRandomValues(new Uint32Array(length))
-    .forEach((n) => (r += a[n % a.length]));
-  return r;
 }
 function generateDeck() {
   const editions = selectedValues("edition"),
@@ -323,23 +293,6 @@ function renderOutput() {
   });
 }
 
-function chunkArray(items, chunkSize) {
-  const chunks = [];
-
-  for (let index = 0; index < items.length; index += chunkSize) {
-    chunks.push(items.slice(index, index + chunkSize));
-  }
-
-  return chunks;
-}
-function escapeHtml(v) {
-  return String(v)
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
-}
 function downloadManifest() {
   if (!state.manifest) {
     byId("status").textContent = "Generate a deck first.";
