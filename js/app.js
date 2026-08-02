@@ -1,4 +1,5 @@
 import { chunkArray, escapeHtml, randomCode, seededShuffle } from "./utils.js";
+import { getTheme, themes } from "./themes/index.js";
 
 const state = {
   cards: [],
@@ -6,6 +7,7 @@ const state = {
   editions: [],
   generated: [],
   manifest: null,
+  themeId: "trail-blue",
 };
 const byId = (id) => document.getElementById(id);
 async function loadData() {
@@ -18,6 +20,7 @@ async function loadData() {
   state.categories = categories;
   state.editions = editions;
   renderOptions();
+  renderThemeOptions();
 }
 function renderOptions() {
   const e = byId("edition-options"),
@@ -38,6 +41,22 @@ function renderOptions() {
         `<label class="option"><input type="checkbox" name="category" value="${x.id}" checked><span>${x.icon} ${x.name}</span></label>`,
       ),
     );
+}
+function renderThemeOptions() {
+  const selector = byId("theme");
+
+  themes.forEach((theme) => {
+    selector.insertAdjacentHTML(
+      "beforeend",
+      `
+        <option value="${theme.id}">
+          ${theme.name}
+        </option>
+      `,
+    );
+  });
+
+  selector.value = state.themeId;
 }
 function selectedValues(n) {
   return [...document.querySelectorAll(`input[name="${n}"]:checked`)].map(
@@ -81,6 +100,7 @@ function generateDeck() {
     configuration: {
       editions,
       categories,
+      theme: state.themeId,
       requested_card_count: requested,
       playable_card_count: chosen.length,
     },
@@ -150,9 +170,13 @@ function renderFrontCard(card) {
     </article>
   `;
 }
-function renderBackCard({ showPunchGuide = true } = {}) {
+function renderBackCard({
+  showPunchGuide = true,
+  themeId = state.themeId,
+} = {}) {
+  const theme = getTheme(themeId);
   return `
-    <article class="play-card card-back">
+    <article class="play-card card-back ${theme.backClass}">
 
         ${
           showPunchGuide
@@ -244,34 +268,28 @@ function renderPreview() {
   previewGrid.className = "card-grid preview-card-grid";
 
   state.generated.forEach((card) => {
-    previewGrid.insertAdjacentHTML(
-      "beforeend",
-      renderPreviewCard(card),
-    );
+    previewGrid.insertAdjacentHTML("beforeend", renderPreviewCard(card));
   });
 
   out.appendChild(previewGrid);
 
   previewGrid.querySelectorAll(".preview-card").forEach((cardElement) => {
-  cardElement.addEventListener("click", () => {
-    togglePreviewCard(cardElement);
-  });
-
-  cardElement.addEventListener("keydown", (event) => {
-    if (event.key === "Enter" || event.key === " ") {
-      event.preventDefault();
+    cardElement.addEventListener("click", () => {
       togglePreviewCard(cardElement);
-    }
+    });
+
+    cardElement.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        togglePreviewCard(cardElement);
+      }
+    });
   });
-});
 }
 function togglePreviewCard(cardElement) {
   const isFlipped = cardElement.classList.toggle("is-flipped");
 
-  cardElement.setAttribute(
-    "aria-pressed",
-    String(isFlipped),
-  );
+  cardElement.setAttribute("aria-pressed", String(isFlipped));
 }
 function renderQuickList(container) {
   const list = document.createElement("div");
@@ -387,6 +405,13 @@ byId("print").addEventListener("click", () => window.print());
 byId("download-manifest").addEventListener("click", downloadManifest);
 byId("output-mode").addEventListener("change", () => {
   if (state.generated.length) renderOutput();
+});
+byId("theme").addEventListener("change", (event) => {
+state.themeId = event.target.value;
+
+if (state.generated.length) {
+    renderOutput();
+}
 });
 loadData().catch((error) => {
   console.error(error);
