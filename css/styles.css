@@ -245,7 +245,25 @@ button.primary {
   size: Letter portrait;
   margin: 0.22in;
 }
+/*
+ * Screen preview is visible during normal use.
+ * Print output is hidden until printing.
+ */
+.preview-output {
+  display: block;
+}
+
+.print-output {
+  display: none;
+}
 @media print {
+  .preview-output {
+    display: none !important;
+  }
+
+  .print-output {
+    display: block !important;
+  }
   body {
     background: white;
   }
@@ -269,10 +287,10 @@ button.primary {
   .quick-list {
     border: none;
   }
-.print-page {
-  width: 100%;
-  break-after: page;
-  page-break-after: always;
+ .print-page {
+   width: 100%;
+   break-after: page;
+   page-break-after: always;
 }
 
 .print-page:last-child {

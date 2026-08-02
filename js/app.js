@@ -201,51 +201,85 @@ function renderSummary() {
   el.hidden = false;
   el.innerHTML = `<strong>Deck ${m.deck_code}</strong> · ${m.configuration.playable_card_count} playable cards · Seed <code>${escapeHtml(m.seed)}</code> · Generator ${m.generator_version}`;
 }
+
 function renderOutput() {
+  renderPreview();
+  renderPrintOutput();
+}
+
+function renderPreview() {
   const mode = byId("output-mode").value;
-  const out = byId("output");
+  const out = byId("preview-output");
 
   out.innerHTML = "";
 
   if (mode === "list") {
-    const list = document.createElement("div");
-    list.className = "quick-list";
+    renderQuickList(out);
+    return;
+  }
 
-    state.generated.forEach((card) => {
-      const cat = categoryFor(card);
+  const previewGrid = document.createElement("div");
+  previewGrid.className = "card-grid preview-card-grid";
 
-      list.insertAdjacentHTML(
-        "beforeend",
-        `
-          <article class="list-item">
-            <div class="list-meta">
-              ${state.manifest.deck_code} ·
-              ${card.deck_position}/${state.generated.length}
-              <br>
-              ${cat.icon} ${cat.name}
-            </div>
+  state.generated.forEach((card) => {
+    previewGrid.insertAdjacentHTML(
+      "beforeend",
+      renderFrontCard(card),
+    );
+  });
 
-            <p class="list-prompt">
-              <strong>${escapeHtml(card.content.prompt)}</strong>
-              ${
-                card.content.instruction
-                  ? `<br>${escapeHtml(card.content.instruction)}`
-                  : ""
-              }
-            </p>
-          </article>
-        `,
-      );
-    });
+  out.appendChild(previewGrid);
+}
 
-    out.appendChild(list);
+function renderQuickList(container) {
+  const list = document.createElement("div");
+  list.className = "quick-list";
+
+  state.generated.forEach((card) => {
+    const cat = categoryFor(card);
+
+    list.insertAdjacentHTML(
+      "beforeend",
+      `
+        <article class="list-item">
+          <div class="list-meta">
+            ${state.manifest.deck_code} ·
+            ${card.deck_position}/${state.generated.length}
+            <br>
+            ${cat.icon} ${cat.name}
+          </div>
+
+          <p class="list-prompt">
+            <strong>${escapeHtml(card.content.prompt)}</strong>
+            ${
+              card.content.instruction
+                ? `<br>${escapeHtml(card.content.instruction)}`
+                : ""
+            }
+          </p>
+        </article>
+      `,
+    );
+  });
+
+  container.appendChild(list);
+}
+
+function renderPrintOutput() {
+  const mode = byId("output-mode").value;
+  const out = byId("print-output");
+
+  out.innerHTML = "";
+
+  if (mode === "list") {
+    renderQuickList(out);
     return;
   }
 
   const cardsPerPage = 6;
   const cardGroups = chunkArray(state.generated, cardsPerPage);
 
-  cardGroups.forEach((cards, groupIndex) => {
+  cardGroups.forEach((cards) => {
     const firstPosition = cards[0].deck_position;
     const lastPosition = cards[cards.length - 1].deck_position;
 
@@ -261,10 +295,10 @@ function renderOutput() {
     frontGrid.className = "card-grid";
 
     cards.forEach((card) => {
-        frontGrid.insertAdjacentHTML(
-            "beforeend",
-            renderFrontCard(card)
-        );
+      frontGrid.insertAdjacentHTML(
+        "beforeend",
+        renderFrontCard(card),
+      );
     });
 
     frontPage.appendChild(frontGrid);
@@ -282,10 +316,10 @@ function renderOutput() {
     backGrid.className = "card-grid";
 
     cards.forEach(() => {
-        backGrid.insertAdjacentHTML(
-            "beforeend",
-            renderBackCard()
-        );
+      backGrid.insertAdjacentHTML(
+        "beforeend",
+        renderBackCard(),
+      );
     });
 
     backPage.appendChild(backGrid);
