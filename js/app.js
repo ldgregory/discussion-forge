@@ -208,10 +208,6 @@ function renderOutput() {
         "beforeend",
         `
           <article class="play-card card-front">
-            <div
-              class="punch-safe punch-safe-front"
-              title="Optional hole-punch safe area"
-            ></div>
 
             <div
               class="card-band"

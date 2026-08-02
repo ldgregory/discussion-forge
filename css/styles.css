@@ -153,8 +153,9 @@ button.primary {
 }
 .card-body {
   height: 2.55in;
-  display: grid;
-  place-items: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   text-align: center;
   padding: 0.2in;
 }
@@ -164,7 +165,7 @@ button.primary {
 }
 .card-prompt {
   margin: 0;
-  font-size: 1rem;
+  font-size: 1.25rem;
   line-height: 1.25;
   font-weight: 700;
 }
@@ -176,7 +177,8 @@ button.primary {
 .card-footer {
   height: 0.37in;
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
+  font-weight: 600;
   align-items: center;
   padding: 0 0.14in;
   font-size: 0.62rem;
@@ -299,26 +301,34 @@ button.primary {
  * The category name follows it.
  */
 .card-band {
-  padding-left: 0.14in;
-  padding-right: 0.68in;
-  justify-content: flex-start;
-  gap: 0.12in;
+    display: flex;
+    align-items: center;
+
+    gap: .12in;
+
+    padding-left: .14in;
+    padding-right: .14in;
+
+    font-weight: 700;
 }
 
 .category-icon {
-  font-size: 1.2rem;
-  line-height: 1;
+    font-size: 1.7rem;
+    line-height: 1;
+    flex: none;
 }
 
 .category-name {
-  flex: 1;
+    font-size: .82rem;
+    flex: 1;
 }
 
 /*
  * Slightly larger center icon.
  */
 .card-icon {
-  font-size: 2.15rem;
+    font-size: 2.6rem;
+    margin-bottom: .18in;
 }
 
 /*
