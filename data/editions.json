@@ -1,0 +1,20 @@
+[
+  {
+    "id": "core",
+    "name": "Core Edition",
+    "description": "A balanced general-purpose deck.",
+    "active": true
+  },
+  {
+    "id": "campfire",
+    "name": "Campfire Edition",
+    "description": "Longer stories and reflective prompts.",
+    "active": true
+  },
+  {
+    "id": "recovery",
+    "name": "Recovery Edition",
+    "description": "Stucks, repairs, trail lessons, and close calls.",
+    "active": true
+  }
+]

@@ -1,0 +1,34 @@
+[
+  {
+    "id": "gear",
+    "name": "Gear & Vehicle",
+    "short_name": "Gear",
+    "icon": "\ud83e\uddf0",
+    "color": "#3F6B45",
+    "active": true
+  },
+  {
+    "id": "story-time",
+    "name": "Story Time",
+    "short_name": "Story",
+    "icon": "\ud83d\udd25",
+    "color": "#76528B",
+    "active": true
+  },
+  {
+    "id": "lightning",
+    "name": "Lightning Round",
+    "short_name": "Lightning",
+    "icon": "\u26a1",
+    "color": "#59636E",
+    "active": true
+  },
+  {
+    "id": "wildcard",
+    "name": "Wild Cards",
+    "short_name": "Wild",
+    "icon": "\ud83c\udccf",
+    "color": "#A33A2B",
+    "active": true
+  }
+]

@@ -1,0 +1,1302 @@
+[
+  {
+    "card_uuid": "562fee20-2152-41c4-80c7-26bc7b54f9a8",
+    "type": "question",
+    "content": {
+      "prompt": "What has been your best overlanding purchase?"
+    },
+    "categories": [
+      "gear"
+    ],
+    "editions": [
+      "core"
+    ],
+    "visual": {
+      "primary_category": "gear"
+    },
+    "response_style": "discussion",
+    "answer_length": "medium",
+    "experience_level": [
+      "beginner",
+      "experienced"
+    ],
+    "audience": [
+      "general"
+    ],
+    "group_familiarity": [
+      "new-group",
+      "friends"
+    ],
+    "sensitivity": "low",
+    "credit": {
+      "name": "Anonymous",
+      "display": false
+    },
+    "source": "original",
+    "status": "approved",
+    "active": true,
+    "added_to_catalog_at": "2026-08-01T00:00:00Z",
+    "updated_at": "2026-08-01T00:00:00Z",
+    "content_version": 1
+  },
+  {
+    "card_uuid": "aafb22c7-ac0a-4fa6-baef-a16643caf7da",
+    "type": "question",
+    "content": {
+      "prompt": "What has been your worst overlanding purchase?"
+    },
+    "categories": [
+      "gear"
+    ],
+    "editions": [
+      "core"
+    ],
+    "visual": {
+      "primary_category": "gear"
+    },
+    "response_style": "discussion",
+    "answer_length": "medium",
+    "experience_level": [
+      "beginner",
+      "experienced"
+    ],
+    "audience": [
+      "general"
+    ],
+    "group_familiarity": [
+      "new-group",
+      "friends"
+    ],
+    "sensitivity": "low",
+    "credit": {
+      "name": "Anonymous",
+      "display": false
+    },
+    "source": "original",
+    "status": "approved",
+    "active": true,
+    "added_to_catalog_at": "2026-08-01T00:00:00Z",
+    "updated_at": "2026-08-01T00:00:00Z",
+    "content_version": 1
+  },
+  {
+    "card_uuid": "a1b1ba67-dfe9-4c37-b273-921f4532bc31",
+    "type": "question",
+    "content": {
+      "prompt": "What inexpensive item punches far above its weight?"
+    },
+    "categories": [
+      "gear"
+    ],
+    "editions": [
+      "core"
+    ],
+    "visual": {
+      "primary_category": "gear"
+    },
+    "response_style": "discussion",
+    "answer_length": "medium",
+    "experience_level": [
+      "beginner",
+      "experienced"
+    ],
+    "audience": [
+      "general"
+    ],
+    "group_familiarity": [
+      "new-group",
+      "friends"
+    ],
+    "sensitivity": "low",
+    "credit": {
+      "name": "Anonymous",
+      "display": false
+    },
+    "source": "original",
+    "status": "approved",
+    "active": true,
+    "added_to_catalog_at": "2026-08-01T00:00:00Z",
+    "updated_at": "2026-08-01T00:00:00Z",
+    "content_version": 1
+  },
+  {
+    "card_uuid": "188e7fc4-e734-49c1-9d16-374405c82351",
+    "type": "question",
+    "content": {
+      "prompt": "What piece of gear do you refuse to camp without?"
+    },
+    "categories": [
+      "gear"
+    ],
+    "editions": [
+      "core"
+    ],
+    "visual": {
+      "primary_category": "gear"
+    },
+    "response_style": "discussion",
+    "answer_length": "medium",
+    "experience_level": [
+      "beginner",
+      "experienced"
+    ],
+    "audience": [
+      "general"
+    ],
+    "group_familiarity": [
+      "new-group",
+      "friends"
+    ],
+    "sensitivity": "low",
+    "credit": {
+      "name": "Anonymous",
+      "display": false
+    },
+    "source": "original",
+    "status": "approved",
+    "active": true,
+    "added_to_catalog_at": "2026-08-01T00:00:00Z",
+    "updated_at": "2026-08-01T00:00:00Z",
+    "content_version": 1
+  },
+  {
+    "card_uuid": "b8e03166-d735-481c-91a4-948872910c4b",
+    "type": "question",
+    "content": {
+      "prompt": "What modification would you undo if you could?"
+    },
+    "categories": [
+      "gear"
+    ],
+    "editions": [
+      "core"
+    ],
+    "visual": {
+      "primary_category": "gear"
+    },
+    "response_style": "discussion",
+    "answer_length": "medium",
+    "experience_level": [
+      "beginner",
+      "experienced"
+    ],
+    "audience": [
+      "general"
+    ],
+    "group_familiarity": [
+      "new-group",
+      "friends"
+    ],
+    "sensitivity": "low",
+    "credit": {
+      "name": "Anonymous",
+      "display": false
+    },
+    "source": "original",
+    "status": "approved",
+    "active": true,
+    "added_to_catalog_at": "2026-08-01T00:00:00Z",
+    "updated_at": "2026-08-01T00:00:00Z",
+    "content_version": 1
+  },
+  {
+    "card_uuid": "2e69d4ff-8e1b-4ba2-8007-84f2c2974a0a",
+    "type": "question",
+    "content": {
+      "prompt": "What do you carry that most people do not?"
+    },
+    "categories": [
+      "gear"
+    ],
+    "editions": [
+      "core"
+    ],
+    "visual": {
+      "primary_category": "gear"
+    },
+    "response_style": "discussion",
+    "answer_length": "medium",
+    "experience_level": [
+      "beginner",
+      "experienced"
+    ],
+    "audience": [
+      "general"
+    ],
+    "group_familiarity": [
+      "new-group",
+      "friends"
+    ],
+    "sensitivity": "low",
+    "credit": {
+      "name": "Anonymous",
+      "display": false
+    },
+    "source": "original",
+    "status": "approved",
+    "active": true,
+    "added_to_catalog_at": "2026-08-01T00:00:00Z",
+    "updated_at": "2026-08-01T00:00:00Z",
+    "content_version": 1
+  },
+  {
+    "card_uuid": "b3660e2f-97e7-4ed1-8cf3-cfa9ace5a026",
+    "type": "question",
+    "content": {
+      "prompt": "What gear did you finally stop packing?"
+    },
+    "categories": [
+      "gear"
+    ],
+    "editions": [
+      "core"
+    ],
+    "visual": {
+      "primary_category": "gear"
+    },
+    "response_style": "discussion",
+    "answer_length": "medium",
+    "experience_level": [
+      "beginner",
+      "experienced"
+    ],
+    "audience": [
+      "general"
+    ],
+    "group_familiarity": [
+      "new-group",
+      "friends"
+    ],
+    "sensitivity": "low",
+    "credit": {
+      "name": "Anonymous",
+      "display": false
+    },
+    "source": "original",
+    "status": "approved",
+    "active": true,
+    "added_to_catalog_at": "2026-08-01T00:00:00Z",
+    "updated_at": "2026-08-01T00:00:00Z",
+    "content_version": 1
+  },
+  {
+    "card_uuid": "8bcf4b08-0844-45de-b18a-bec5f6aeaab8",
+    "type": "question",
+    "content": {
+      "prompt": "If you had $5,000 for your rig, what would you change first?"
+    },
+    "categories": [
+      "gear"
+    ],
+    "editions": [
+      "core"
+    ],
+    "visual": {
+      "primary_category": "gear"
+    },
+    "response_style": "discussion",
+    "answer_length": "medium",
+    "experience_level": [
+      "beginner",
+      "experienced"
+    ],
+    "audience": [
+      "general"
+    ],
+    "group_familiarity": [
+      "new-group",
+      "friends"
+    ],
+    "sensitivity": "low",
+    "credit": {
+      "name": "Anonymous",
+      "display": false
+    },
+    "source": "original",
+    "status": "approved",
+    "active": true,
+    "added_to_catalog_at": "2026-08-01T00:00:00Z",
+    "updated_at": "2026-08-01T00:00:00Z",
+    "content_version": 1
+  },
+  {
+    "card_uuid": "95f0be66-2958-4876-9dec-d43af6e72853",
+    "type": "story",
+    "content": {
+      "prompt": "Tell us about your worst stuck."
+    },
+    "categories": [
+      "story-time"
+    ],
+    "editions": [
+      "core",
+      "recovery"
+    ],
+    "visual": {
+      "primary_category": "story-time"
+    },
+    "response_style": "story",
+    "answer_length": "long",
+    "experience_level": [
+      "beginner",
+      "experienced"
+    ],
+    "audience": [
+      "general"
+    ],
+    "group_familiarity": [
+      "new-group",
+      "friends"
+    ],
+    "sensitivity": "low",
+    "credit": {
+      "name": "Anonymous",
+      "display": false
+    },
+    "source": "original",
+    "status": "approved",
+    "active": true,
+    "added_to_catalog_at": "2026-08-01T00:00:00Z",
+    "updated_at": "2026-08-01T00:00:00Z",
+    "content_version": 1
+  },
+  {
+    "card_uuid": "562704b8-42ff-4027-bf47-09c431439be3",
+    "type": "story",
+    "content": {
+      "prompt": "What trip will you still be talking about twenty years from now?"
+    },
+    "categories": [
+      "story-time"
+    ],
+    "editions": [
+      "core",
+      "campfire"
+    ],
+    "visual": {
+      "primary_category": "story-time"
+    },
+    "response_style": "story",
+    "answer_length": "long",
+    "experience_level": [
+      "beginner",
+      "experienced"
+    ],
+    "audience": [
+      "general"
+    ],
+    "group_familiarity": [
+      "new-group",
+      "friends"
+    ],
+    "sensitivity": "low",
+    "credit": {
+      "name": "Anonymous",
+      "display": false
+    },
+    "source": "original",
+    "status": "approved",
+    "active": true,
+    "added_to_catalog_at": "2026-08-01T00:00:00Z",
+    "updated_at": "2026-08-01T00:00:00Z",
+    "content_version": 1
+  },
+  {
+    "card_uuid": "025cca1e-c047-4ab6-9085-8a094495253c",
+    "type": "story",
+    "content": {
+      "prompt": "What is the closest you have come to calling for help?"
+    },
+    "categories": [
+      "story-time"
+    ],
+    "editions": [
+      "recovery",
+      "campfire"
+    ],
+    "visual": {
+      "primary_category": "story-time"
+    },
+    "response_style": "story",
+    "answer_length": "long",
+    "experience_level": [
+      "beginner",
+      "experienced"
+    ],
+    "audience": [
+      "general"
+    ],
+    "group_familiarity": [
+      "new-group",
+      "friends"
+    ],
+    "sensitivity": "low",
+    "credit": {
+      "name": "Anonymous",
+      "display": false
+    },
+    "source": "original",
+    "status": "approved",
+    "active": true,
+    "added_to_catalog_at": "2026-08-01T00:00:00Z",
+    "updated_at": "2026-08-01T00:00:00Z",
+    "content_version": 1
+  },
+  {
+    "card_uuid": "fa91453c-68f5-4618-a545-046ef667cb8b",
+    "type": "story",
+    "content": {
+      "prompt": "What was your most surprising campsite?"
+    },
+    "categories": [
+      "story-time"
+    ],
+    "editions": [
+      "core",
+      "campfire"
+    ],
+    "visual": {
+      "primary_category": "story-time"
+    },
+    "response_style": "story",
+    "answer_length": "long",
+    "experience_level": [
+      "beginner",
+      "experienced"
+    ],
+    "audience": [
+      "general"
+    ],
+    "group_familiarity": [
+      "new-group",
+      "friends"
+    ],
+    "sensitivity": "low",
+    "credit": {
+      "name": "Anonymous",
+      "display": false
+    },
+    "source": "original",
+    "status": "approved",
+    "active": true,
+    "added_to_catalog_at": "2026-08-01T00:00:00Z",
+    "updated_at": "2026-08-01T00:00:00Z",
+    "content_version": 1
+  },
+  {
+    "card_uuid": "76c1aac7-4276-4c80-b694-627f404adbc5",
+    "type": "story",
+    "content": {
+      "prompt": "Tell us about a trip you had to abandon."
+    },
+    "categories": [
+      "story-time"
+    ],
+    "editions": [
+      "recovery",
+      "campfire"
+    ],
+    "visual": {
+      "primary_category": "story-time"
+    },
+    "response_style": "story",
+    "answer_length": "long",
+    "experience_level": [
+      "beginner",
+      "experienced"
+    ],
+    "audience": [
+      "general"
+    ],
+    "group_familiarity": [
+      "new-group",
+      "friends"
+    ],
+    "sensitivity": "low",
+    "credit": {
+      "name": "Anonymous",
+      "display": false
+    },
+    "source": "original",
+    "status": "approved",
+    "active": true,
+    "added_to_catalog_at": "2026-08-01T00:00:00Z",
+    "updated_at": "2026-08-01T00:00:00Z",
+    "content_version": 1
+  },
+  {
+    "card_uuid": "b7e073cf-869f-438e-9544-9f3d68cf4001",
+    "type": "story",
+    "content": {
+      "prompt": "Who taught you the most about camping or off-roading?"
+    },
+    "categories": [
+      "story-time"
+    ],
+    "editions": [
+      "core",
+      "campfire"
+    ],
+    "visual": {
+      "primary_category": "story-time"
+    },
+    "response_style": "story",
+    "answer_length": "long",
+    "experience_level": [
+      "beginner",
+      "experienced"
+    ],
+    "audience": [
+      "general"
+    ],
+    "group_familiarity": [
+      "new-group",
+      "friends"
+    ],
+    "sensitivity": "low",
+    "credit": {
+      "name": "Anonymous",
+      "display": false
+    },
+    "source": "original",
+    "status": "approved",
+    "active": true,
+    "added_to_catalog_at": "2026-08-01T00:00:00Z",
+    "updated_at": "2026-08-01T00:00:00Z",
+    "content_version": 1
+  },
+  {
+    "card_uuid": "1208bc14-3c92-483d-af05-e2ab06d9c980",
+    "type": "story",
+    "content": {
+      "prompt": "What is your proudest overlanding accomplishment?"
+    },
+    "categories": [
+      "story-time"
+    ],
+    "editions": [
+      "core",
+      "campfire"
+    ],
+    "visual": {
+      "primary_category": "story-time"
+    },
+    "response_style": "story",
+    "answer_length": "long",
+    "experience_level": [
+      "beginner",
+      "experienced"
+    ],
+    "audience": [
+      "general"
+    ],
+    "group_familiarity": [
+      "new-group",
+      "friends"
+    ],
+    "sensitivity": "low",
+    "credit": {
+      "name": "Anonymous",
+      "display": false
+    },
+    "source": "original",
+    "status": "approved",
+    "active": true,
+    "added_to_catalog_at": "2026-08-01T00:00:00Z",
+    "updated_at": "2026-08-01T00:00:00Z",
+    "content_version": 1
+  },
+  {
+    "card_uuid": "fc0b0b80-042a-4cac-904f-ac9f46b09634",
+    "type": "story",
+    "content": {
+      "prompt": "What is the funniest thing that happened on a trip?"
+    },
+    "categories": [
+      "story-time"
+    ],
+    "editions": [
+      "core",
+      "campfire"
+    ],
+    "visual": {
+      "primary_category": "story-time"
+    },
+    "response_style": "story",
+    "answer_length": "long",
+    "experience_level": [
+      "beginner",
+      "experienced"
+    ],
+    "audience": [
+      "general"
+    ],
+    "group_familiarity": [
+      "new-group",
+      "friends"
+    ],
+    "sensitivity": "low",
+    "credit": {
+      "name": "Anonymous",
+      "display": false
+    },
+    "source": "original",
+    "status": "approved",
+    "active": true,
+    "added_to_catalog_at": "2026-08-01T00:00:00Z",
+    "updated_at": "2026-08-01T00:00:00Z",
+    "content_version": 1
+  },
+  {
+    "card_uuid": "3f2d39ba-9bd3-46d0-b554-378eb557b2d8",
+    "type": "lightning",
+    "content": {
+      "prompt": "Tent or hammock?"
+    },
+    "categories": [
+      "lightning"
+    ],
+    "editions": [
+      "core",
+      "campfire"
+    ],
+    "visual": {
+      "primary_category": "lightning"
+    },
+    "response_style": "quick",
+    "answer_length": "short",
+    "experience_level": [
+      "beginner",
+      "experienced"
+    ],
+    "audience": [
+      "general"
+    ],
+    "group_familiarity": [
+      "new-group",
+      "friends"
+    ],
+    "sensitivity": "low",
+    "credit": {
+      "name": "Anonymous",
+      "display": false
+    },
+    "source": "original",
+    "status": "approved",
+    "active": true,
+    "added_to_catalog_at": "2026-08-01T00:00:00Z",
+    "updated_at": "2026-08-01T00:00:00Z",
+    "content_version": 1
+  },
+  {
+    "card_uuid": "02565f42-3784-4efe-a319-4a69b151e953",
+    "type": "lightning",
+    "content": {
+      "prompt": "Sunrise or sunset?"
+    },
+    "categories": [
+      "lightning"
+    ],
+    "editions": [
+      "core",
+      "campfire"
+    ],
+    "visual": {
+      "primary_category": "lightning"
+    },
+    "response_style": "quick",
+    "answer_length": "short",
+    "experience_level": [
+      "beginner",
+      "experienced"
+    ],
+    "audience": [
+      "general"
+    ],
+    "group_familiarity": [
+      "new-group",
+      "friends"
+    ],
+    "sensitivity": "low",
+    "credit": {
+      "name": "Anonymous",
+      "display": false
+    },
+    "source": "original",
+    "status": "approved",
+    "active": true,
+    "added_to_catalog_at": "2026-08-01T00:00:00Z",
+    "updated_at": "2026-08-01T00:00:00Z",
+    "content_version": 1
+  },
+  {
+    "card_uuid": "ac95df25-0eb9-417c-9519-945f570f6ab3",
+    "type": "lightning",
+    "content": {
+      "prompt": "Maps or GPS?"
+    },
+    "categories": [
+      "lightning"
+    ],
+    "editions": [
+      "core"
+    ],
+    "visual": {
+      "primary_category": "lightning"
+    },
+    "response_style": "quick",
+    "answer_length": "short",
+    "experience_level": [
+      "beginner",
+      "experienced"
+    ],
+    "audience": [
+      "general"
+    ],
+    "group_familiarity": [
+      "new-group",
+      "friends"
+    ],
+    "sensitivity": "low",
+    "credit": {
+      "name": "Anonymous",
+      "display": false
+    },
+    "source": "original",
+    "status": "approved",
+    "active": true,
+    "added_to_catalog_at": "2026-08-01T00:00:00Z",
+    "updated_at": "2026-08-01T00:00:00Z",
+    "content_version": 1
+  },
+  {
+    "card_uuid": "cd37dcad-6c9f-4812-9828-db17829e59fd",
+    "type": "lightning",
+    "content": {
+      "prompt": "Snow or sand?"
+    },
+    "categories": [
+      "lightning"
+    ],
+    "editions": [
+      "core"
+    ],
+    "visual": {
+      "primary_category": "lightning"
+    },
+    "response_style": "quick",
+    "answer_length": "short",
+    "experience_level": [
+      "beginner",
+      "experienced"
+    ],
+    "audience": [
+      "general"
+    ],
+    "group_familiarity": [
+      "new-group",
+      "friends"
+    ],
+    "sensitivity": "low",
+    "credit": {
+      "name": "Anonymous",
+      "display": false
+    },
+    "source": "original",
+    "status": "approved",
+    "active": true,
+    "added_to_catalog_at": "2026-08-01T00:00:00Z",
+    "updated_at": "2026-08-01T00:00:00Z",
+    "content_version": 1
+  },
+  {
+    "card_uuid": "82866252-aacd-43fd-bc18-a936ba14f421",
+    "type": "lightning",
+    "content": {
+      "prompt": "Mountains or desert?"
+    },
+    "categories": [
+      "lightning"
+    ],
+    "editions": [
+      "core"
+    ],
+    "visual": {
+      "primary_category": "lightning"
+    },
+    "response_style": "quick",
+    "answer_length": "short",
+    "experience_level": [
+      "beginner",
+      "experienced"
+    ],
+    "audience": [
+      "general"
+    ],
+    "group_familiarity": [
+      "new-group",
+      "friends"
+    ],
+    "sensitivity": "low",
+    "credit": {
+      "name": "Anonymous",
+      "display": false
+    },
+    "source": "original",
+    "status": "approved",
+    "active": true,
+    "added_to_catalog_at": "2026-08-01T00:00:00Z",
+    "updated_at": "2026-08-01T00:00:00Z",
+    "content_version": 1
+  },
+  {
+    "card_uuid": "3d331818-4506-4c87-849c-90f16d994f92",
+    "type": "lightning",
+    "content": {
+      "prompt": "Winch or traction boards?"
+    },
+    "categories": [
+      "lightning"
+    ],
+    "editions": [
+      "core",
+      "recovery"
+    ],
+    "visual": {
+      "primary_category": "lightning"
+    },
+    "response_style": "quick",
+    "answer_length": "short",
+    "experience_level": [
+      "beginner",
+      "experienced"
+    ],
+    "audience": [
+      "general"
+    ],
+    "group_familiarity": [
+      "new-group",
+      "friends"
+    ],
+    "sensitivity": "low",
+    "credit": {
+      "name": "Anonymous",
+      "display": false
+    },
+    "source": "original",
+    "status": "approved",
+    "active": true,
+    "added_to_catalog_at": "2026-08-01T00:00:00Z",
+    "updated_at": "2026-08-01T00:00:00Z",
+    "content_version": 1
+  },
+  {
+    "card_uuid": "bc51ab72-e03c-496f-a241-d4c006484ec3",
+    "type": "lightning",
+    "content": {
+      "prompt": "Coffee or hot chocolate?"
+    },
+    "categories": [
+      "lightning"
+    ],
+    "editions": [
+      "core",
+      "campfire"
+    ],
+    "visual": {
+      "primary_category": "lightning"
+    },
+    "response_style": "quick",
+    "answer_length": "short",
+    "experience_level": [
+      "beginner",
+      "experienced"
+    ],
+    "audience": [
+      "general"
+    ],
+    "group_familiarity": [
+      "new-group",
+      "friends"
+    ],
+    "sensitivity": "low",
+    "credit": {
+      "name": "Anonymous",
+      "display": false
+    },
+    "source": "original",
+    "status": "approved",
+    "active": true,
+    "added_to_catalog_at": "2026-08-01T00:00:00Z",
+    "updated_at": "2026-08-01T00:00:00Z",
+    "content_version": 1
+  },
+  {
+    "card_uuid": "65c0832a-1547-42af-b317-be0cceaa4589",
+    "type": "lightning",
+    "content": {
+      "prompt": "Early start or sleep in?"
+    },
+    "categories": [
+      "lightning"
+    ],
+    "editions": [
+      "core"
+    ],
+    "visual": {
+      "primary_category": "lightning"
+    },
+    "response_style": "quick",
+    "answer_length": "short",
+    "experience_level": [
+      "beginner",
+      "experienced"
+    ],
+    "audience": [
+      "general"
+    ],
+    "group_familiarity": [
+      "new-group",
+      "friends"
+    ],
+    "sensitivity": "low",
+    "credit": {
+      "name": "Anonymous",
+      "display": false
+    },
+    "source": "original",
+    "status": "approved",
+    "active": true,
+    "added_to_catalog_at": "2026-08-01T00:00:00Z",
+    "updated_at": "2026-08-01T00:00:00Z",
+    "content_version": 1
+  },
+  {
+    "card_uuid": "f360b78e-b320-4c80-9cf5-7b4c807e83d6",
+    "type": "wildcard",
+    "content": {
+      "prompt": "Reverse Order",
+      "instruction": "Start with the tail gunner and work toward the lead vehicle."
+    },
+    "categories": [
+      "wildcard"
+    ],
+    "editions": [
+      "core"
+    ],
+    "visual": {
+      "primary_category": "wildcard"
+    },
+    "response_style": "challenge",
+    "answer_length": "short",
+    "experience_level": [
+      "beginner",
+      "experienced"
+    ],
+    "audience": [
+      "general"
+    ],
+    "group_familiarity": [
+      "new-group",
+      "friends"
+    ],
+    "sensitivity": "low",
+    "credit": {
+      "name": "Anonymous",
+      "display": false
+    },
+    "source": "original",
+    "status": "approved",
+    "active": true,
+    "added_to_catalog_at": "2026-08-01T00:00:00Z",
+    "updated_at": "2026-08-01T00:00:00Z",
+    "content_version": 1
+  },
+  {
+    "card_uuid": "d5cffe91-051e-4279-a9b6-dc94867da9e7",
+    "type": "wildcard",
+    "content": {
+      "prompt": "Everyone Answers",
+      "instruction": "No passes. Every vehicle gives an answer."
+    },
+    "categories": [
+      "wildcard"
+    ],
+    "editions": [
+      "core"
+    ],
+    "visual": {
+      "primary_category": "wildcard"
+    },
+    "response_style": "challenge",
+    "answer_length": "short",
+    "experience_level": [
+      "beginner",
+      "experienced"
+    ],
+    "audience": [
+      "general"
+    ],
+    "group_familiarity": [
+      "new-group",
+      "friends"
+    ],
+    "sensitivity": "low",
+    "credit": {
+      "name": "Anonymous",
+      "display": false
+    },
+    "source": "original",
+    "status": "approved",
+    "active": true,
+    "added_to_catalog_at": "2026-08-01T00:00:00Z",
+    "updated_at": "2026-08-01T00:00:00Z",
+    "content_version": 1
+  },
+  {
+    "card_uuid": "1bf3439e-8011-4535-8dbf-b3abb00770ee",
+    "type": "wildcard",
+    "content": {
+      "prompt": "Driver's Choice",
+      "instruction": "The lead driver chooses who answers first."
+    },
+    "categories": [
+      "wildcard"
+    ],
+    "editions": [
+      "core"
+    ],
+    "visual": {
+      "primary_category": "wildcard"
+    },
+    "response_style": "challenge",
+    "answer_length": "short",
+    "experience_level": [
+      "beginner",
+      "experienced"
+    ],
+    "audience": [
+      "general"
+    ],
+    "group_familiarity": [
+      "new-group",
+      "friends"
+    ],
+    "sensitivity": "low",
+    "credit": {
+      "name": "Anonymous",
+      "display": false
+    },
+    "source": "original",
+    "status": "approved",
+    "active": true,
+    "added_to_catalog_at": "2026-08-01T00:00:00Z",
+    "updated_at": "2026-08-01T00:00:00Z",
+    "content_version": 1
+  },
+  {
+    "card_uuid": "c6d37974-6be5-4efa-ba38-cce949d3c895",
+    "type": "wildcard",
+    "content": {
+      "prompt": "Tell the Whole Story",
+      "instruction": "The next answer cannot be summarized. Tell the full story."
+    },
+    "categories": [
+      "wildcard"
+    ],
+    "editions": [
+      "campfire"
+    ],
+    "visual": {
+      "primary_category": "wildcard"
+    },
+    "response_style": "challenge",
+    "answer_length": "long",
+    "experience_level": [
+      "beginner",
+      "experienced"
+    ],
+    "audience": [
+      "general"
+    ],
+    "group_familiarity": [
+      "new-group",
+      "friends"
+    ],
+    "sensitivity": "low",
+    "credit": {
+      "name": "Anonymous",
+      "display": false
+    },
+    "source": "original",
+    "status": "approved",
+    "active": true,
+    "added_to_catalog_at": "2026-08-01T00:00:00Z",
+    "updated_at": "2026-08-01T00:00:00Z",
+    "content_version": 1
+  },
+  {
+    "card_uuid": "c4be9fc7-a714-4638-b0cd-e19f9264ee21",
+    "type": "wildcard",
+    "content": {
+      "prompt": "One More Card",
+      "instruction": "Draw another card immediately after this one."
+    },
+    "categories": [
+      "wildcard"
+    ],
+    "editions": [
+      "core"
+    ],
+    "visual": {
+      "primary_category": "wildcard"
+    },
+    "response_style": "challenge",
+    "answer_length": "short",
+    "experience_level": [
+      "beginner",
+      "experienced"
+    ],
+    "audience": [
+      "general"
+    ],
+    "group_familiarity": [
+      "new-group",
+      "friends"
+    ],
+    "sensitivity": "low",
+    "credit": {
+      "name": "Anonymous",
+      "display": false
+    },
+    "source": "original",
+    "status": "approved",
+    "active": true,
+    "added_to_catalog_at": "2026-08-01T00:00:00Z",
+    "updated_at": "2026-08-01T00:00:00Z",
+    "content_version": 1
+  },
+  {
+    "card_uuid": "3db0afa4-9571-4658-93a3-65c5bc890848",
+    "type": "wildcard",
+    "content": {
+      "prompt": "Tail Gunner's Choice",
+      "instruction": "The tail gunner chooses the next category."
+    },
+    "categories": [
+      "wildcard"
+    ],
+    "editions": [
+      "core"
+    ],
+    "visual": {
+      "primary_category": "wildcard"
+    },
+    "response_style": "challenge",
+    "answer_length": "short",
+    "experience_level": [
+      "beginner",
+      "experienced"
+    ],
+    "audience": [
+      "general"
+    ],
+    "group_familiarity": [
+      "new-group",
+      "friends"
+    ],
+    "sensitivity": "low",
+    "credit": {
+      "name": "Anonymous",
+      "display": false
+    },
+    "source": "original",
+    "status": "approved",
+    "active": true,
+    "added_to_catalog_at": "2026-08-01T00:00:00Z",
+    "updated_at": "2026-08-01T00:00:00Z",
+    "content_version": 1
+  },
+  {
+    "card_uuid": "00751f94-d30a-43cd-8187-239fb5326655",
+    "type": "wildcard",
+    "content": {
+      "prompt": "Thirty Seconds",
+      "instruction": "Everyone must answer the next prompt in thirty seconds or less."
+    },
+    "categories": [
+      "wildcard"
+    ],
+    "editions": [
+      "core"
+    ],
+    "visual": {
+      "primary_category": "wildcard"
+    },
+    "response_style": "challenge",
+    "answer_length": "short",
+    "experience_level": [
+      "beginner",
+      "experienced"
+    ],
+    "audience": [
+      "general"
+    ],
+    "group_familiarity": [
+      "new-group",
+      "friends"
+    ],
+    "sensitivity": "low",
+    "credit": {
+      "name": "Anonymous",
+      "display": false
+    },
+    "source": "original",
+    "status": "approved",
+    "active": true,
+    "added_to_catalog_at": "2026-08-01T00:00:00Z",
+    "updated_at": "2026-08-01T00:00:00Z",
+    "content_version": 1
+  },
+  {
+    "card_uuid": "ab199cc6-c058-4c0c-a58b-05d3dfff417a",
+    "type": "wildcard",
+    "content": {
+      "prompt": "No Repeats",
+      "instruction": "No one may repeat an answer already given."
+    },
+    "categories": [
+      "wildcard"
+    ],
+    "editions": [
+      "core"
+    ],
+    "visual": {
+      "primary_category": "wildcard"
+    },
+    "response_style": "challenge",
+    "answer_length": "short",
+    "experience_level": [
+      "beginner",
+      "experienced"
+    ],
+    "audience": [
+      "general"
+    ],
+    "group_familiarity": [
+      "new-group",
+      "friends"
+    ],
+    "sensitivity": "low",
+    "credit": {
+      "name": "Anonymous",
+      "display": false
+    },
+    "source": "original",
+    "status": "approved",
+    "active": true,
+    "added_to_catalog_at": "2026-08-01T00:00:00Z",
+    "updated_at": "2026-08-01T00:00:00Z",
+    "content_version": 1
+  }
+]
