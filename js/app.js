@@ -1,1 +1,355 @@
-const state={cards:[],categories:[],editions:[],generated:[],manifest:null};const byId=id=>document.getElementById(id);async function loadData(){const[cards,categories,editions]=await Promise.all([fetch("data/cards.json").then(r=>r.json()),fetch("data/categories.json").then(r=>r.json()),fetch("data/editions.json").then(r=>r.json())]);state.cards=cards;state.categories=categories;state.editions=editions;renderOptions()}function renderOptions(){const e=byId("edition-options"),c=byId("category-options");state.editions.filter(x=>x.active).forEach((x,i)=>e.insertAdjacentHTML("beforeend",`<label class="option"><input type="checkbox" name="edition" value="${x.id}" ${i===0?"checked":""}><span>${x.name}</span></label>`));state.categories.filter(x=>x.active).forEach(x=>c.insertAdjacentHTML("beforeend",`<label class="option"><input type="checkbox" name="category" value="${x.id}" checked><span>${x.icon} ${x.name}</span></label>`))}function selectedValues(n){return[...document.querySelectorAll(`input[name="${n}"]:checked`)].map(x=>x.value)}function xmur3(t){let h=1779033703^t.length;for(let i=0;i<t.length;i++){h=Math.imul(h^t.charCodeAt(i),3432918353);h=h<<13|h>>>19}return function(){h=Math.imul(h^h>>>16,2246822507);h=Math.imul(h^h>>>13,3266489909);return(h^=h>>>16)>>>0}}function mulberry32(s){return function(){let t=s+=0x6D2B79F5;t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return((t^t>>>14)>>>0)/4294967296}}function seededShuffle(items,seedText){const random=mulberry32(xmur3(seedText)()),copy=[...items];for(let i=copy.length-1;i>0;i--){const j=Math.floor(random()*(i+1));[copy[i],copy[j]]=[copy[j],copy[i]]}return copy}function randomCode(length=6){const a="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";let r="";crypto.getRandomValues(new Uint32Array(length)).forEach(n=>r+=a[n%a.length]);return r}function generateDeck(){const editions=selectedValues("edition"),categories=selectedValues("category"),requested=Number(byId("deck-size").value),seed=byId("seed").value.trim()||"convoy-demo";if(!editions.length||!categories.length){byId("status").textContent="Select at least one edition and one category.";return}const eligible=state.cards.filter(card=>card.active&&card.status==="approved"&&card.editions.some(x=>editions.includes(x))&&card.categories.some(x=>categories.includes(x)));const chosen=seededShuffle(eligible,seed).slice(0,Math.min(requested,eligible.length));const deckCode=randomCode(4),deckUuid=crypto.randomUUID();state.generated=chosen.map((card,index)=>({deck_position:index+1,...card}));state.manifest={deck_uuid:deckUuid,deck_code:deckCode,generated_at:new Date().toISOString(),seed,generator_version:"0.1.0",catalog_version:"2026.08.01",configuration:{editions,categories,requested_card_count:requested,playable_card_count:chosen.length},cards:state.generated.map(card=>({deck_position:card.deck_position,card_uuid:card.card_uuid,content_version:card.content_version,content_snapshot:card.content}))};byId("status").textContent=chosen.length<requested?`Only ${chosen.length} eligible cards were available.`:`Generated ${chosen.length} playable cards.`;renderSummary();renderOutput()}function categoryFor(card){return state.categories.find(x=>x.id===card.visual.primary_category)}function renderSummary(){const el=byId("deck-summary"),m=state.manifest;el.hidden=false;el.innerHTML=`<strong>Deck ${m.deck_code}</strong> · ${m.configuration.playable_card_count} playable cards · Seed <code>${escapeHtml(m.seed)}</code> · Generator ${m.generator_version}`}function renderOutput(){const mode=byId("output-mode").value,out=byId("output");out.innerHTML="";if(mode==="list"){const list=document.createElement("div");list.className="quick-list";state.generated.forEach(card=>{const cat=categoryFor(card);list.insertAdjacentHTML("beforeend",`<article class="list-item"><div class="list-meta">${state.manifest.deck_code} · ${card.deck_position}/${state.generated.length}<br>${cat.icon} ${cat.name}</div><p class="list-prompt"><strong>${escapeHtml(card.content.prompt)}</strong>${card.content.instruction?`<br>${escapeHtml(card.content.instruction)}`:""}</p></article>`)});out.appendChild(list);return}const fronts=document.createElement("div");fronts.className="card-grid";state.generated.forEach(card=>{const cat=categoryFor(card);fronts.insertAdjacentHTML("beforeend",`<article class="play-card"><div class="punch-safe" title="Optional hole-punch safe area"></div><div class="card-band" style="background:${cat.color}"><span>${cat.name}</span><span>${cat.icon}</span></div><div class="card-body"><div><div class="card-icon">${cat.icon}</div><p class="card-prompt">${escapeHtml(card.content.prompt)}</p>${card.content.instruction?`<p class="card-instruction">${escapeHtml(card.content.instruction)}</p>`:""}</div></div><div class="card-footer"><span>${state.manifest.deck_code}</span><span>${card.deck_position}/${state.generated.length}</span></div></article>`)});state.generated.forEach(()=>fronts.insertAdjacentHTML("beforeend",`<article class="play-card card-back"><div class="punch-safe" title="Optional hole-punch safe area"></div><div class="card-body"><div><h3>CONVOY<br>CONVERSATIONS</h3><p>Stories from the Trail</p><p>Overlanding Atlas</p></div></div></article>`));out.appendChild(fronts)}function escapeHtml(v){return String(v).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;")}function downloadManifest(){if(!state.manifest){byId("status").textContent="Generate a deck first.";return}const blob=new Blob([JSON.stringify(state.manifest,null,2)],{type:"application/json"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download=`convoy-${state.manifest.deck_code}-manifest.json`;a.click();URL.revokeObjectURL(url)}byId("generate").addEventListener("click",generateDeck);byId("random-seed").addEventListener("click",()=>byId("seed").value=randomCode(10));byId("print").addEventListener("click",()=>window.print());byId("download-manifest").addEventListener("click",downloadManifest);byId("output-mode").addEventListener("change",()=>{if(state.generated.length)renderOutput()});loadData().catch(error=>{console.error(error);byId("status").textContent="Could not load JSON. Run this folder through a small local web server; see README.md."});
+const state = {
+  cards: [],
+  categories: [],
+  editions: [],
+  generated: [],
+  manifest: null,
+};
+const byId = (id) => document.getElementById(id);
+async function loadData() {
+  const [cards, categories, editions] = await Promise.all([
+    fetch("data/cards.json").then((r) => r.json()),
+    fetch("data/categories.json").then((r) => r.json()),
+    fetch("data/editions.json").then((r) => r.json()),
+  ]);
+  state.cards = cards;
+  state.categories = categories;
+  state.editions = editions;
+  renderOptions();
+}
+function renderOptions() {
+  const e = byId("edition-options"),
+    c = byId("category-options");
+  state.editions
+    .filter((x) => x.active)
+    .forEach((x, i) =>
+      e.insertAdjacentHTML(
+        "beforeend",
+        `<label class="option"><input type="checkbox" name="edition" value="${x.id}" ${i === 0 ? "checked" : ""}><span>${x.name}</span></label>`,
+      ),
+    );
+  state.categories
+    .filter((x) => x.active)
+    .forEach((x) =>
+      c.insertAdjacentHTML(
+        "beforeend",
+        `<label class="option"><input type="checkbox" name="category" value="${x.id}" checked><span>${x.icon} ${x.name}</span></label>`,
+      ),
+    );
+}
+function selectedValues(n) {
+  return [...document.querySelectorAll(`input[name="${n}"]:checked`)].map(
+    (x) => x.value,
+  );
+}
+function xmur3(t) {
+  let h = 1779033703 ^ t.length;
+  for (let i = 0; i < t.length; i++) {
+    h = Math.imul(h ^ t.charCodeAt(i), 3432918353);
+    h = (h << 13) | (h >>> 19);
+  }
+  return function () {
+    h = Math.imul(h ^ (h >>> 16), 2246822507);
+    h = Math.imul(h ^ (h >>> 13), 3266489909);
+    return (h ^= h >>> 16) >>> 0;
+  };
+}
+function mulberry32(s) {
+  return function () {
+    let t = (s += 0x6d2b79f5);
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+function seededShuffle(items, seedText) {
+  const random = mulberry32(xmur3(seedText)()),
+    copy = [...items];
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy;
+}
+function randomCode(length = 6) {
+  const a = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  let r = "";
+  crypto
+    .getRandomValues(new Uint32Array(length))
+    .forEach((n) => (r += a[n % a.length]));
+  return r;
+}
+function generateDeck() {
+  const editions = selectedValues("edition"),
+    categories = selectedValues("category"),
+    requested = Number(byId("deck-size").value),
+    seed = byId("seed").value.trim() || "convoy-demo";
+  if (!editions.length || !categories.length) {
+    byId("status").textContent =
+      "Select at least one edition and one category.";
+    return;
+  }
+  const eligible = state.cards.filter(
+    (card) =>
+      card.active &&
+      card.status === "approved" &&
+      card.editions.some((x) => editions.includes(x)) &&
+      card.categories.some((x) => categories.includes(x)),
+  );
+  const chosen = seededShuffle(eligible, seed).slice(
+    0,
+    Math.min(requested, eligible.length),
+  );
+  const deckCode = randomCode(4),
+    deckUuid = crypto.randomUUID();
+  state.generated = chosen.map((card, index) => ({
+    deck_position: index + 1,
+    ...card,
+  }));
+  state.manifest = {
+    deck_uuid: deckUuid,
+    deck_code: deckCode,
+    generated_at: new Date().toISOString(),
+    seed,
+    generator_version: "0.1.0",
+    catalog_version: "2026.08.01",
+    configuration: {
+      editions,
+      categories,
+      requested_card_count: requested,
+      playable_card_count: chosen.length,
+    },
+    cards: state.generated.map((card) => ({
+      deck_position: card.deck_position,
+      card_uuid: card.card_uuid,
+      content_version: card.content_version,
+      content_snapshot: card.content,
+    })),
+  };
+  byId("status").textContent =
+    chosen.length < requested
+      ? `Only ${chosen.length} eligible cards were available.`
+      : `Generated ${chosen.length} playable cards.`;
+  renderSummary();
+  renderOutput();
+}
+function categoryFor(card) {
+  return state.categories.find((x) => x.id === card.visual.primary_category);
+}
+function renderSummary() {
+  const el = byId("deck-summary"),
+    m = state.manifest;
+  el.hidden = false;
+  el.innerHTML = `<strong>Deck ${m.deck_code}</strong> · ${m.configuration.playable_card_count} playable cards · Seed <code>${escapeHtml(m.seed)}</code> · Generator ${m.generator_version}`;
+}
+function renderOutput() {
+  const mode = byId("output-mode").value;
+  const out = byId("output");
+
+  out.innerHTML = "";
+
+  if (mode === "list") {
+    const list = document.createElement("div");
+    list.className = "quick-list";
+
+    state.generated.forEach((card) => {
+      const cat = categoryFor(card);
+
+      list.insertAdjacentHTML(
+        "beforeend",
+        `
+          <article class="list-item">
+            <div class="list-meta">
+              ${state.manifest.deck_code} ·
+              ${card.deck_position}/${state.generated.length}
+              <br>
+              ${cat.icon} ${cat.name}
+            </div>
+
+            <p class="list-prompt">
+              <strong>${escapeHtml(card.content.prompt)}</strong>
+              ${
+                card.content.instruction
+                  ? `<br>${escapeHtml(card.content.instruction)}`
+                  : ""
+              }
+            </p>
+          </article>
+        `,
+      );
+    });
+
+    out.appendChild(list);
+    return;
+  }
+
+  const cardsPerPage = 6;
+  const cardGroups = chunkArray(state.generated, cardsPerPage);
+
+  cardGroups.forEach((cards, groupIndex) => {
+    const firstPosition = cards[0].deck_position;
+    const lastPosition = cards[cards.length - 1].deck_position;
+
+    /*
+     * Front page
+     */
+    const frontPage = document.createElement("section");
+    frontPage.className = "print-page front-page";
+    frontPage.dataset.pageType = "front";
+    frontPage.dataset.cardRange = `${firstPosition}-${lastPosition}`;
+
+    const frontGrid = document.createElement("div");
+    frontGrid.className = "card-grid";
+
+    cards.forEach((card) => {
+      const cat = categoryFor(card);
+
+      frontGrid.insertAdjacentHTML(
+        "beforeend",
+        `
+          <article class="play-card card-front">
+            <div
+              class="punch-safe punch-safe-front"
+              title="Optional hole-punch safe area"
+            ></div>
+
+            <div
+              class="card-band"
+              style="background: ${cat.color}"
+            >
+              <span class="category-icon">${cat.icon}</span>
+              <span class="category-name">${cat.name}</span>
+            </div>
+
+            <div class="card-body">
+              <div>
+                <div class="card-icon">${cat.icon}</div>
+
+                <p class="card-prompt">
+                  ${escapeHtml(card.content.prompt)}
+                </p>
+
+                ${
+                  card.content.instruction
+                    ? `
+                      <p class="card-instruction">
+                        ${escapeHtml(card.content.instruction)}
+                      </p>
+                    `
+                    : ""
+                }
+              </div>
+            </div>
+
+            <div class="card-footer">
+              <span>
+                ${state.manifest.deck_code}
+                ·
+                ${card.deck_position}/${state.generated.length}
+              </span>
+            </div>
+          </article>
+        `,
+      );
+    });
+
+    frontPage.appendChild(frontGrid);
+    out.appendChild(frontPage);
+
+    /*
+     * Matching back page
+     */
+    const backPage = document.createElement("section");
+    backPage.className = "print-page back-page";
+    backPage.dataset.pageType = "back";
+    backPage.dataset.cardRange = `${firstPosition}-${lastPosition}`;
+
+    const backGrid = document.createElement("div");
+    backGrid.className = "card-grid";
+
+    cards.forEach(() => {
+      backGrid.insertAdjacentHTML(
+        "beforeend",
+        `
+          <article class="play-card card-back">
+            <div
+              class="punch-safe punch-safe-back"
+              title="Optional hole-punch safe area"
+            ></div>
+
+            <div class="card-back-content">
+              <div class="trail-talk-compass" aria-hidden="true">
+                ✥
+              </div>
+
+              <h3>TRAIL TALK</h3>
+
+              <p class="card-back-tagline">
+                Real Questions. Real Connections.
+              </p>
+
+              <div class="trail-line" aria-hidden="true">
+                - - - - - - - - - - 🚩
+              </div>
+
+              <p class="card-back-brand">
+                Overlanding Atlas
+              </p>
+            </div>
+          </article>
+        `,
+      );
+    });
+
+    backPage.appendChild(backGrid);
+    out.appendChild(backPage);
+  });
+}
+
+function chunkArray(items, chunkSize) {
+  const chunks = [];
+
+  for (let index = 0; index < items.length; index += chunkSize) {
+    chunks.push(items.slice(index, index + chunkSize));
+  }
+
+  return chunks;
+}
+function escapeHtml(v) {
+  return String(v)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+function downloadManifest() {
+  if (!state.manifest) {
+    byId("status").textContent = "Generate a deck first.";
+    return;
+  }
+  const blob = new Blob([JSON.stringify(state.manifest, null, 2)], {
+      type: "application/json",
+    }),
+    url = URL.createObjectURL(blob),
+    a = document.createElement("a");
+  a.href = url;
+  a.download = `convoy-${state.manifest.deck_code}-manifest.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+byId("generate").addEventListener("click", generateDeck);
+byId("random-seed").addEventListener(
+  "click",
+  () => (byId("seed").value = randomCode(10)),
+);
+byId("print").addEventListener("click", () => window.print());
+byId("download-manifest").addEventListener("click", downloadManifest);
+byId("output-mode").addEventListener("change", () => {
+  if (state.generated.length) renderOutput();
+});
+loadData().catch((error) => {
+  console.error(error);
+  byId("status").textContent =
+    "Could not load JSON. Run this folder through a small local web server; see README.md.";
+});
