@@ -1,9 +1,4 @@
-import {
-  chunkArray,
-  escapeHtml,
-  randomCode,
-  seededShuffle,
-} from "./utils.js";
+import { chunkArray, escapeHtml, randomCode, seededShuffle } from "./utils.js";
 
 const state = {
   cards: [],
@@ -155,14 +150,20 @@ function renderFrontCard(card) {
     </article>
   `;
 }
-function renderBackCard() {
+function renderBackCard({ showPunchGuide = true } = {}) {
   return `
     <article class="play-card card-back">
 
-      <div
-        class="punch-safe punch-safe-back"
-        title="Optional hole-punch safe area"
-      ></div>
+        ${
+          showPunchGuide
+            ? `
+            <div
+                class="punch-safe punch-safe-back"
+                title="Optional hole-punch safe area"
+            ></div>
+            `
+            : ""
+        }
 
       <div class="card-back-content">
 
@@ -195,6 +196,27 @@ function renderBackCard() {
     </article>
   `;
 }
+function renderPreviewCard(card) {
+  return `
+    <div
+      class="preview-card"
+      role="button"
+      tabindex="0"
+      aria-pressed="false"
+      aria-label="Flip card ${card.deck_position} to view the back"
+    >
+      <div class="preview-card-inner">
+        <div class="preview-card-side preview-card-front">
+          ${renderFrontCard(card)}
+        </div>
+
+        <div class="preview-card-side preview-card-back">
+          ${renderBackCard({ showPunchGuide: false })}
+        </div>
+      </div>
+    </div>
+  `;
+}
 function renderSummary() {
   const el = byId("deck-summary"),
     m = state.manifest;
@@ -224,13 +246,33 @@ function renderPreview() {
   state.generated.forEach((card) => {
     previewGrid.insertAdjacentHTML(
       "beforeend",
-      renderFrontCard(card),
+      renderPreviewCard(card),
     );
   });
 
   out.appendChild(previewGrid);
-}
 
+  previewGrid.querySelectorAll(".preview-card").forEach((cardElement) => {
+  cardElement.addEventListener("click", () => {
+    togglePreviewCard(cardElement);
+  });
+
+  cardElement.addEventListener("keydown", (event) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      togglePreviewCard(cardElement);
+    }
+  });
+});
+}
+function togglePreviewCard(cardElement) {
+  const isFlipped = cardElement.classList.toggle("is-flipped");
+
+  cardElement.setAttribute(
+    "aria-pressed",
+    String(isFlipped),
+  );
+}
 function renderQuickList(container) {
   const list = document.createElement("div");
   list.className = "quick-list";
@@ -295,10 +337,7 @@ function renderPrintOutput() {
     frontGrid.className = "card-grid";
 
     cards.forEach((card) => {
-      frontGrid.insertAdjacentHTML(
-        "beforeend",
-        renderFrontCard(card),
-      );
+      frontGrid.insertAdjacentHTML("beforeend", renderFrontCard(card));
     });
 
     frontPage.appendChild(frontGrid);
@@ -316,10 +355,7 @@ function renderPrintOutput() {
     backGrid.className = "card-grid";
 
     cards.forEach(() => {
-      backGrid.insertAdjacentHTML(
-        "beforeend",
-        renderBackCard(),
-      );
+      backGrid.insertAdjacentHTML("beforeend", renderBackCard());
     });
 
     backPage.appendChild(backGrid);
