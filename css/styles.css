@@ -106,13 +106,6 @@ button.primary {
 .status {
   min-height: 1.2em;
 }
-.deck-summary {
-  margin: 1rem 0;
-  padding: 0.9rem 1rem;
-  background: #fff8dc;
-  border: 1px solid #d4c48e;
-  border-radius: 10px;
-}
 .output {
   margin: 1rem auto 3rem;
 }
@@ -479,8 +472,7 @@ button.primary {
   }
 
   .site-header,
-  .controls,
-  .deck-summary {
+  .controls {
     display: none !important;
   }
 

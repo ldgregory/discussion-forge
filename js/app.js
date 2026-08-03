@@ -738,10 +738,6 @@ function clearGeneratedOutput() {
   state.generated = [];
   state.manifest = null;
 
-  const summary = requireElement("deck-summary");
-  summary.hidden = true;
-  summary.replaceChildren();
-
   requireElement("preview-output").replaceChildren();
   requireElement("print-output").replaceChildren();
 }
@@ -880,7 +876,6 @@ async function generateDeck() {
         : `Generated ${chosen.length} playable cards.`,
     );
 
-    renderSummary();
     renderOutput();
   } catch (error) {
     console.error(error);
@@ -1082,39 +1077,6 @@ function renderPreviewCard(card) {
   wrapper.appendChild(inner);
 
   return wrapper;
-}
-
-function renderSummary() {
-  const element = requireElement("deck-summary");
-
-  const manifest = state.manifest;
-
-  if (!manifest) {
-    element.hidden = true;
-    element.replaceChildren();
-
-    return;
-  }
-
-  const strong = document.createElement("strong");
-
-  strong.textContent = `Deck ${manifest.deck_id}`;
-
-  const seedCode = document.createElement("code");
-
-  seedCode.textContent = manifest.seed;
-
-  element.replaceChildren(
-    strong,
-    document.createTextNode(
-      ` · ${manifest.configuration.playable_card_count}` +
-        " playable cards · Seed ",
-    ),
-    seedCode,
-    document.createTextNode(` · Generator ${manifest.generator_version}`),
-  );
-
-  element.hidden = false;
 }
 
 function renderOutput() {
