@@ -1,6 +1,5 @@
-export const charcoalTrailTheme = {
+export const charcoalTrailTheme = Object.freeze({
   id: "charcoal-trail",
   name: "Charcoal Trail",
   backClass: "theme-charcoal-trail",
-  stylesheet: "css/themes/charcoal-trail.css",
-};
+});

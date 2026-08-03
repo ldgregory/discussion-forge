@@ -1,3 +1,11 @@
+## Security
+
+Trail Talk follows Secure by Design principles.
+
+See SECURITY.md for security architecture, trust boundaries,
+and development requirements.
+  and before release.
+
 ## Version 0.2 Design Decisions
 
 Printing

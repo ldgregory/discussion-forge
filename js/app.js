@@ -7,7 +7,7 @@ import {
 import {
   getTheme,
   themes,
-} from "./themes/index.js";
+} from "../themes/index.js";
 
 const LIMITS = Object.freeze({
   maxCards: 5000,
