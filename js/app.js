@@ -36,6 +36,44 @@ const ALLOWED_CARD_STATUSES = new Set([
   "retired",
 ]);
 
+const ALLOWED_RESPONSE_STYLES = new Set([
+  "discussion",
+  "story",
+  "quick",
+  "challenge",
+]);
+
+const ALLOWED_ANSWER_LENGTHS = new Set([
+  "short",
+  "medium",
+  "long",
+]);
+
+const ALLOWED_EXPERIENCE_LEVELS = new Set([
+  "beginner",
+  "experienced",
+]);
+
+const ALLOWED_AUDIENCES = new Set([
+  "general",
+]);
+
+const ALLOWED_GROUP_FAMILIARITY = new Set([
+  "new-group",
+  "friends",
+]);
+
+const ALLOWED_SENSITIVITY_LEVELS = new Set([
+  "low",
+  "medium",
+  "high",
+]);
+
+const ALLOWED_SOURCES = new Set([
+  "original",
+  "community",
+]);
+
 const ID_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
 const UUID_PATTERN =
@@ -188,6 +226,51 @@ function requireStringArray(
   );
 }
 
+function requireAllowedStringArray(
+  value,
+  fieldName,
+  allowedValues,
+) {
+  const items = requireStringArray(
+    value,
+    fieldName,
+    {
+      maxItems: allowedValues.size,
+      itemPattern: ID_PATTERN,
+    },
+  );
+
+  items.forEach((item) => {
+    if (!allowedValues.has(item)) {
+      throw new TypeError(
+        `${fieldName} contains an unsupported value: "${item}".`,
+      );
+    }
+  });
+
+  return items;
+}
+
+function requireIsoTimestamp(value, fieldName) {
+  const timestamp = requireString(
+    value,
+    fieldName,
+    {
+      maxLength: 40,
+    },
+  );
+
+  const parsed = new Date(timestamp);
+
+  if (Number.isNaN(parsed.getTime())) {
+    throw new TypeError(
+      `${fieldName} must be a valid ISO timestamp.`,
+    );
+  }
+
+  return parsed;
+}
+
 function requireCatalogArray(
   value,
   catalogName,
@@ -317,6 +400,11 @@ function validateCard(rawCard, index) {
     `cards[${index}].visual`,
   );
 
+  const credit = requireObject(
+    card.credit,
+    `cards[${index}].credit`,
+  );
+
   const type = requireString(
     card.type,
     `cards[${index}].type`,
@@ -344,6 +432,100 @@ function validateCard(rawCard, index) {
   if (!ALLOWED_CARD_STATUSES.has(status)) {
     throw new TypeError(
       `cards[${index}].status contains an unsupported status.`,
+    );
+  }
+
+  const responseStyle = requireString(
+    card.response_style,
+    `cards[${index}].response_style`,
+    {
+      maxLength: 32,
+      pattern: ID_PATTERN,
+    },
+  );
+
+  if (!ALLOWED_RESPONSE_STYLES.has(responseStyle)) {
+    throw new TypeError(
+      `cards[${index}].response_style contains an unsupported value.`,
+    );
+  }
+
+  const answerLength = requireString(
+    card.answer_length,
+    `cards[${index}].answer_length`,
+    {
+      maxLength: 32,
+      pattern: ID_PATTERN,
+    },
+  );
+
+  if (!ALLOWED_ANSWER_LENGTHS.has(answerLength)) {
+    throw new TypeError(
+      `cards[${index}].answer_length contains an unsupported value.`,
+    );
+  }
+
+  const sensitivity = requireString(
+    card.sensitivity,
+    `cards[${index}].sensitivity`,
+    {
+      maxLength: 32,
+      pattern: ID_PATTERN,
+    },
+  );
+
+  if (!ALLOWED_SENSITIVITY_LEVELS.has(sensitivity)) {
+    throw new TypeError(
+      `cards[${index}].sensitivity contains an unsupported value.`,
+    );
+  }
+
+  const source = requireString(
+    card.source,
+    `cards[${index}].source`,
+    {
+      maxLength: 32,
+      pattern: ID_PATTERN,
+    },
+  );
+
+  if (!ALLOWED_SOURCES.has(source)) {
+    throw new TypeError(
+      `cards[${index}].source contains an unsupported value.`,
+    );
+  }
+
+  const experienceLevel = requireAllowedStringArray(
+    card.experience_level,
+    `cards[${index}].experience_level`,
+    ALLOWED_EXPERIENCE_LEVELS,
+  );
+
+  const audience = requireAllowedStringArray(
+    card.audience,
+    `cards[${index}].audience`,
+    ALLOWED_AUDIENCES,
+  );
+
+  const groupFamiliarity = requireAllowedStringArray(
+    card.group_familiarity,
+    `cards[${index}].group_familiarity`,
+    ALLOWED_GROUP_FAMILIARITY,
+  );
+
+  const addedAt = requireIsoTimestamp(
+    card.added_to_catalog_at,
+    `cards[${index}].added_to_catalog_at`,
+  );
+
+  const updatedAt = requireIsoTimestamp(
+    card.updated_at,
+    `cards[${index}].updated_at`,
+  );
+
+  if (updatedAt < addedAt) {
+    throw new RangeError(
+      `cards[${index}].updated_at cannot be earlier than added_to_catalog_at.`,
     );
   }
 
@@ -406,12 +588,38 @@ function validateCard(rawCard, index) {
       ),
     },
 
+    response_style: responseStyle,
+    answer_length: answerLength,
+    experience_level: experienceLevel,
+    audience,
+    group_familiarity: groupFamiliarity,
+    sensitivity,
+
+    credit: {
+      name: requireString(
+        credit.name,
+        `cards[${index}].credit.name`,
+        {
+          maxLength: LIMITS.maxDisplayNameLength,
+        },
+      ),
+
+      display: requireBoolean(
+        credit.display,
+        `cards[${index}].credit.display`,
+      ),
+    },
+
+    source,
     status,
 
     active: requireBoolean(
       card.active,
       `cards[${index}].active`,
     ),
+
+    added_to_catalog_at: addedAt.toISOString(),
+    updated_at: updatedAt.toISOString(),
 
     content_version: requirePositiveInteger(
       card.content_version,
