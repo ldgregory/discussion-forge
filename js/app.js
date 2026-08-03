@@ -14,6 +14,9 @@ const GENERATOR_VERSION = "0.2.0-alpha3";
 const CATALOG_VERSION = "2026.08.01";
 const HUMAN_DECK_ID_LENGTH = 10;
 
+const THEME_STYLESHEET_ID =
+  "active-theme-stylesheet";
+
 const LIMITS = Object.freeze({
   maxCards: 5000,
   maxCategories: 100,
@@ -583,6 +586,7 @@ async function loadData() {
   state.categories = categories;
   state.editions = editions;
 
+  loadThemeStylesheet(state.themeId);
   renderOptions();
   renderThemeOptions();
 }
@@ -650,6 +654,33 @@ function requireTheme(themeId) {
   return theme;
 }
 
+function loadThemeStylesheet(themeId) {
+  const theme = requireTheme(themeId);
+
+  let stylesheet = document.getElementById(
+    THEME_STYLESHEET_ID,
+  );
+
+  if (!stylesheet) {
+    stylesheet =
+      document.createElement("link");
+
+    stylesheet.id = THEME_STYLESHEET_ID;
+    stylesheet.rel = "stylesheet";
+
+    document.head.appendChild(stylesheet);
+  }
+
+  if (
+    stylesheet.getAttribute("href") ===
+    theme.stylesheet
+  ) {
+    return;
+  }
+
+  stylesheet.href = theme.stylesheet;
+}
+
 function validateThemeDefinition(theme) {
   if (!isPlainObject(theme)) {
     return false;
@@ -662,7 +693,16 @@ function validateThemeDefinition(theme) {
     theme.name.length > 0 &&
     theme.name.length <= LIMITS.maxDisplayNameLength &&
     typeof theme.className === "string" &&
-    ID_PATTERN.test(theme.className)
+    ID_PATTERN.test(theme.className) &&
+    typeof theme.stylesheet === "string" &&
+    theme.stylesheet.length > 0 &&
+    theme.stylesheet.length <= 200 &&
+    theme.stylesheet.startsWith("themes/") &&
+    theme.stylesheet.endsWith("/theme.css") &&
+    !theme.stylesheet.includes("..") &&
+    !theme.stylesheet.includes("\\") &&
+    !theme.stylesheet.includes(":") &&
+    !theme.stylesheet.startsWith("/")
   );
 }
 
@@ -1400,32 +1440,42 @@ requireElement("output-mode").addEventListener("change", () => {
   }
 });
 
-requireElement("theme").addEventListener("change", (event) => {
-  const requestedThemeId = event.target.value;
+requireElement("theme").addEventListener(
+  "change",
+  (event) => {
+    const requestedThemeId =
+      event.target.value;
 
-  const selectedTheme = getTheme(requestedThemeId);
+    try {
+      const selectedTheme =
+        requireTheme(requestedThemeId);
 
-  if (
-    !validateThemeDefinition(selectedTheme) ||
-    selectedTheme.id !== requestedThemeId
-  ) {
-    setStatus("The selected theme is not available.");
+      state.themeId = selectedTheme.id;
 
-    event.target.value = state.themeId;
+      loadThemeStylesheet(
+        state.themeId,
+      );
 
-    return;
-  }
+      if (state.manifest) {
+        state.manifest.configuration.theme =
+          state.themeId;
+      }
 
-  state.themeId = selectedTheme.id;
+      if (state.generated.length > 0) {
+        renderOutput();
+      }
+    } catch (error) {
+      console.error(error);
 
-  if (state.manifest) {
-    state.manifest.configuration.theme = state.themeId;
-  }
+      setStatus(
+        "The selected theme is not available.",
+      );
 
-  if (state.generated.length > 0) {
-    renderOutput();
-  }
-});
+      event.target.value =
+        state.themeId;
+    }
+  },
+);
 
 loadData().catch((error) => {
   console.error(error);
