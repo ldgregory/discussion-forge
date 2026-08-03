@@ -1,0 +1,36 @@
+.card-back.theme-trail-blue {
+  background:
+    repeating-radial-gradient(
+      ellipse at center,
+      transparent 0 10px,
+      rgb(255 255 255 / 14%) 11px 12px
+    ),
+    #173b63;
+}
+
+.card-back.theme-trail-blue .trail-talk-compass,
+.card-back.theme-trail-blue .trail-line,
+.card-back.theme-trail-blue h3,
+.card-back.theme-trail-blue .card-back-tagline,
+.card-back.theme-trail-blue .card-back-brand {
+  color: white;
+}
+
+/*
+ * Category colors
+ */
+.category-gear {
+  background-color: #3f6b45;
+}
+
+.category-story-time {
+  background-color: #76528b;
+}
+
+.category-lightning {
+  background-color: #59636e;
+}
+
+.category-wildcard {
+  background-color: #a33a2b;
+}

@@ -106,13 +106,6 @@ button.primary {
 .status {
   min-height: 1.2em;
 }
-.deck-summary {
-  margin: 1rem 0;
-  padding: 0.9rem 1rem;
-  background: #fff8dc;
-  border: 1px solid #d4c48e;
-  border-radius: 10px;
-}
 .output {
   margin: 1rem auto 3rem;
 }
@@ -352,12 +345,28 @@ button.primary {
 .preview-card {
   width: 2.4in;
   height: 3.4in;
+
+  perspective: 1000px;
+  cursor: pointer;
+
+  filter: drop-shadow(
+    0 4px 7px rgb(0 0 0 / 18%)
+  );
+
+  transition:
+    transform 0.15s ease,
+    filter 0.15s ease;
 }
 
 .preview-card:hover,
 .preview-card:focus-visible {
   transform: translateY(-4px);
   filter: drop-shadow(0 9px 12px rgb(0 0 0 / 25%));
+}
+
+.preview-card:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 4px;
 }
 
 .preview-card-inner {
@@ -463,8 +472,7 @@ button.primary {
   }
 
   .site-header,
-  .controls,
-  .deck-summary {
+  .controls {
     display: none !important;
   }
 
