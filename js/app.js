@@ -1,13 +1,18 @@
 import {
+  bytesToHex,
   chunkArray,
+  encodeBase32,
   randomCode,
   seededShuffle,
+  sha256Bytes,
 } from "./utils.js";
 
-import {
-  getTheme,
-  themes,
-} from "../themes/index.js";
+import { getTheme, themes } from "../themes/index.js";
+
+const DECK_IDENTITY_VERSION = 1;
+const GENERATOR_VERSION = "0.2.0-alpha3";
+const CATALOG_VERSION = "2026.08.01";
+const HUMAN_DECK_ID_LENGTH = 10;
 
 const LIMITS = Object.freeze({
   maxCards: 5000,
@@ -43,36 +48,17 @@ const ALLOWED_RESPONSE_STYLES = new Set([
   "challenge",
 ]);
 
-const ALLOWED_ANSWER_LENGTHS = new Set([
-  "short",
-  "medium",
-  "long",
-]);
+const ALLOWED_ANSWER_LENGTHS = new Set(["short", "medium", "long"]);
 
-const ALLOWED_EXPERIENCE_LEVELS = new Set([
-  "beginner",
-  "experienced",
-]);
+const ALLOWED_EXPERIENCE_LEVELS = new Set(["beginner", "experienced"]);
 
-const ALLOWED_AUDIENCES = new Set([
-  "general",
-]);
+const ALLOWED_AUDIENCES = new Set(["general"]);
 
-const ALLOWED_GROUP_FAMILIARITY = new Set([
-  "new-group",
-  "friends",
-]);
+const ALLOWED_GROUP_FAMILIARITY = new Set(["new-group", "friends"]);
 
-const ALLOWED_SENSITIVITY_LEVELS = new Set([
-  "low",
-  "medium",
-  "high",
-]);
+const ALLOWED_SENSITIVITY_LEVELS = new Set(["low", "medium", "high"]);
 
-const ALLOWED_SOURCES = new Set([
-  "original",
-  "community",
-]);
+const ALLOWED_SOURCES = new Set(["original", "community"]);
 
 const ID_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
@@ -109,11 +95,7 @@ function setStatus(message) {
 }
 
 function isPlainObject(value) {
-  return (
-    typeof value === "object" &&
-    value !== null &&
-    !Array.isArray(value)
-  );
+  return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
 function requireObject(value, fieldName) {
@@ -127,11 +109,7 @@ function requireObject(value, fieldName) {
 function requireString(
   value,
   fieldName,
-  {
-    minLength = 1,
-    maxLength = 500,
-    pattern = null,
-  } = {},
+  { minLength = 1, maxLength = 500, pattern = null } = {},
 ) {
   if (typeof value !== "string") {
     throw new TypeError(`${fieldName} must be a string.`);
@@ -146,9 +124,7 @@ function requireString(
   }
 
   if (normalized.length > maxLength) {
-    throw new RangeError(
-      `${fieldName} cannot exceed ${maxLength} characters.`,
-    );
+    throw new RangeError(`${fieldName} cannot exceed ${maxLength} characters.`);
   }
 
   if (pattern && !pattern.test(normalized)) {
@@ -158,13 +134,7 @@ function requireString(
   return normalized;
 }
 
-function optionalString(
-  value,
-  fieldName,
-  {
-    maxLength = 500,
-  } = {},
-) {
+function optionalString(value, fieldName, { maxLength = 500 } = {}) {
   if (value === undefined || value === null || value === "") {
     return null;
   }
@@ -194,10 +164,7 @@ function requirePositiveInteger(value, fieldName) {
 function requireStringArray(
   value,
   fieldName,
-  {
-    maxItems = 100,
-    itemPattern = null,
-  } = {},
+  { maxItems = 100, itemPattern = null } = {},
 ) {
   if (!Array.isArray(value)) {
     throw new TypeError(`${fieldName} must be an array.`);
@@ -214,31 +181,19 @@ function requireStringArray(
   }
 
   return value.map((item, index) =>
-    requireString(
-      item,
-      `${fieldName}[${index}]`,
-      {
-        minLength: 1,
-        maxLength: 100,
-        pattern: itemPattern,
-      },
-    ),
+    requireString(item, `${fieldName}[${index}]`, {
+      minLength: 1,
+      maxLength: 100,
+      pattern: itemPattern,
+    }),
   );
 }
 
-function requireAllowedStringArray(
-  value,
-  fieldName,
-  allowedValues,
-) {
-  const items = requireStringArray(
-    value,
-    fieldName,
-    {
-      maxItems: allowedValues.size,
-      itemPattern: ID_PATTERN,
-    },
-  );
+function requireAllowedStringArray(value, fieldName, allowedValues) {
+  const items = requireStringArray(value, fieldName, {
+    maxItems: allowedValues.size,
+    itemPattern: ID_PATTERN,
+  });
 
   items.forEach((item) => {
     if (!allowedValues.has(item)) {
@@ -252,30 +207,20 @@ function requireAllowedStringArray(
 }
 
 function requireIsoTimestamp(value, fieldName) {
-  const timestamp = requireString(
-    value,
-    fieldName,
-    {
-      maxLength: 40,
-    },
-  );
+  const timestamp = requireString(value, fieldName, {
+    maxLength: 40,
+  });
 
   const parsed = new Date(timestamp);
 
   if (Number.isNaN(parsed.getTime())) {
-    throw new TypeError(
-      `${fieldName} must be a valid ISO timestamp.`,
-    );
+    throw new TypeError(`${fieldName} must be a valid ISO timestamp.`);
   }
 
   return parsed;
 }
 
-function requireCatalogArray(
-  value,
-  catalogName,
-  maxItems,
-) {
+function requireCatalogArray(value, catalogName, maxItems) {
   if (!Array.isArray(value)) {
     throw new TypeError(`${catalogName} must be an array.`);
   }
@@ -290,28 +235,17 @@ function requireCatalogArray(
 }
 
 function validateCategory(rawCategory, index) {
-  const category = requireObject(
-    rawCategory,
-    `categories[${index}]`,
-  );
+  const category = requireObject(rawCategory, `categories[${index}]`);
 
   return {
-    id: requireString(
-      category.id,
-      `categories[${index}].id`,
-      {
-        maxLength: 64,
-        pattern: ID_PATTERN,
-      },
-    ),
+    id: requireString(category.id, `categories[${index}].id`, {
+      maxLength: 64,
+      pattern: ID_PATTERN,
+    }),
 
-    name: requireString(
-      category.name,
-      `categories[${index}].name`,
-      {
-        maxLength: LIMITS.maxDisplayNameLength,
-      },
-    ),
+    name: requireString(category.name, `categories[${index}].name`, {
+      maxLength: LIMITS.maxDisplayNameLength,
+    }),
 
     short_name: optionalString(
       category.short_name,
@@ -321,53 +255,31 @@ function validateCategory(rawCategory, index) {
       },
     ),
 
-    icon: requireString(
-      category.icon,
-      `categories[${index}].icon`,
-      {
-        maxLength: LIMITS.maxIconLength,
-      },
-    ),
+    icon: requireString(category.icon, `categories[${index}].icon`, {
+      maxLength: LIMITS.maxIconLength,
+    }),
 
-    color: requireString(
-      category.color,
-      `categories[${index}].color`,
-      {
-        maxLength: 7,
-        pattern: HEX_COLOR_PATTERN,
-      },
-    ),
+    color: requireString(category.color, `categories[${index}].color`, {
+      maxLength: 7,
+      pattern: HEX_COLOR_PATTERN,
+    }),
 
-    active: requireBoolean(
-      category.active,
-      `categories[${index}].active`,
-    ),
+    active: requireBoolean(category.active, `categories[${index}].active`),
   };
 }
 
 function validateEdition(rawEdition, index) {
-  const edition = requireObject(
-    rawEdition,
-    `editions[${index}]`,
-  );
+  const edition = requireObject(rawEdition, `editions[${index}]`);
 
   return {
-    id: requireString(
-      edition.id,
-      `editions[${index}].id`,
-      {
-        maxLength: 64,
-        pattern: ID_PATTERN,
-      },
-    ),
+    id: requireString(edition.id, `editions[${index}].id`, {
+      maxLength: 64,
+      pattern: ID_PATTERN,
+    }),
 
-    name: requireString(
-      edition.name,
-      `editions[${index}].name`,
-      {
-        maxLength: LIMITS.maxDisplayNameLength,
-      },
-    ),
+    name: requireString(edition.name, `editions[${index}].name`, {
+      maxLength: LIMITS.maxDisplayNameLength,
+    }),
 
     description: optionalString(
       edition.description,
@@ -377,42 +289,23 @@ function validateEdition(rawEdition, index) {
       },
     ),
 
-    active: requireBoolean(
-      edition.active,
-      `editions[${index}].active`,
-    ),
+    active: requireBoolean(edition.active, `editions[${index}].active`),
   };
 }
 
 function validateCard(rawCard, index) {
-  const card = requireObject(
-    rawCard,
-    `cards[${index}]`,
-  );
+  const card = requireObject(rawCard, `cards[${index}]`);
 
-  const content = requireObject(
-    card.content,
-    `cards[${index}].content`,
-  );
+  const content = requireObject(card.content, `cards[${index}].content`);
 
-  const visual = requireObject(
-    card.visual,
-    `cards[${index}].visual`,
-  );
+  const visual = requireObject(card.visual, `cards[${index}].visual`);
 
-  const credit = requireObject(
-    card.credit,
-    `cards[${index}].credit`,
-  );
+  const credit = requireObject(card.credit, `cards[${index}].credit`);
 
-  const type = requireString(
-    card.type,
-    `cards[${index}].type`,
-    {
-      maxLength: 32,
-      pattern: ID_PATTERN,
-    },
-  );
+  const type = requireString(card.type, `cards[${index}].type`, {
+    maxLength: 32,
+    pattern: ID_PATTERN,
+  });
 
   if (!ALLOWED_CARD_TYPES.has(type)) {
     throw new TypeError(
@@ -420,14 +313,10 @@ function validateCard(rawCard, index) {
     );
   }
 
-  const status = requireString(
-    card.status,
-    `cards[${index}].status`,
-    {
-      maxLength: 32,
-      pattern: ID_PATTERN,
-    },
-  );
+  const status = requireString(card.status, `cards[${index}].status`, {
+    maxLength: 32,
+    pattern: ID_PATTERN,
+  });
 
   if (!ALLOWED_CARD_STATUSES.has(status)) {
     throw new TypeError(
@@ -480,14 +369,10 @@ function validateCard(rawCard, index) {
     );
   }
 
-  const source = requireString(
-    card.source,
-    `cards[${index}].source`,
-    {
-      maxLength: 32,
-      pattern: ID_PATTERN,
-    },
-  );
+  const source = requireString(card.source, `cards[${index}].source`, {
+    maxLength: 32,
+    pattern: ID_PATTERN,
+  });
 
   if (!ALLOWED_SOURCES.has(source)) {
     throw new TypeError(
@@ -530,25 +415,17 @@ function validateCard(rawCard, index) {
   }
 
   return {
-    card_uuid: requireString(
-      card.card_uuid,
-      `cards[${index}].card_uuid`,
-      {
-        maxLength: 36,
-        pattern: UUID_PATTERN,
-      },
-    ),
+    card_uuid: requireString(card.card_uuid, `cards[${index}].card_uuid`, {
+      maxLength: 36,
+      pattern: UUID_PATTERN,
+    }),
 
     type,
 
     content: {
-      prompt: requireString(
-        content.prompt,
-        `cards[${index}].content.prompt`,
-        {
-          maxLength: LIMITS.maxPromptLength,
-        },
-      ),
+      prompt: requireString(content.prompt, `cards[${index}].content.prompt`, {
+        maxLength: LIMITS.maxPromptLength,
+      }),
 
       instruction: optionalString(
         content.instruction,
@@ -568,14 +445,10 @@ function validateCard(rawCard, index) {
       },
     ),
 
-    editions: requireStringArray(
-      card.editions,
-      `cards[${index}].editions`,
-      {
-        maxItems: LIMITS.maxEditions,
-        itemPattern: ID_PATTERN,
-      },
-    ),
+    editions: requireStringArray(card.editions, `cards[${index}].editions`, {
+      maxItems: LIMITS.maxEditions,
+      itemPattern: ID_PATTERN,
+    }),
 
     visual: {
       primary_category: requireString(
@@ -596,27 +469,17 @@ function validateCard(rawCard, index) {
     sensitivity,
 
     credit: {
-      name: requireString(
-        credit.name,
-        `cards[${index}].credit.name`,
-        {
-          maxLength: LIMITS.maxDisplayNameLength,
-        },
-      ),
+      name: requireString(credit.name, `cards[${index}].credit.name`, {
+        maxLength: LIMITS.maxDisplayNameLength,
+      }),
 
-      display: requireBoolean(
-        credit.display,
-        `cards[${index}].credit.display`,
-      ),
+      display: requireBoolean(credit.display, `cards[${index}].credit.display`),
     },
 
     source,
     status,
 
-    active: requireBoolean(
-      card.active,
-      `cards[${index}].active`,
-    ),
+    active: requireBoolean(card.active, `cards[${index}].active`),
 
     added_to_catalog_at: addedAt.toISOString(),
     updated_at: updatedAt.toISOString(),
@@ -644,18 +507,10 @@ function assertUniqueIds(records, collectionName, keyName) {
   });
 }
 
-function validateCatalogRelationships(
-  cards,
-  categories,
-  editions,
-) {
-  const categoryIds = new Set(
-    categories.map((category) => category.id),
-  );
+function validateCatalogRelationships(cards, categories, editions) {
+  const categoryIds = new Set(categories.map((category) => category.id));
 
-  const editionIds = new Set(
-    editions.map((edition) => edition.id),
-  );
+  const editionIds = new Set(editions.map((edition) => edition.id));
 
   cards.forEach((card, index) => {
     card.categories.forEach((categoryId) => {
@@ -674,11 +529,7 @@ function validateCatalogRelationships(
       }
     });
 
-    if (
-      !card.categories.includes(
-        card.visual.primary_category,
-      )
-    ) {
+    if (!card.categories.includes(card.visual.primary_category)) {
       throw new Error(
         `cards[${index}].visual.primary_category must also appear in the card's categories array.`,
       );
@@ -693,20 +544,14 @@ async function fetchJson(path) {
   });
 
   if (!response.ok) {
-    throw new Error(
-      `Unable to load ${path}: HTTP ${response.status}.`,
-    );
+    throw new Error(`Unable to load ${path}: HTTP ${response.status}.`);
   }
 
   return response.json();
 }
 
 async function loadData() {
-  const [
-    rawCards,
-    rawCategories,
-    rawEditions,
-  ] = await Promise.all([
+  const [rawCards, rawCategories, rawEditions] = await Promise.all([
     fetchJson("data/cards.json"),
     fetchJson("data/categories.json"),
     fetchJson("data/editions.json"),
@@ -724,21 +569,15 @@ async function loadData() {
     LIMITS.maxEditions,
   ).map(validateEdition);
 
-  const cards = requireCatalogArray(
-    rawCards,
-    "cards",
-    LIMITS.maxCards,
-  ).map(validateCard);
+  const cards = requireCatalogArray(rawCards, "cards", LIMITS.maxCards).map(
+    validateCard,
+  );
 
   assertUniqueIds(categories, "categories", "id");
   assertUniqueIds(editions, "editions", "id");
   assertUniqueIds(cards, "cards", "card_uuid");
 
-  validateCatalogRelationships(
-    cards,
-    categories,
-    editions,
-  );
+  validateCatalogRelationships(cards, categories, editions);
 
   state.cards = cards;
   state.categories = categories;
@@ -748,12 +587,7 @@ async function loadData() {
   renderThemeOptions();
 }
 
-function createCheckboxOption({
-  name,
-  value,
-  labelText,
-  checked,
-}) {
+function createCheckboxOption({ name, value, labelText, checked }) {
   const label = document.createElement("label");
   label.className = "option";
 
@@ -772,11 +606,9 @@ function createCheckboxOption({
 }
 
 function renderOptions() {
-  const editionContainer =
-    requireElement("edition-options");
+  const editionContainer = requireElement("edition-options");
 
-  const categoryContainer =
-    requireElement("category-options");
+  const categoryContainer = requireElement("category-options");
 
   editionContainer.replaceChildren();
   categoryContainer.replaceChildren();
@@ -812,9 +644,7 @@ function requireTheme(themeId) {
   const theme = getTheme(themeId);
 
   if (!validateThemeDefinition(theme)) {
-    throw new Error(
-      `Unknown or invalid theme: ${themeId}`,
-    );
+    throw new Error(`Unknown or invalid theme: ${themeId}`);
   }
 
   return theme;
@@ -858,9 +688,7 @@ function renderThemeOptions() {
   const selectedTheme = getTheme(state.themeId);
 
   if (!validateThemeDefinition(selectedTheme)) {
-    throw new Error(
-      `Unknown or invalid initial theme: ${state.themeId}`,
-    );
+    throw new Error(`Unknown or invalid initial theme: ${state.themeId}`);
   }
 
   selector.value = selectedTheme.id;
@@ -868,31 +696,22 @@ function renderThemeOptions() {
 
 function selectedValues(name) {
   if (name !== "edition" && name !== "category") {
-    throw new Error(
-      `Unsupported option group requested: ${name}`,
-    );
+    throw new Error(`Unsupported option group requested: ${name}`);
   }
 
-  return [
-    ...document.querySelectorAll(
-      `input[name="${name}"]:checked`,
-    ),
-  ].map((input) => input.value);
+  return [...document.querySelectorAll(`input[name="${name}"]:checked`)].map(
+    (input) => input.value,
+  );
 }
 
 function validateDeckSize(rawValue) {
   const size = Number(rawValue);
 
   if (!Number.isInteger(size)) {
-    throw new TypeError(
-      "Deck size must be a whole number.",
-    );
+    throw new TypeError("Deck size must be a whole number.");
   }
 
-  if (
-    size < 1 ||
-    size > LIMITS.maxDeckSize
-  ) {
+  if (size < 1 || size > LIMITS.maxDeckSize) {
     throw new RangeError(
       `Deck size must be between 1 and ${LIMITS.maxDeckSize}.`,
     );
@@ -902,10 +721,7 @@ function validateDeckSize(rawValue) {
 }
 
 function validateSeed(rawSeed) {
-  const normalized =
-    typeof rawSeed === "string"
-      ? rawSeed.trim()
-      : "";
+  const normalized = typeof rawSeed === "string" ? rawSeed.trim() : "";
 
   const seed = normalized || "trailtalk-demo";
 
@@ -930,26 +746,62 @@ function clearGeneratedOutput() {
   requireElement("print-output").replaceChildren();
 }
 
-function generateDeck() {
+async function createDeckIdentity({
+  seed,
+  editions,
+  categories,
+  requestedCardCount,
+  cards,
+}) {
+  const identityPayload = {
+    identity_version: DECK_IDENTITY_VERSION,
+    generator_version: GENERATOR_VERSION,
+    catalog_version: CATALOG_VERSION,
+    seed,
+    editions: [...editions].sort(),
+    categories: [...categories].sort(),
+    requested_card_count: requestedCardCount,
+
+    /*
+     * Ordered card identities make the fingerprint
+     * describe the actual playable deck.
+     */
+    cards: cards.map((card) => ({
+      card_uuid: card.card_uuid,
+      content_version: card.content_version,
+    })),
+  };
+
+  /*
+   * Property order is intentionally fixed above, and
+   * set-like arrays are sorted before serialization.
+   */
+  const canonicalPayload = JSON.stringify(identityPayload);
+
+  const digest = await sha256Bytes(canonicalPayload);
+
+  const fingerprint = bytesToHex(digest);
+
+  const deckId = encodeBase32(digest).slice(0, HUMAN_DECK_ID_LENGTH);
+
+  return {
+    deckId,
+    fingerprint,
+    identityPayload,
+  };
+}
+
+async function generateDeck() {
   try {
     const editions = selectedValues("edition");
     const categories = selectedValues("category");
 
-    const requested = validateDeckSize(
-      requireElement("deck-size").value,
-    );
+    const requested = validateDeckSize(requireElement("deck-size").value);
 
-    const seed = validateSeed(
-      requireElement("seed").value,
-    );
+    const seed = validateSeed(requireElement("seed").value);
 
-    if (
-      editions.length === 0 ||
-      categories.length === 0
-    ) {
-      setStatus(
-        "Select at least one edition and one category.",
-      );
+    if (editions.length === 0 || categories.length === 0) {
+      setStatus("Select at least one edition and one category.");
 
       return;
     }
@@ -958,57 +810,56 @@ function generateDeck() {
       (card) =>
         card.active &&
         card.status === "approved" &&
-        card.editions.some((editionId) =>
-          editions.includes(editionId),
-        ) &&
-        card.categories.some((categoryId) =>
-          categories.includes(categoryId),
-        ),
+        card.editions.some((editionId) => editions.includes(editionId)) &&
+        card.categories.some((categoryId) => categories.includes(categoryId)),
     );
 
     if (eligible.length === 0) {
       clearGeneratedOutput();
 
-      setStatus(
-        "No cards match the selected editions and categories.",
-      );
+      setStatus("No cards match the selected editions and categories.");
 
       return;
     }
 
-    const chosen = seededShuffle(
-      eligible,
-      seed,
-    ).slice(
+    const chosen = seededShuffle(eligible, seed).slice(
       0,
       Math.min(requested, eligible.length),
     );
 
-    const deckCode = randomCode(4);
     const deckUuid = crypto.randomUUID();
 
-    state.generated = chosen.map(
-      (card, index) => ({
-        deck_position: index + 1,
-        ...card,
-      }),
-    );
+    const { deckId, fingerprint } = await createDeckIdentity({
+      seed,
+      editions,
+      categories,
+      requestedCardCount: requested,
+      cards: chosen,
+    });
+
+    state.generated = chosen.map((card, index) => ({
+      deck_position: index + 1,
+      ...card,
+    }));
 
     state.manifest = {
       deck_uuid: deckUuid,
-      deck_code: deckCode,
+      deck_id: deckId,
+      deck_fingerprint: fingerprint,
+      deck_identity_version: DECK_IDENTITY_VERSION,
+
       generated_at: new Date().toISOString(),
       seed,
-      generator_version: "0.1.0",
-      catalog_version: "2026.08.01",
+
+      generator_version: GENERATOR_VERSION,
+      catalog_version: CATALOG_VERSION,
 
       configuration: {
         editions: [...editions],
         categories: [...categories],
         theme: state.themeId,
         requested_card_count: requested,
-        playable_card_count:
-          state.generated.length,
+        playable_card_count: state.generated.length,
       },
 
       cards: state.generated.map((card) => ({
@@ -1018,8 +869,7 @@ function generateDeck() {
 
         content_snapshot: {
           prompt: card.content.prompt,
-          instruction:
-            card.content.instruction,
+          instruction: card.content.instruction,
         },
       })),
     };
@@ -1045,9 +895,7 @@ function generateDeck() {
 
 function categoryFor(card) {
   const category = state.categories.find(
-    (candidate) =>
-      candidate.id ===
-      card.visual.primary_category,
+    (candidate) => candidate.id === card.visual.primary_category,
   );
 
   if (!category) {
@@ -1059,39 +907,24 @@ function categoryFor(card) {
   return category;
 }
 
-function renderFrontCard(
-  card,
-  {
-    themeId = state.themeId,
-  } = {},
-) {
+function renderFrontCard(card, { themeId = state.themeId } = {}) {
   const category = categoryFor(card);
   const theme = requireTheme(themeId);
 
-  const article =
-    document.createElement("article");
+  const article = document.createElement("article");
 
-  article.classList.add(
-    "play-card",
-    "card-front",
-    theme.className,
-  );
+  article.classList.add("play-card", "card-front", theme.className);
 
   const band = document.createElement("div");
 
-  band.classList.add(
-    "card-band",
-    `category-${category.id}`,
-  );
+  band.classList.add("card-band", `category-${category.id}`);
 
-  const bandIcon =
-    document.createElement("span");
+  const bandIcon = document.createElement("span");
 
   bandIcon.className = "category-icon";
   bandIcon.textContent = category.icon;
 
-  const bandName =
-    document.createElement("span");
+  const bandName = document.createElement("span");
 
   bandName.className = "category-name";
   bandName.textContent = category.name;
@@ -1101,11 +934,9 @@ function renderFrontCard(
   const body = document.createElement("div");
   body.className = "card-body";
 
-  const bodyContent =
-    document.createElement("div");
+  const bodyContent = document.createElement("div");
 
-  const cardIcon =
-    document.createElement("div");
+  const cardIcon = document.createElement("div");
 
   cardIcon.className = "card-icon";
   cardIcon.textContent = category.icon;
@@ -1117,30 +948,25 @@ function renderFrontCard(
   bodyContent.append(cardIcon, prompt);
 
   if (card.content.instruction) {
-    const instruction =
-      document.createElement("p");
+    const instruction = document.createElement("p");
 
-    instruction.className =
-      "card-instruction";
+    instruction.className = "card-instruction";
 
-    instruction.textContent =
-      card.content.instruction;
+    instruction.textContent = card.content.instruction;
 
     bodyContent.appendChild(instruction);
   }
 
   body.appendChild(bodyContent);
 
-  const footer =
-    document.createElement("div");
+  const footer = document.createElement("div");
 
   footer.className = "card-footer";
 
-  const footerText =
-    document.createElement("span");
+  const footerText = document.createElement("span");
 
   footerText.textContent =
-    `${state.manifest.deck_code} · ` +
+    `${state.manifest.deck_id} · ` +
     `${card.deck_position}/` +
     `${state.generated.length}`;
 
@@ -1157,92 +983,61 @@ function renderBackCard({
 } = {}) {
   const theme = requireTheme(themeId);
 
-  const article =
-    document.createElement("article");
+  const article = document.createElement("article");
 
-  article.classList.add(
-    "play-card",
-    "card-back",
-    theme.className,
-  );
+  article.classList.add("play-card", "card-back", theme.className);
 
   if (showPunchGuide) {
-    const punchGuide =
-      document.createElement("div");
+    const punchGuide = document.createElement("div");
 
-    punchGuide.className =
-      "punch-safe punch-safe-back";
+    punchGuide.className = "punch-safe punch-safe-back";
 
-    punchGuide.title =
-      "Optional hole-punch safe area";
+    punchGuide.title = "Optional hole-punch safe area";
 
     article.appendChild(punchGuide);
   }
 
-  const content =
-    document.createElement("div");
+  const content = document.createElement("div");
 
   content.className = "card-back-content";
 
-  const compass =
-    document.createElement("div");
+  const compass = document.createElement("div");
 
   compass.className = "trail-talk-compass";
   compass.setAttribute("aria-hidden", "true");
   compass.textContent = "✥";
 
-  const heading =
-    document.createElement("h3");
+  const heading = document.createElement("h3");
 
   heading.textContent = "TRAIL TALK";
 
-  const tagline =
-    document.createElement("p");
+  const tagline = document.createElement("p");
 
   tagline.className = "card-back-tagline";
 
-  const taglineLineOne =
-    document.createElement("span");
+  const taglineLineOne = document.createElement("span");
 
-  taglineLineOne.textContent =
-    "Real Questions.";
+  taglineLineOne.textContent = "Real Questions.";
 
-  const taglineLineTwo =
-    document.createElement("span");
+  const taglineLineTwo = document.createElement("span");
 
-  taglineLineTwo.textContent =
-    "Real Connections.";
+  taglineLineTwo.textContent = "Real Connections.";
 
-  tagline.append(
-    taglineLineOne,
-    taglineLineTwo,
-  );
+  tagline.append(taglineLineOne, taglineLineTwo);
 
-  const trailLine =
-    document.createElement("div");
+  const trailLine = document.createElement("div");
 
   trailLine.className = "trail-line";
-  trailLine.setAttribute(
-    "aria-hidden",
-    "true",
-  );
+  trailLine.setAttribute("aria-hidden", "true");
 
-  trailLine.textContent =
-    "- - - - - - - - - - 🚩";
+  trailLine.textContent = "- - - - - - - - - - 🚩";
 
-  const brand =
-    document.createElement("p");
+  const brand = document.createElement("p");
 
   brand.className = "card-back-brand";
   brand.textContent = "Overlanding Atlas";
 
-  content.append(
-    compass,
-    heading,
-    tagline,
-    trailLine,
-    brand,
-  );
+  content.append(compass, heading, tagline, trailLine, brand);
 
   article.appendChild(content);
 
@@ -1250,43 +1045,32 @@ function renderBackCard({
 }
 
 function renderPreviewCard(card) {
-  const wrapper =
-    document.createElement("div");
+  const wrapper = document.createElement("div");
 
   wrapper.className = "preview-card";
   wrapper.setAttribute("role", "button");
   wrapper.tabIndex = 0;
 
-  wrapper.setAttribute(
-    "aria-pressed",
-    "false",
-  );
+  wrapper.setAttribute("aria-pressed", "false");
 
   wrapper.setAttribute(
     "aria-label",
     `Flip card ${card.deck_position} to view the back`,
   );
 
-  const inner =
-    document.createElement("div");
+  const inner = document.createElement("div");
 
   inner.className = "preview-card-inner";
 
-  const frontSide =
-    document.createElement("div");
+  const frontSide = document.createElement("div");
 
-  frontSide.className =
-    "preview-card-side preview-card-front";
+  frontSide.className = "preview-card-side preview-card-front";
 
-  frontSide.appendChild(
-    renderFrontCard(card),
-  );
+  frontSide.appendChild(renderFrontCard(card));
 
-  const backSide =
-    document.createElement("div");
+  const backSide = document.createElement("div");
 
-  backSide.className =
-    "preview-card-side preview-card-back";
+  backSide.className = "preview-card-side preview-card-back";
 
   backSide.appendChild(
     renderBackCard({
@@ -1301,8 +1085,7 @@ function renderPreviewCard(card) {
 }
 
 function renderSummary() {
-  const element =
-    requireElement("deck-summary");
+  const element = requireElement("deck-summary");
 
   const manifest = state.manifest;
 
@@ -1313,14 +1096,11 @@ function renderSummary() {
     return;
   }
 
-  const strong =
-    document.createElement("strong");
+  const strong = document.createElement("strong");
 
-  strong.textContent =
-    `Deck ${manifest.deck_code}`;
+  strong.textContent = `Deck ${manifest.deck_id}`;
 
-  const seedCode =
-    document.createElement("code");
+  const seedCode = document.createElement("code");
 
   seedCode.textContent = manifest.seed;
 
@@ -1328,12 +1108,10 @@ function renderSummary() {
     strong,
     document.createTextNode(
       ` · ${manifest.configuration.playable_card_count}` +
-      " playable cards · Seed ",
+        " playable cards · Seed ",
     ),
     seedCode,
-    document.createTextNode(
-      ` · Generator ${manifest.generator_version}`,
-    ),
+    document.createTextNode(` · Generator ${manifest.generator_version}`),
   );
 
   element.hidden = false;
@@ -1349,109 +1127,72 @@ function renderPreviewStatus() {
     return null;
   }
 
-  const configuration =
-    state.manifest.configuration;
+  const configuration = state.manifest.configuration;
 
   const theme = getTheme(state.themeId);
 
   if (!validateThemeDefinition(theme)) {
-    throw new Error(
-      `Unknown or invalid theme: ${state.themeId}`,
-    );
+    throw new Error(`Unknown or invalid theme: ${state.themeId}`);
   }
 
-  const editionNames =
-    configuration.editions
-      .map((editionId) =>
-        state.editions.find(
-          (edition) =>
-            edition.id === editionId,
-        ),
-      )
-      .filter(Boolean)
-      .map((edition) => edition.name);
+  const editionNames = configuration.editions
+    .map((editionId) =>
+      state.editions.find((edition) => edition.id === editionId),
+    )
+    .filter(Boolean)
+    .map((edition) => edition.name);
 
-  const categoryNames =
-    configuration.categories
-      .map((categoryId) =>
-        state.categories.find(
-          (category) =>
-            category.id === categoryId,
-        ),
-      )
-      .filter(Boolean)
-      .map((category) => category.name);
+  const categoryNames = configuration.categories
+    .map((categoryId) =>
+      state.categories.find((category) => category.id === categoryId),
+    )
+    .filter(Boolean)
+    .map((category) => category.name);
 
-  const header =
-    document.createElement("header");
+  const header = document.createElement("header");
 
   header.className = "preview-status";
 
-  const headingRow =
-    document.createElement("div");
+  const headingRow = document.createElement("div");
 
-  headingRow.className =
-    "preview-status-heading";
+  headingRow.className = "preview-status-heading";
 
-  const headingText =
-    document.createElement("div");
+  const headingText = document.createElement("div");
 
-  const eyebrow =
-    document.createElement("p");
+  const eyebrow = document.createElement("p");
 
-  eyebrow.className =
-    "preview-status-eyebrow";
+  eyebrow.className = "preview-status-eyebrow";
 
   eyebrow.textContent = "Deck Preview";
 
-  const heading =
-    document.createElement("h2");
+  const heading = document.createElement("h2");
 
-  heading.textContent =
-    `Deck ${state.manifest.deck_code}`;
+  heading.textContent = `Deck ${state.manifest.deck_id}`;
 
   headingText.append(eyebrow, heading);
 
-  const count =
-    document.createElement("span");
+  const count = document.createElement("span");
 
-  count.className =
-    "preview-status-count";
+  count.className = "preview-status-count";
 
-  count.textContent =
-    `${state.generated.length} cards`;
+  count.textContent = `${state.generated.length} cards`;
 
   headingRow.append(headingText, count);
 
-  const details =
-    document.createElement("dl");
+  const details = document.createElement("dl");
 
-  details.className =
-    "preview-status-details";
+  details.className = "preview-status-details";
 
   details.append(
-    createStatusDetail(
-      "Theme",
-      theme.name,
-    ),
+    createStatusDetail("Theme", theme.name),
 
-    createStatusDetail(
-      "Editions",
-      editionNames.join(", "),
-    ),
+    createStatusDetail("Editions", editionNames.join(", ")),
 
-    createStatusDetail(
-      "Categories",
-      categoryNames.join(", "),
-    ),
+    createStatusDetail("Categories", categoryNames.join(", ")),
 
-    createStatusDetail(
-      "Seed",
-      state.manifest.seed,
-      {
-        useCode: true,
-      },
-    ),
+    createStatusDetail("Seed", state.manifest.seed, {
+      useCode: true,
+    }),
   );
 
   header.append(headingRow, details);
@@ -1459,27 +1200,17 @@ function renderPreviewStatus() {
   return header;
 }
 
-function createStatusDetail(
-  label,
-  value,
-  {
-    useCode = false,
-  } = {},
-) {
-  const wrapper =
-    document.createElement("div");
+function createStatusDetail(label, value, { useCode = false } = {}) {
+  const wrapper = document.createElement("div");
 
-  const term =
-    document.createElement("dt");
+  const term = document.createElement("dt");
 
   term.textContent = label;
 
-  const description =
-    document.createElement("dd");
+  const description = document.createElement("dd");
 
   if (useCode) {
-    const code =
-      document.createElement("code");
+    const code = document.createElement("code");
 
     code.textContent = value;
     description.appendChild(code);
@@ -1493,11 +1224,9 @@ function createStatusDetail(
 }
 
 function renderPreview() {
-  const mode =
-    requireElement("output-mode").value;
+  const mode = requireElement("output-mode").value;
 
-  const output =
-    requireElement("preview-output");
+  const output = requireElement("preview-output");
 
   output.replaceChildren();
 
@@ -1513,117 +1242,82 @@ function renderPreview() {
     return;
   }
 
-  const previewGrid =
-    document.createElement("div");
+  const previewGrid = document.createElement("div");
 
-  previewGrid.className =
-    "card-grid preview-card-grid";
+  previewGrid.className = "card-grid preview-card-grid";
 
   state.generated.forEach((card) => {
-    previewGrid.appendChild(
-      renderPreviewCard(card),
-    );
+    previewGrid.appendChild(renderPreviewCard(card));
   });
 
   output.appendChild(previewGrid);
 
-  previewGrid
-    .querySelectorAll(".preview-card")
-    .forEach((cardElement) => {
-      cardElement.addEventListener(
-        "click",
-        () => {
-          togglePreviewCard(cardElement);
-        },
-      );
-
-      cardElement.addEventListener(
-        "keydown",
-        (event) => {
-          if (
-            event.key === "Enter" ||
-            event.key === " "
-          ) {
-            event.preventDefault();
-
-            togglePreviewCard(
-              cardElement,
-            );
-          }
-        },
-      );
+  previewGrid.querySelectorAll(".preview-card").forEach((cardElement) => {
+    cardElement.addEventListener("click", () => {
+      togglePreviewCard(cardElement);
     });
+
+    cardElement.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+
+        togglePreviewCard(cardElement);
+      }
+    });
+  });
 }
 
 function togglePreviewCard(cardElement) {
-  const isFlipped =
-    cardElement.classList.toggle(
-      "is-flipped",
-    );
+  const isFlipped = cardElement.classList.toggle("is-flipped");
 
-  cardElement.setAttribute(
-    "aria-pressed",
-    String(isFlipped),
-  );
+  cardElement.setAttribute("aria-pressed", String(isFlipped));
 
   cardElement.setAttribute(
     "aria-label",
-    isFlipped
-      ? "Flip card to view the front"
-      : "Flip card to view the back",
+    isFlipped ? "Flip card to view the front" : "Flip card to view the back",
   );
 }
 
 function renderQuickList(container) {
-  const list =
-    document.createElement("div");
+  const list = document.createElement("div");
 
   list.className = "quick-list";
 
   state.generated.forEach((card) => {
     const category = categoryFor(card);
 
-    const article =
-      document.createElement("article");
+    const article = document.createElement("article");
 
     article.className = "list-item";
 
-    const metadata =
-      document.createElement("div");
+    const metadata = document.createElement("div");
 
     metadata.className = "list-meta";
 
     metadata.append(
       document.createTextNode(
-        `${state.manifest.deck_code} · ` +
-        `${card.deck_position}/` +
-        `${state.generated.length}`,
+        `${state.manifest.deck_id} · ` +
+          `${card.deck_position}/` +
+          `${state.generated.length}`,
       ),
       document.createElement("br"),
-      document.createTextNode(
-        `${category.icon} ${category.name}`,
-      ),
+      document.createTextNode(`${category.icon} ${category.name}`),
     );
 
-    const prompt =
-      document.createElement("p");
+    const prompt = document.createElement("p");
 
     prompt.className = "list-prompt";
 
-    const strong =
-      document.createElement("strong");
+    const strong = document.createElement("strong");
 
-    strong.textContent =
-      card.content.prompt;
+    strong.textContent = card.content.prompt;
 
     prompt.appendChild(strong);
 
     if (card.content.instruction) {
       prompt.append(
         document.createElement("br"),
-        document.createTextNode(
-          card.content.instruction,
-        ),
+        document.createTextNode(card.content.instruction),
       );
     }
 
@@ -1635,11 +1329,9 @@ function renderQuickList(container) {
 }
 
 function renderPrintOutput() {
-  const mode =
-    requireElement("output-mode").value;
+  const mode = requireElement("output-mode").value;
 
-  const output =
-    requireElement("print-output");
+  const output = requireElement("print-output");
 
   output.replaceChildren();
 
@@ -1651,64 +1343,46 @@ function renderPrintOutput() {
 
   const cardsPerPage = 6;
 
-  const cardGroups = chunkArray(
-    state.generated,
-    cardsPerPage,
-  );
+  const cardGroups = chunkArray(state.generated, cardsPerPage);
 
   cardGroups.forEach((cards) => {
-    const firstPosition =
-      cards[0].deck_position;
+    const firstPosition = cards[0].deck_position;
 
-    const lastPosition =
-      cards[cards.length - 1]
-        .deck_position;
+    const lastPosition = cards[cards.length - 1].deck_position;
 
-    const frontPage =
-      document.createElement("section");
+    const frontPage = document.createElement("section");
 
-    frontPage.className =
-      "print-page front-page";
+    frontPage.className = "print-page front-page";
 
     frontPage.dataset.pageType = "front";
 
-    frontPage.dataset.cardRange =
-      `${firstPosition}-${lastPosition}`;
+    frontPage.dataset.cardRange = `${firstPosition}-${lastPosition}`;
 
-    const frontGrid =
-      document.createElement("div");
+    const frontGrid = document.createElement("div");
 
     frontGrid.className = "card-grid";
 
     cards.forEach((card) => {
-      frontGrid.appendChild(
-        renderFrontCard(card),
-      );
+      frontGrid.appendChild(renderFrontCard(card));
     });
 
     frontPage.appendChild(frontGrid);
     output.appendChild(frontPage);
 
-    const backPage =
-      document.createElement("section");
+    const backPage = document.createElement("section");
 
-    backPage.className =
-      "print-page back-page";
+    backPage.className = "print-page back-page";
 
     backPage.dataset.pageType = "back";
 
-    backPage.dataset.cardRange =
-      `${firstPosition}-${lastPosition}`;
+    backPage.dataset.cardRange = `${firstPosition}-${lastPosition}`;
 
-    const backGrid =
-      document.createElement("div");
+    const backGrid = document.createElement("div");
 
     backGrid.className = "card-grid";
 
     cards.forEach(() => {
-      backGrid.appendChild(
-        renderBackCard(),
-      );
+      backGrid.appendChild(renderBackCard());
     });
 
     backPage.appendChild(backGrid);
@@ -1723,30 +1397,17 @@ function downloadManifest() {
     return;
   }
 
-  const blob = new Blob(
-    [
-      JSON.stringify(
-        state.manifest,
-        null,
-        2,
-      ),
-    ],
-    {
-      type: "application/json",
-    },
-  );
+  const blob = new Blob([JSON.stringify(state.manifest, null, 2)], {
+    type: "application/json",
+  });
 
-  const url =
-    URL.createObjectURL(blob);
+  const url = URL.createObjectURL(blob);
 
-  const anchor =
-    document.createElement("a");
+  const anchor = document.createElement("a");
 
   anchor.href = url;
 
-  anchor.download =
-    `trailtalk-${state.manifest.deck_code}` +
-    "-manifest.json";
+  anchor.download = `trailtalk-${state.manifest.deck_id}` + "-manifest.json";
 
   anchor.hidden = true;
 
@@ -1759,83 +1420,50 @@ function downloadManifest() {
   }, 0);
 }
 
-requireElement("generate").addEventListener(
-  "click",
-  generateDeck,
-);
+requireElement("generate").addEventListener("click", generateDeck);
 
-requireElement("random-seed").addEventListener(
-  "click",
-  () => {
-    requireElement("seed").value =
-      randomCode(10);
-  },
-);
+requireElement("random-seed").addEventListener("click", () => {
+  requireElement("seed").value = randomCode(10);
+});
 
-requireElement("print").addEventListener(
-  "click",
-  () => {
-    window.print();
-  },
-);
+requireElement("print").addEventListener("click", () => {
+  window.print();
+});
 
-requireElement(
-  "download-manifest",
-).addEventListener(
-  "click",
-  downloadManifest,
-);
+requireElement("download-manifest").addEventListener("click", downloadManifest);
 
-requireElement(
-  "output-mode",
-).addEventListener(
-  "change",
-  () => {
-    if (state.generated.length > 0) {
-      renderOutput();
-    }
-  },
-);
+requireElement("output-mode").addEventListener("change", () => {
+  if (state.generated.length > 0) {
+    renderOutput();
+  }
+});
 
-requireElement("theme").addEventListener(
-  "change",
-  (event) => {
-    const requestedThemeId =
-      event.target.value;
+requireElement("theme").addEventListener("change", (event) => {
+  const requestedThemeId = event.target.value;
 
-    const selectedTheme =
-      getTheme(requestedThemeId);
+  const selectedTheme = getTheme(requestedThemeId);
 
-    if (
-      !validateThemeDefinition(
-        selectedTheme,
-      ) ||
-      selectedTheme.id !==
-        requestedThemeId
-    ) {
-      setStatus(
-        "The selected theme is not available.",
-      );
+  if (
+    !validateThemeDefinition(selectedTheme) ||
+    selectedTheme.id !== requestedThemeId
+  ) {
+    setStatus("The selected theme is not available.");
 
-      event.target.value =
-        state.themeId;
+    event.target.value = state.themeId;
 
-      return;
-    }
+    return;
+  }
 
-    state.themeId =
-      selectedTheme.id;
+  state.themeId = selectedTheme.id;
 
-    if (state.manifest) {
-      state.manifest.configuration.theme =
-        state.themeId;
-    }
+  if (state.manifest) {
+    state.manifest.configuration.theme = state.themeId;
+  }
 
-    if (state.generated.length > 0) {
-      renderOutput();
-    }
-  },
-);
+  if (state.generated.length > 0) {
+    renderOutput();
+  }
+});
 
 loadData().catch((error) => {
   console.error(error);
@@ -1844,6 +1472,6 @@ loadData().catch((error) => {
 
   setStatus(
     "The card catalog could not be loaded safely. " +
-    "Check the browser console for details.",
+      "Check the browser console for details.",
   );
 });

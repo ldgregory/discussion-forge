@@ -3,8 +3,12 @@ const MAX_CHUNK_SIZE = 10_000;
 const MAX_SEED_LENGTH = 128;
 const MAX_CODE_LENGTH = 64;
 
-const CODE_ALPHABET =
+const BASE32_ALPHABET =
   "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+
+const SHA256_HEX_LENGTH = 64;
+
+const CODE_ALPHABET = BASE32_ALPHABET;
 
 /*
  * Divide an array into independent arrays of a fixed maximum size.
@@ -175,6 +179,106 @@ export function seededShuffle(
   }
 
   return copy;
+}
+
+/*
+ * Return the SHA-256 digest of a string as raw bytes.
+ */
+export async function sha256Bytes(value) {
+  if (typeof value !== "string") {
+    throw new TypeError(
+      "sha256Bytes value must be a string.",
+    );
+  }
+
+  if (
+    !globalThis.crypto?.subtle ||
+    typeof globalThis.crypto.subtle.digest !==
+      "function"
+  ) {
+    throw new Error(
+      "SHA-256 is not available in this browser context.",
+    );
+  }
+
+  const encoded = new TextEncoder().encode(value);
+
+  const digest = await globalThis.crypto.subtle.digest(
+    "SHA-256",
+    encoded,
+  );
+
+  return new Uint8Array(digest);
+}
+
+/*
+ * Convert bytes into lowercase hexadecimal text.
+ */
+export function bytesToHex(bytes) {
+  if (!(bytes instanceof Uint8Array)) {
+    throw new TypeError(
+      "bytesToHex requires a Uint8Array.",
+    );
+  }
+
+  const result = Array.from(
+    bytes,
+    (byte) => byte.toString(16).padStart(2, "0"),
+  ).join("");
+
+  if (bytes.length === 32 &&
+      result.length !== SHA256_HEX_LENGTH) {
+    throw new Error(
+      "Unexpected SHA-256 hexadecimal length.",
+    );
+  }
+
+  return result;
+}
+
+/*
+ * Encode bytes using Trail Talk's human-readable
+ * 32-character alphabet.
+ */
+export function encodeBase32(bytes) {
+  if (!(bytes instanceof Uint8Array)) {
+    throw new TypeError(
+      "encodeBase32 requires a Uint8Array.",
+    );
+  }
+
+  let buffer = 0;
+  let bitCount = 0;
+  let result = "";
+
+  for (const byte of bytes) {
+    buffer = (buffer << 8) | byte;
+    bitCount += 8;
+
+    while (bitCount >= 5) {
+      bitCount -= 5;
+
+      result +=
+        BASE32_ALPHABET[
+          (buffer >>> bitCount) & 0x1f
+        ];
+    }
+
+    /*
+     * Retain only unconsumed bits so the buffer
+     * cannot grow indefinitely.
+     */
+    buffer &= (1 << bitCount) - 1;
+  }
+
+  if (bitCount > 0) {
+    result +=
+      BASE32_ALPHABET[
+        (buffer << (5 - bitCount)) & 0x1f
+      ];
+  }
+
+  return result;
 }
 
 /*
