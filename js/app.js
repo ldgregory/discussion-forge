@@ -808,6 +808,18 @@ function renderOptions() {
     });
 }
 
+function requireTheme(themeId) {
+  const theme = getTheme(themeId);
+
+  if (!validateThemeDefinition(theme)) {
+    throw new Error(
+      `Unknown or invalid theme: ${themeId}`,
+    );
+  }
+
+  return theme;
+}
+
 function validateThemeDefinition(theme) {
   if (!isPlainObject(theme)) {
     return false;
@@ -817,9 +829,10 @@ function validateThemeDefinition(theme) {
     typeof theme.id === "string" &&
     ID_PATTERN.test(theme.id) &&
     typeof theme.name === "string" &&
+    theme.name.length > 0 &&
     theme.name.length <= LIMITS.maxDisplayNameLength &&
-    typeof theme.backClass === "string" &&
-    ID_PATTERN.test(theme.backClass)
+    typeof theme.className === "string" &&
+    ID_PATTERN.test(theme.className)
   );
 }
 
@@ -1046,28 +1059,30 @@ function categoryFor(card) {
   return category;
 }
 
-function renderFrontCard(card) {
+function renderFrontCard(
+  card,
+  {
+    themeId = state.themeId,
+  } = {},
+) {
   const category = categoryFor(card);
+  const theme = requireTheme(themeId);
 
   const article =
     document.createElement("article");
 
-  article.className =
-    "play-card card-front";
+  article.classList.add(
+    "play-card",
+    "card-front",
+    theme.className,
+  );
 
   const band = document.createElement("div");
-  band.className = "card-band";
 
-  /*
-   * category.color is restricted to a six-digit
-   * hexadecimal color during catalog validation.
-   *
-   * This is safe from CSS injection, but it remains an
-   * inline style and should later be replaced with
-   * trusted CSS classes for a strict CSP.
-   */
-  band.style.backgroundColor =
-    category.color;
+  band.classList.add(
+    "card-band",
+    `category-${category.id}`,
+  );
 
   const bandIcon =
     document.createElement("span");
@@ -1140,13 +1155,7 @@ function renderBackCard({
   showPunchGuide = true,
   themeId = state.themeId,
 } = {}) {
-  const theme = getTheme(themeId);
-
-  if (!validateThemeDefinition(theme)) {
-    throw new Error(
-      `Unknown or invalid theme: ${themeId}`,
-    );
-  }
+  const theme = requireTheme(themeId);
 
   const article =
     document.createElement("article");
@@ -1154,7 +1163,7 @@ function renderBackCard({
   article.classList.add(
     "play-card",
     "card-back",
-    theme.backClass,
+    theme.className,
   );
 
   if (showPunchGuide) {
