@@ -1,12 +1,12 @@
-# SECURITY.md
-
 # Security Policy
+
+This document defines the security engineering standards used throughout the Trail Talk project.
 
 ## Philosophy
 
 Trail Talk is developed using **Secure by Design** principles.
 
-Security is treated as a design requirement, not a feature added later. Every
+Security is an engineering requirement, not a feature added later. Every
 new feature, architectural decision, and code review considers security before
 implementation begins.
 
@@ -25,6 +25,23 @@ Our security philosophy is guided by:
 
 ---
 
+## Current Security Posture
+
+Implemented protections include:
+
+- DOM-only rendering for user content
+- Validation of all catalog data
+- Trusted theme registry
+- Immutable theme definitions
+- Declarative theme packages
+- Explicit trust boundaries
+- Browser cryptographic random source
+- No executable community assets
+
+Future deployment hardening (such as Content Security Policy, HTTP security headers, and deployment configuration) will be introduced as deployment targets are added.
+
+---
+
 # Trust Boundaries
 
 Everything is considered **untrusted** until it has been validated or reviewed.
@@ -34,12 +51,12 @@ Everything is considered **untrusted** until it has been validated or reviewed.
 The following components are maintained as part of the Trail Talk repository
 and are considered trusted.
 
-- Application source code
-- Bundled JavaScript modules
-- Bundled CSS
-- Bundled themes
-- Bundled SVG assets
-- Bundled JSON catalogs
+Application source code
+Bundled CSS
+Bundled JavaScript modules
+Bundled JSON catalogs
+Bundled SVG assets
+Bundled themes
 
 ## Conditionally Trusted
 
@@ -70,7 +87,7 @@ The following must always be treated as untrusted input.
 
 ## Validate Before Use
 
-All external data shall be validated before use.
+Validation occurs before data enters the application's trusted state.
 
 Validation should prefer allowlists over denylists whenever practical.
 
@@ -94,7 +111,7 @@ validated data.
 
 ---
 
-## No Dynamic Code
+## Executable Content
 
 Community contributions must never introduce executable code.
 
@@ -123,20 +140,22 @@ Community supplied SVG files shall be reviewed and sanitized before inclusion.
 Active content including scripts, event handlers, external references, and
 embedded executable content is prohibited.
 
+SVG assets become trusted only after review and inclusion in the project repository.
+
 ---
 
 ## Rendering
 
-User supplied text is rendered using DOM APIs and `textContent`.
+User-supplied text is rendered using DOM APIs and `textContent`.
 
-Application code should avoid using `innerHTML` and `insertAdjacentHTML`
+Application code shall avoid using `innerHTML` and `insertAdjacentHTML`
 for untrusted content.
 
 ---
 
-## Content Security Policy
+## Browser Security
 
-The application should remain compatible with a strict Content Security Policy.
+The application shall remain compatible with a strict Content Security Policy.
 
 Future development should avoid unnecessary inline styles or inline scripts.
 
@@ -181,12 +200,13 @@ Before merging significant changes, consider:
 - Does this increase attack surface?
 - Does this introduce new dependencies?
 - Does this violate Secure by Design?
+- Does this preserve the project's architectural principles?
 
 ---
 
 ## Release Criteria
 
-Features are considered complete only after functional,
+Significant features are considered complete only after functional,
 architectural, and security review.
 
 ---
