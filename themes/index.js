@@ -1,9 +1,9 @@
 import { trailBlueTheme } from "./trail-blue/index.js";
-import { charcoalTrailTheme } from "./charcoal-trail/index.js";
+import { trailCharcoalTheme } from "./trail-charcoal/index.js";
 
 const themeRegistry = new Map([
   [trailBlueTheme.id, trailBlueTheme],
-  [charcoalTrailTheme.id, charcoalTrailTheme],
+  [trailCharcoalTheme.id, trailCharcoalTheme],
 ]);
 
 export const themes = Object.freeze(
