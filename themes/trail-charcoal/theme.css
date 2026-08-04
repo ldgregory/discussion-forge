@@ -1,7 +1,44 @@
-.card-back.theme-trail-charcoal {
-  /* existing Trail Charcoal back styling */
+/*
+ * Bundled title font.
+ */
+@font-face {
+  font-family: "Trail Charcoal Title";
+  src:
+    url("./assets/fonts/ChunkFive-Regular.otf")
+    format("opentype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
 }
 
+/*
+ * Trail Charcoal card-back background.
+ */
+.card-back.theme-trail-charcoal {
+  background: #36454f;
+}
+
+/*
+ * Optional hole-punch guide.
+ *
+ * Shared CSS owns its size and position.
+ * Trail Charcoal supplies a visible color for the navy back.
+ */
+.card-back.theme-trail-charcoal
+  .punch-safe-back {
+  border-color: rgb(255 255 255 / 75%);
+  border-width: 2px;
+  z-index: 5;
+}
+
+/*
+ * Shared card-back text color.
+ *
+ * This affects:
+ * - TRAIL TALK
+ * - Real Questions. Real Connections.
+ * - Overlanding Atlas
+ */
 .card-back.theme-trail-charcoal
   .card-back-title,
 .card-back.theme-trail-charcoal
@@ -11,27 +48,130 @@
   color: white;
 }
 
-.card-back.theme-trail-charcoal h3,
-.card-back.theme-trail-charcoal .card-back-tagline,
-.card-back.theme-trail-charcoal .card-back-brand {
-  color: white;
+/*
+ * Main title row:
+ * star + TRAIL TALK + star
+ */
+.card-back.theme-trail-charcoal
+  .card-back-title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.03in;
+
+  margin: 0 0 0.08in;
+
+  font-family:
+    "Trail Charcoal Title",
+    Impact,
+    sans-serif;
+  font-size: 1.12rem;
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
 }
 
 /*
- * Category colors
+ * Decorative title stars.
  */
-.category-gear {
-  background-color: #676cd7;
+.card-back.theme-trail-charcoal
+  .card-back-title::before,
+.card-back.theme-trail-charcoal
+  .card-back-title::after {
+  content: "";
+
+  display: block;
+  flex: none;
+
+  width: 0.18in;
+  height: 0.18in;
+
+  background-color: #e3261f;
+
+  -webkit-mask-image:
+    url("./assets/star.svg");
+  -webkit-mask-position: center;
+  -webkit-mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+
+  mask-image:
+    url("./assets/star.svg");
+  mask-position: center;
+  mask-size: contain;
+  mask-repeat: no-repeat;
 }
 
-.category-story-time {
+/*
+ * Standalone red divider beneath the title.
+ *
+ * Its width is independent of the tagline width.
+ */
+.card-back.theme-trail-charcoal
+  .card-back-divider {
+  width: 95%;
+  height: 2px;
+  margin: 0 0 0.11in;
+
+  background-color: #ff1803;
+}
+
+/*
+ * Tagline:
+ * Real Questions. Real Connections.
+ */
+.card-back.theme-trail-charcoal
+  .card-back-tagline {
+  width: 100%;
+  margin: 0;
+
+  font-family:
+    system-ui,
+    sans-serif;
+  font-size: 0.65rem;
+  line-height: 1.25;
+  text-align: center;
+  white-space: nowrap;
+}
+
+/*
+ * Brand:
+ * Overlanding Atlas
+ */
+.card-back.theme-trail-charcoal
+  .card-back-brand {
+  margin: 0.14in 0 0;
+
+  font-family:
+    "Arial Black",
+    "Arial Bold",
+    sans-serif;
+  font-size: 0.50rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.9;
+}
+
+/*
+ * Category banner colors on card fronts.
+ */
+.theme-trail-charcoal
+  .category-gear {
+  background-color: #3f6b45;
+}
+
+.theme-trail-charcoal
+  .category-story-time {
   background-color: #76528b;
 }
 
-.category-lightning {
+.theme-trail-charcoal
+  .category-lightning {
   background-color: #59636e;
 }
 
-.category-wildcard {
+.theme-trail-charcoal
+  .category-wildcard {
   background-color: #a33a2b;
 }

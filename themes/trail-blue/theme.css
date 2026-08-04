@@ -109,11 +109,11 @@
  */
 .card-back.theme-trail-blue
   .card-back-divider {
-  width: 82%;
+  width: 95%;
   height: 2px;
   margin: 0 0 0.11in;
 
-  background-color: #c9483c;
+  background-color: #ff1803;
 }
 
 /*
@@ -146,7 +146,7 @@
     "Arial Black",
     "Arial Bold",
     sans-serif;
-  font-size: 0.72rem;
+  font-size: 0.50rem;
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;

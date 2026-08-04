@@ -1,0 +1,37 @@
+.card-back.theme-trail-charcoal {
+  /* existing Trail Charcoal back styling */
+}
+
+.card-back.theme-trail-charcoal
+  .card-back-title,
+.card-back.theme-trail-charcoal
+  .card-back-tagline,
+.card-back.theme-trail-charcoal
+  .card-back-brand {
+  color: white;
+}
+
+.card-back.theme-trail-charcoal h3,
+.card-back.theme-trail-charcoal .card-back-tagline,
+.card-back.theme-trail-charcoal .card-back-brand {
+  color: white;
+}
+
+/*
+ * Category colors
+ */
+.category-gear {
+  background-color: #676cd7;
+}
+
+.category-story-time {
+  background-color: #76528b;
+}
+
+.category-lightning {
+  background-color: #59636e;
+}
+
+.category-wildcard {
+  background-color: #a33a2b;
+}

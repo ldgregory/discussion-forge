@@ -19,8 +19,11 @@ themes/
     ├── index.js
     ├── theme.css
     ├── assets/
+    │   ├── fonts/
     │   ├── icons/
-    │   └── preview.png (optional)
+    │   ├── card-back.svg
+    │   ├── other_graphics_assets_for_card_backs
+    │   └── preview.png (optional - not yet implemented)
 ```
 
 ---
@@ -34,10 +37,12 @@ Defines the theme metadata exported to the trusted theme registry.
 Example:
 
 ```javascript
-export const trailBlueTheme = Object.freeze({
+export const theme = Object.freeze({
   id: "trail-blue",
   name: "Trail Blue",
   className: "theme-trail-blue",
+  stylesheet: "themes/trail-blue/theme.css",
+  assetRoot: "themes/trail-blue/assets",
 });
 ```
 
