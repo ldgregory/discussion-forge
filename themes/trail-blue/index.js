@@ -3,4 +3,5 @@ export const trailBlueTheme = Object.freeze({
   name: "Trail Blue",
   className: "theme-trail-blue",
   stylesheet: "themes/trail-blue/theme.css",
+  assetRoot: "themes/trail-blue/assets",
 });

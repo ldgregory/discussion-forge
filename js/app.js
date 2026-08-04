@@ -653,6 +653,16 @@ function requireTheme(themeId) {
   return theme;
 }
 
+function buildThemeIconPath(
+    theme,
+    category,
+) {
+    return (
+        `${theme.assetRoot}/icons/` +
+        `${category.id}.svg`
+    );
+}
+
 function loadThemeStylesheet(themeId) {
   const theme = requireTheme(themeId);
 
@@ -695,7 +705,14 @@ function validateThemeDefinition(theme) {
     !theme.stylesheet.includes("..") &&
     !theme.stylesheet.includes("\\") &&
     !theme.stylesheet.includes(":") &&
-    !theme.stylesheet.startsWith("/")
+    !theme.stylesheet.startsWith("/") &&
+    typeof theme.assetRoot === "string" &&
+    theme.assetRoot.startsWith("themes/") &&
+    theme.assetRoot.endsWith("/assets") &&
+    !theme.assetRoot.includes("..") &&
+    !theme.assetRoot.includes("\\") &&
+    !theme.assetRoot.includes(":") &&
+    !theme.assetRoot.startsWith("/")
   );
 }
 
@@ -937,23 +954,57 @@ function categoryFor(card) {
 
 function createCategoryIcon(
   category,
-  { className = "", decorative = true } = {},
+  {
+    className = "",
+    decorative = true,
+    themeId = state.themeId,
+  } = {},
 ) {
-  const icon = document.createElement("span");
+  const theme = requireTheme(themeId);
+
+  const wrapper =
+    document.createElement("span");
 
   if (className) {
-    icon.className = className;
+    wrapper.className = className;
   }
-
-  icon.textContent = category.icon;
 
   if (decorative) {
-    icon.setAttribute("aria-hidden", "true");
+    wrapper.setAttribute(
+      "aria-hidden",
+      "true",
+    );
   } else {
-    icon.setAttribute("aria-label", category.name);
+    wrapper.setAttribute(
+      "aria-label",
+      category.name,
+    );
   }
 
-  return icon;
+  const image =
+    document.createElement("img");
+
+  image.src = buildThemeIconPath(
+    theme,
+    category,
+  );
+
+  image.alt = "";
+
+  image.width = 32;
+  image.height = 32;
+
+  image.className =
+    "category-svg-icon";
+
+  image.onerror = () => {
+    wrapper.textContent =
+      category.icon;
+  };
+
+  wrapper.appendChild(image);
+
+  return wrapper;
 }
 
 function renderFrontCard(card, { themeId = state.themeId } = {}) {
