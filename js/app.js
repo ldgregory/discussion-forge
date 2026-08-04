@@ -653,14 +653,12 @@ function requireTheme(themeId) {
   return theme;
 }
 
-function buildThemeIconPath(
-    theme,
-    category,
-) {
-    return (
-        `${theme.assetRoot}/icons/` +
-        `${category.id}.svg`
-    );
+function buildApplicationIconPath(category) {
+  return `assets/icons/${category.id}.svg`;
+}
+
+function buildThemeIconPath(theme, category) {
+  return `${theme.assetRoot}/icons/${category.id}.svg`;
 }
 
 function loadThemeStylesheet(themeId) {
@@ -954,52 +952,39 @@ function categoryFor(card) {
 
 function createCategoryIcon(
   category,
-  {
-    className = "",
-    decorative = true,
-    themeId = state.themeId,
-  } = {},
+  { className = "", decorative = true, themeId = state.themeId } = {},
 ) {
   const theme = requireTheme(themeId);
 
-  const wrapper =
-    document.createElement("span");
+  const wrapper = document.createElement("span");
 
   if (className) {
     wrapper.className = className;
   }
 
   if (decorative) {
-    wrapper.setAttribute(
-      "aria-hidden",
-      "true",
-    );
+    wrapper.setAttribute("aria-hidden", "true");
   } else {
-    wrapper.setAttribute(
-      "aria-label",
-      category.name,
-    );
+    wrapper.setAttribute("aria-label", category.name);
   }
 
-  const image =
-    document.createElement("img");
+  const image = document.createElement("img");
 
-  image.src = buildThemeIconPath(
-    theme,
-    category,
-  );
+  image.src = buildThemeIconPath(theme, category);
 
   image.alt = "";
 
   image.width = 32;
   image.height = 32;
 
-  image.className =
-    "category-svg-icon";
+  image.className = "category-svg-icon";
 
   image.onerror = () => {
-    wrapper.textContent =
-      category.icon;
+    image.onerror = () => {
+      wrapper.textContent = category.icon;
+    };
+
+    image.src = buildApplicationIconPath(category);
   };
 
   wrapper.appendChild(image);
