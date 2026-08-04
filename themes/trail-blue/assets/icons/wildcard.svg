@@ -6,10 +6,10 @@
 >
   <title id="title">Wild Card</title>
   <desc id="desc">
-    A trail marker sign with a centered question mark.
+    A trail marker with arrows pointing in several directions.
   </desc>
 
-  <!-- Outer badge -->
+  <!-- Trail Blue badge -->
   <circle
     cx="12"
     cy="12"
@@ -19,9 +19,9 @@
     stroke-width="1.5"
   />
 
-  <!-- Sign post, connected directly to the sign -->
+  <!-- Short signpost -->
   <path
-    d="M12 11.8v7.3"
+    d="M12 14.1v5"
     fill="none"
     stroke="#173B63"
     stroke-width="1.8"
@@ -30,45 +30,52 @@
 
   <!-- Post base -->
   <path
-    d="M9.4 19.3h5.2"
+    d="M9.5 19.3h5"
     fill="none"
     stroke="#173B63"
     stroke-width="1.8"
     stroke-linecap="round"
   />
 
-  <!-- Centered directional trail sign -->
-  <path
-    d="M6.2 5.4
-       H16.4
-       L18.2 7.9
-       L16.4 10.4
-       H6.2
-       Z"
+  <!-- Taller trail marker -->
+  <rect
+    x="5.7"
+    y="4.8"
+    width="12.6"
+    height="9.5"
+    rx="1.25"
     fill="#173B63"
     stroke="#173B63"
     stroke-width="1.4"
-    stroke-linejoin="round"
   />
 
-  <!-- Question mark body, reduced slightly for breathing room -->
+  <!-- Left-pointing trail arrow -->
   <path
-    d="M10.3 7.1
-       c.15-.85.85-1.4 1.8-1.4
-       1.05 0 1.85.6 1.85 1.5
-       0 .7-.45 1.15-1.1 1.5
-       -.6.35-.9.75-.9 1.25"
+    d="M11 7.1H7.7m0 0 1.35-1.15M7.7 7.1l1.35 1.15"
     fill="none"
     stroke="#FFFDF8"
     stroke-width="1.25"
     stroke-linecap="round"
+    stroke-linejoin="round"
   />
 
-  <!-- Red question mark dot, fully inside the sign -->
-  <circle
-    cx="12"
-    cy="9.55"
-    r=".48"
-    fill="#C9483C"
+  <!-- Upper-right trail arrow -->
+  <path
+    d="M12.8 8.2 15.4 5.8m0 0-1.75.05m1.75-.05-.05 1.75"
+    fill="none"
+    stroke="#FFFDF8"
+    stroke-width="1.25"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+
+  <!-- Lower-right trail arrow, used as the red accent -->
+  <path
+    d="M10.8 11.6h4.1m0 0-1.4-1.2m1.4 1.2-1.4 1.2"
+    fill="none"
+    stroke="#C9483C"
+    stroke-width="1.35"
+    stroke-linecap="round"
+    stroke-linejoin="round"
   />
 </svg>

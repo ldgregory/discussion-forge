@@ -11,7 +11,7 @@
 
 ### Security
 
-- [ ] Define SVG acceptance and sanitization workflow
+- [x] Define SVG acceptance and sanitization workflow
 - [ ] Document recommended production security headers
 - [ ] Add Content Security Policy deployment guidance
 

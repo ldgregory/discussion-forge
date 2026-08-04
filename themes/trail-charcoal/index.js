@@ -1,4 +1,4 @@
-export const trailCharcoalTheme = Object.freeze({
+export const theme = Object.freeze({
   id: "trail-charcoal",
   name: "Trail Charcoal",
   className: "theme-trail-charcoal",

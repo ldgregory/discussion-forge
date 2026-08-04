@@ -1,18 +1,16 @@
 .card-back.theme-trail-charcoal {
-  background:
-    repeating-radial-gradient(
-      ellipse at center,
-      transparent 0 10px,
-      rgb(255 255 255 / 8%) 11px 12px
-    ),
-    #242424;
+  /* existing Trail Charcoal back styling */
 }
 
-.card-back.theme-trail-charcoal .trail-talk-compass {
-  color: #c9483c;
+.card-back.theme-trail-charcoal
+  .card-back-title,
+.card-back.theme-trail-charcoal
+  .card-back-tagline,
+.card-back.theme-trail-charcoal
+  .card-back-brand {
+  color: white;
 }
 
-.card-back.theme-trail-charcoal .trail-line,
 .card-back.theme-trail-charcoal h3,
 .card-back.theme-trail-charcoal .card-back-tagline,
 .card-back.theme-trail-charcoal .card-back-brand {

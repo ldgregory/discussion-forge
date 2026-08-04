@@ -9,6 +9,13 @@ import {
 
 import { getTheme, themes } from "../themes/index.js";
 
+const APP_IDENTITY = Object.freeze({
+  title: "TRAIL TALK",
+  taglineLineOne: "Real Questions.",
+  taglineLineTwo: "Real Connections.",
+  brand: "Overlanding Atlas",
+});
+
 const DECK_IDENTITY_VERSION = 1;
 const GENERATOR_VERSION = "0.2.0-alpha3";
 const CATALOG_VERSION = "2026.08.01";
@@ -654,18 +661,21 @@ function requireTheme(themeId) {
   return theme;
 }
 
-// function buildApplicationIconPath(category) {
-//   return `assets/icons/${category.id}.svg`;
-// }
+// Default fail-through to the canonical theme if a requested asset is missing.
+function buildDefaultThemeIconPath(category) {
+  const defaultTheme = requireTheme(DEFAULT_THEME_ID);
+
+  return buildThemeIconPath(defaultTheme, category);
+}
 
 function buildThemeIconPath(theme, category) {
   return `${theme.assetRoot}/icons/${category.id}.svg`;
 }
 
-function buildDefaultThemeIconPath(category) {
-  const defaultTheme = requireTheme(DEFAULT_THEME_ID);
-
-  return buildThemeIconPath(defaultTheme, category);
+function buildThemeCardBackPath(theme) {
+  return (
+    `${theme.assetRoot}/card-back.svg`
+  );
 }
 
 function loadThemeStylesheet(themeId) {
@@ -1004,6 +1014,56 @@ function createCategoryIcon(
   return wrapper;
 }
 
+function createCardBackGraphic({ themeId = state.themeId } = {}) {
+  const theme = requireTheme(themeId);
+
+  const wrapper = document.createElement("div");
+
+  wrapper.className = "card-back-main-graphic";
+
+  /*
+   * The image is decorative. The meaningful content
+   * of the card back remains available as text.
+   */
+  wrapper.setAttribute("aria-hidden", "true");
+
+  const image = document.createElement("img");
+
+  image.className = "card-back-main-graphic-image";
+
+  image.alt = "";
+
+  image.src = buildThemeCardBackPath(theme);
+
+  image.onerror = () => {
+    /*
+     * Trail Blue is the canonical fallback theme.
+     * Do not request the same missing asset twice.
+     */
+    if (theme.id === DEFAULT_THEME_ID) {
+      wrapper.remove();
+      return;
+    }
+
+    const defaultTheme = requireTheme(DEFAULT_THEME_ID);
+
+    image.onerror = () => {
+      /*
+       * Both assets are unavailable. Remove the
+       * decorative graphic and retain the complete
+       * text-only card back.
+       */
+      wrapper.remove();
+    };
+
+    image.src = buildThemeCardBackPath(defaultTheme);
+  };
+
+  wrapper.appendChild(image);
+
+  return wrapper;
+}
+
 function renderFrontCard(card, { themeId = state.themeId } = {}) {
   const category = categoryFor(card);
   const theme = requireTheme(themeId);
@@ -1078,6 +1138,17 @@ function renderBackCard({
 } = {}) {
   const theme = requireTheme(themeId);
 
+  const divider =
+  document.createElement("div");
+
+  divider.className =
+    "card-back-divider";
+
+  divider.setAttribute(
+    "aria-hidden",
+    "true",
+  );
+
   const article = document.createElement("article");
 
   article.classList.add("play-card", "card-back", theme.className);
@@ -1096,15 +1167,15 @@ function renderBackCard({
 
   content.className = "card-back-content";
 
-  const compass = document.createElement("div");
-
-  compass.className = "trail-talk-compass";
-  compass.setAttribute("aria-hidden", "true");
-  compass.textContent = "✥";
+  const mainGraphic = createCardBackGraphic({
+    themeId,
+  });
 
   const heading = document.createElement("h3");
 
-  heading.textContent = "TRAIL TALK";
+  heading.className = "card-back-title";
+
+  heading.textContent = APP_IDENTITY.title;
 
   const tagline = document.createElement("p");
 
@@ -1112,27 +1183,27 @@ function renderBackCard({
 
   const taglineLineOne = document.createElement("span");
 
-  taglineLineOne.textContent = "Real Questions.";
+  taglineLineOne.textContent = APP_IDENTITY.taglineLineOne + ' ' + APP_IDENTITY.taglineLineTwo;
 
   const taglineLineTwo = document.createElement("span");
 
-  taglineLineTwo.textContent = "Real Connections.";
+  taglineLineTwo.textContent = "" //APP_IDENTITY.taglineLineTwo;
 
   tagline.append(taglineLineOne, taglineLineTwo);
-
-  const trailLine = document.createElement("div");
-
-  trailLine.className = "trail-line";
-  trailLine.setAttribute("aria-hidden", "true");
-
-  trailLine.textContent = "- - - - - - - - - - 🚩";
 
   const brand = document.createElement("p");
 
   brand.className = "card-back-brand";
-  brand.textContent = "Overlanding Atlas";
 
-  content.append(compass, heading, tagline, trailLine, brand);
+  brand.textContent = APP_IDENTITY.brand;
+
+  content.append(
+  mainGraphic,
+  heading,
+  divider,
+  tagline,
+  brand,
+  );
 
   article.appendChild(content);
 
@@ -1169,7 +1240,7 @@ function renderPreviewCard(card) {
 
   backSide.appendChild(
     renderBackCard({
-      showPunchGuide: false,
+      showPunchGuide: true,
     }),
   );
 
