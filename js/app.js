@@ -14,8 +14,7 @@ const GENERATOR_VERSION = "0.2.0-alpha3";
 const CATALOG_VERSION = "2026.08.01";
 const HUMAN_DECK_ID_LENGTH = 10;
 
-const THEME_STYLESHEET_ID =
-  "active-theme-stylesheet";
+const THEME_STYLESHEET_ID = "active-theme-stylesheet";
 
 const LIMITS = Object.freeze({
   maxCards: 5000,
@@ -657,13 +656,10 @@ function requireTheme(themeId) {
 function loadThemeStylesheet(themeId) {
   const theme = requireTheme(themeId);
 
-  let stylesheet = document.getElementById(
-    THEME_STYLESHEET_ID,
-  );
+  let stylesheet = document.getElementById(THEME_STYLESHEET_ID);
 
   if (!stylesheet) {
-    stylesheet =
-      document.createElement("link");
+    stylesheet = document.createElement("link");
 
     stylesheet.id = THEME_STYLESHEET_ID;
     stylesheet.rel = "stylesheet";
@@ -671,10 +667,7 @@ function loadThemeStylesheet(themeId) {
     document.head.appendChild(stylesheet);
   }
 
-  if (
-    stylesheet.getAttribute("href") ===
-    theme.stylesheet
-  ) {
+  if (stylesheet.getAttribute("href") === theme.stylesheet) {
     return;
   }
 
@@ -942,6 +935,27 @@ function categoryFor(card) {
   return category;
 }
 
+function createCategoryIcon(
+  category,
+  { className = "", decorative = true } = {},
+) {
+  const icon = document.createElement("span");
+
+  if (className) {
+    icon.className = className;
+  }
+
+  icon.textContent = category.icon;
+
+  if (decorative) {
+    icon.setAttribute("aria-hidden", "true");
+  } else {
+    icon.setAttribute("aria-label", category.name);
+  }
+
+  return icon;
+}
+
 function renderFrontCard(card, { themeId = state.themeId } = {}) {
   const category = categoryFor(card);
   const theme = requireTheme(themeId);
@@ -954,10 +968,9 @@ function renderFrontCard(card, { themeId = state.themeId } = {}) {
 
   band.classList.add("card-band", `category-${category.id}`);
 
-  const bandIcon = document.createElement("span");
-
-  bandIcon.className = "category-icon";
-  bandIcon.textContent = category.icon;
+  const bandIcon = createCategoryIcon(category, {
+    className: "category-icon",
+  });
 
   const bandName = document.createElement("span");
 
@@ -971,10 +984,9 @@ function renderFrontCard(card, { themeId = state.themeId } = {}) {
 
   const bodyContent = document.createElement("div");
 
-  const cardIcon = document.createElement("div");
-
-  cardIcon.className = "card-icon";
-  cardIcon.textContent = category.icon;
+  const cardIcon = createCategoryIcon(category, {
+    className: "card-icon",
+  });
 
   const prompt = document.createElement("p");
   prompt.className = "card-prompt";
@@ -1303,7 +1315,10 @@ function renderQuickList(container) {
           `${state.generated.length}`,
       ),
       document.createElement("br"),
-      document.createTextNode(`${category.icon} ${category.name}`),
+      createCategoryIcon(category, {
+        className: "list-category-icon",
+      }),
+      document.createTextNode(` ${category.name}`),
     );
 
     const prompt = document.createElement("p");
@@ -1440,42 +1455,31 @@ requireElement("output-mode").addEventListener("change", () => {
   }
 });
 
-requireElement("theme").addEventListener(
-  "change",
-  (event) => {
-    const requestedThemeId =
-      event.target.value;
+requireElement("theme").addEventListener("change", (event) => {
+  const requestedThemeId = event.target.value;
 
-    try {
-      const selectedTheme =
-        requireTheme(requestedThemeId);
+  try {
+    const selectedTheme = requireTheme(requestedThemeId);
 
-      state.themeId = selectedTheme.id;
+    state.themeId = selectedTheme.id;
 
-      loadThemeStylesheet(
-        state.themeId,
-      );
+    loadThemeStylesheet(state.themeId);
 
-      if (state.manifest) {
-        state.manifest.configuration.theme =
-          state.themeId;
-      }
-
-      if (state.generated.length > 0) {
-        renderOutput();
-      }
-    } catch (error) {
-      console.error(error);
-
-      setStatus(
-        "The selected theme is not available.",
-      );
-
-      event.target.value =
-        state.themeId;
+    if (state.manifest) {
+      state.manifest.configuration.theme = state.themeId;
     }
-  },
-);
+
+    if (state.generated.length > 0) {
+      renderOutput();
+    }
+  } catch (error) {
+    console.error(error);
+
+    setStatus("The selected theme is not available.");
+
+    event.target.value = state.themeId;
+  }
+});
 
 loadData().catch((error) => {
   console.error(error);

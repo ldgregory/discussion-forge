@@ -209,6 +209,10 @@ button.primary {
   font-size: 0.78rem;
   font-weight: 700;
 }
+.list-category-icon {
+  display: inline-block;
+  line-height: 1;
+}
 .list-prompt {
   margin: 0;
 }
