@@ -75,6 +75,9 @@ const ID_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const UUID_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
+const SEMVER_PATTERN =
+  /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/;
+
 const HEX_COLOR_PATTERN = /^#[0-9a-f]{6}$/i;
 
 const state = {
@@ -707,11 +710,31 @@ function validateThemeDefinition(theme) {
   return (
     typeof theme.id === "string" &&
     ID_PATTERN.test(theme.id) &&
+
     typeof theme.name === "string" &&
     theme.name.length > 0 &&
-    theme.name.length <= LIMITS.maxDisplayNameLength &&
+    theme.name.length <=
+      LIMITS.maxDisplayNameLength &&
+
+    typeof theme.version === "string" &&
+    SEMVER_PATTERN.test(theme.version) &&
+
+    typeof theme.author === "string" &&
+    theme.author.length > 0 &&
+    theme.author.length <=
+      LIMITS.maxDisplayNameLength &&
+
+    typeof theme.description === "string" &&
+    theme.description.length > 0 &&
+    theme.description.length <= 240 &&
+
+    typeof theme.license === "string" &&
+    theme.license.length > 0 &&
+    theme.license.length <= 64 &&
+
     typeof theme.className === "string" &&
     ID_PATTERN.test(theme.className) &&
+
     typeof theme.stylesheet === "string" &&
     theme.stylesheet.length > 0 &&
     theme.stylesheet.length <= 200 &&
@@ -721,7 +744,10 @@ function validateThemeDefinition(theme) {
     !theme.stylesheet.includes("\\") &&
     !theme.stylesheet.includes(":") &&
     !theme.stylesheet.startsWith("/") &&
+
     typeof theme.assetRoot === "string" &&
+    theme.assetRoot.length > 0 &&
+    theme.assetRoot.length <= 200 &&
     theme.assetRoot.startsWith("themes/") &&
     theme.assetRoot.endsWith("/assets") &&
     !theme.assetRoot.includes("..") &&
