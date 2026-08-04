@@ -14,6 +14,7 @@ const GENERATOR_VERSION = "0.2.0-alpha3";
 const CATALOG_VERSION = "2026.08.01";
 const HUMAN_DECK_ID_LENGTH = 10;
 
+const DEFAULT_THEME_ID = "trail-blue";
 const THEME_STYLESHEET_ID = "active-theme-stylesheet";
 
 const LIMITS = Object.freeze({
@@ -653,12 +654,18 @@ function requireTheme(themeId) {
   return theme;
 }
 
-function buildApplicationIconPath(category) {
-  return `assets/icons/${category.id}.svg`;
-}
+// function buildApplicationIconPath(category) {
+//   return `assets/icons/${category.id}.svg`;
+// }
 
 function buildThemeIconPath(theme, category) {
   return `${theme.assetRoot}/icons/${category.id}.svg`;
+}
+
+function buildDefaultThemeIconPath(category) {
+  const defaultTheme = requireTheme(DEFAULT_THEME_ID);
+
+  return buildThemeIconPath(defaultTheme, category);
 }
 
 function loadThemeStylesheet(themeId) {
@@ -980,11 +987,16 @@ function createCategoryIcon(
   image.className = "category-svg-icon";
 
   image.onerror = () => {
+    if (theme.id === DEFAULT_THEME_ID) {
+      wrapper.textContent = category.icon;
+      return;
+    }
+
     image.onerror = () => {
       wrapper.textContent = category.icon;
     };
 
-    image.src = buildApplicationIconPath(category);
+    image.src = buildDefaultThemeIconPath(category);
   };
 
   wrapper.appendChild(image);
