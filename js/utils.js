@@ -1,19 +1,36 @@
+/*
+ * General utility limits
+ */
+
 const MAX_ARRAY_LENGTH = 100_000;
 const MAX_CHUNK_SIZE = 10_000;
 const MAX_SEED_LENGTH = 128;
 const MAX_CODE_LENGTH = 64;
 
+/*
+ * Human-readable Base32 alphabet.
+ *
+ * Ambiguous characters such as I, O, 0, and 1 are
+ * intentionally omitted.
+ */
 const BASE32_ALPHABET =
   "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 
-const SHA256_HEX_LENGTH = 64;
 
-const CODE_ALPHABET = BASE32_ALPHABET;
+/* =========================================================
+ * Array utilities
+ * ========================================================= */
 
 /*
- * Divide an array into independent arrays of a fixed maximum size.
+ * Divide an array into independent arrays of a fixed
+ * maximum size.
+ *
+ * The original array is not modified.
  */
-export function chunkArray(items, chunkSize) {
+export function chunkArray(
+  items,
+  chunkSize,
+) {
   if (!Array.isArray(items)) {
     throw new TypeError(
       "chunkArray items must be an array.",
@@ -44,12 +61,20 @@ export function chunkArray(items, chunkSize) {
     index += chunkSize
   ) {
     chunks.push(
-      items.slice(index, index + chunkSize),
+      items.slice(
+        index,
+        index + chunkSize,
+      ),
     );
   }
 
   return chunks;
 }
+
+
+/* =========================================================
+ * Deterministic deck generation
+ * ========================================================= */
 
 /*
  * Produce a deterministic 32-bit seed from text.
@@ -58,7 +83,8 @@ export function chunkArray(items, chunkSize) {
  * not for cryptographic security.
  */
 function xmur3(text) {
-  let hash = 1779033703 ^ text.length;
+  let hash =
+    1779033703 ^ text.length;
 
   for (
     let index = 0;
@@ -70,7 +96,9 @@ function xmur3(text) {
       3432918353,
     );
 
-    hash = (hash << 13) | (hash >>> 19);
+    hash =
+      (hash << 13) |
+      (hash >>> 19);
   }
 
   return function nextHash() {
@@ -84,7 +112,9 @@ function xmur3(text) {
       3266489909,
     );
 
-    return (hash ^= hash >>> 16) >>> 0;
+    return (
+      (hash ^= hash >>> 16) >>> 0
+    );
   };
 }
 
@@ -95,13 +125,18 @@ function xmur3(text) {
  * This is intentionally not a cryptographic PRNG.
  */
 function mulberry32(seed) {
-  let currentSeed = seed >>> 0;
+  let currentSeed =
+    seed >>> 0;
 
   return function nextRandom() {
     currentSeed =
-      (currentSeed + 0x6d2b79f5) >>> 0;
+      (
+        currentSeed +
+        0x6d2b79f5
+      ) >>> 0;
 
-    let value = currentSeed;
+    let value =
+      currentSeed;
 
     value = Math.imul(
       value ^ (value >>> 15),
@@ -116,17 +151,21 @@ function mulberry32(seed) {
       );
 
     return (
-      ((value ^ (value >>> 14)) >>> 0) /
-      4294967296
-    );
+      (
+        value ^
+        (value >>> 14)
+      ) >>> 0
+    ) / 4294967296;
   };
 }
 
 /*
- * Return a shuffled copy of an array.
+ * Return a deterministically shuffled copy of an array.
  *
  * Supplying the same items in the same order and the
  * same seed produces the same shuffled result.
+ *
+ * The original array is not modified.
  */
 export function seededShuffle(
   items,
@@ -156,18 +195,24 @@ export function seededShuffle(
     );
   }
 
-  const seedFactory = xmur3(seedText);
-  const random = mulberry32(seedFactory());
-  const copy = [...items];
+  const seedFactory =
+    xmur3(seedText);
+
+  const random =
+    mulberry32(seedFactory());
+
+  const copy =
+    [...items];
 
   for (
     let index = copy.length - 1;
     index > 0;
     index--
   ) {
-    const randomIndex = Math.floor(
-      random() * (index + 1),
-    );
+    const randomIndex =
+      Math.floor(
+        random() * (index + 1),
+      );
 
     [
       copy[index],
@@ -180,6 +225,11 @@ export function seededShuffle(
 
   return copy;
 }
+
+
+/* =========================================================
+ * Cryptographic hashing and encoding
+ * ========================================================= */
 
 /*
  * Return the SHA-256 digest of a string as raw bytes.
@@ -201,18 +251,23 @@ export async function sha256Bytes(value) {
     );
   }
 
-  const encoded = new TextEncoder().encode(value);
+  const encoded =
+    new TextEncoder().encode(value);
 
-  const digest = await globalThis.crypto.subtle.digest(
-    "SHA-256",
-    encoded,
-  );
+  const digest =
+    await globalThis.crypto.subtle.digest(
+      "SHA-256",
+      encoded,
+    );
 
   return new Uint8Array(digest);
 }
 
 /*
  * Convert bytes into lowercase hexadecimal text.
+ *
+ * Each byte produces exactly two hexadecimal
+ * characters.
  */
 export function bytesToHex(bytes) {
   if (!(bytes instanceof Uint8Array)) {
@@ -221,24 +276,20 @@ export function bytesToHex(bytes) {
     );
   }
 
-  const result = Array.from(
+  return Array.from(
     bytes,
-    (byte) => byte.toString(16).padStart(2, "0"),
+    (byte) =>
+      byte
+        .toString(16)
+        .padStart(2, "0"),
   ).join("");
-
-  if (bytes.length === 32 &&
-      result.length !== SHA256_HEX_LENGTH) {
-    throw new Error(
-      "Unexpected SHA-256 hexadecimal length.",
-    );
-  }
-
-  return result;
 }
 
 /*
  * Encode bytes using Trail Talk's human-readable
  * 32-character alphabet.
+ *
+ * This encoding does not include padding characters.
  */
 export function encodeBase32(bytes) {
   if (!(bytes instanceof Uint8Array)) {
@@ -252,7 +303,9 @@ export function encodeBase32(bytes) {
   let result = "";
 
   for (const byte of bytes) {
-    buffer = (buffer << 8) | byte;
+    buffer =
+      (buffer << 8) | byte;
+
     bitCount += 8;
 
     while (bitCount >= 5) {
@@ -260,34 +313,44 @@ export function encodeBase32(bytes) {
 
       result +=
         BASE32_ALPHABET[
-          (buffer >>> bitCount) & 0x1f
+          (buffer >>> bitCount) &
+            0x1f
         ];
     }
 
     /*
-     * Retain only unconsumed bits so the buffer
-     * cannot grow indefinitely.
+     * Retain only the unconsumed bits so the
+     * bit buffer remains bounded.
      */
-    buffer &= (1 << bitCount) - 1;
+    buffer &=
+      (1 << bitCount) - 1;
   }
 
   if (bitCount > 0) {
     result +=
       BASE32_ALPHABET[
-        (buffer << (5 - bitCount)) & 0x1f
+        (
+          buffer <<
+          (5 - bitCount)
+        ) & 0x1f
       ];
   }
 
   return result;
 }
 
+
+/* =========================================================
+ * Secure random identifiers
+ * ========================================================= */
+
 /*
  * Generate a human-readable random code using the
  * browser's cryptographically secure random source.
  *
- * The alphabet contains exactly 32 characters, so
- * mapping a 32-bit value with modulo 32 introduces no
- * modulo bias.
+ * The alphabet contains exactly 32 characters. Because
+ * 32 divides evenly into the range of a 32-bit unsigned
+ * integer, modulo selection introduces no bias.
  */
 export function randomCode(length = 6) {
   if (
@@ -319,12 +382,13 @@ export function randomCode(length = 6) {
 
   let result = "";
 
-  randomValues.forEach((value) => {
+  for (const value of randomValues) {
     result +=
-      CODE_ALPHABET[
-        value % CODE_ALPHABET.length
+      BASE32_ALPHABET[
+        value %
+          BASE32_ALPHABET.length
       ];
-  });
+  }
 
   return result;
 }
