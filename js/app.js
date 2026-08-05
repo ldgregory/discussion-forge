@@ -1485,6 +1485,27 @@ function assignDeckPositions(cards) {
   }));
 }
 
+/*
+ * Generate a secure UUID for one manifest instance.
+ *
+ * The deterministic Deck ID identifies the generated deck
+ * configuration and card order. This UUID uniquely identifies
+ * this particular generation event and downloaded manifest.
+ */
+function createDeckUuid() {
+  if (
+    !globalThis.crypto ||
+    typeof globalThis.crypto.randomUUID !==
+      "function"
+  ) {
+    throw new Error(
+      "Secure UUID generation is not available in this browser context.",
+    );
+  }
+
+  return globalThis.crypto.randomUUID();
+}
+
 /* ---------------------------------------------------------
  * Generation transaction
  * --------------------------------------------------------- */
@@ -1550,7 +1571,7 @@ async function generateDeck() {
      * Assign a unique manifest-instance UUID in addition to the
      * deterministic Deck ID and fingerprint.
      */
-    const deckUuid = crypto.randomUUID();
+    const deckUuid = createDeckUuid();
 
     const { deckId, fingerprint } = await createDeckIdentity({
       seed,
