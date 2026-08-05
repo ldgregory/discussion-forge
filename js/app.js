@@ -2394,7 +2394,8 @@ function downloadManifest() {
  * into the builder control.
  */
 function handleRandomSeed() {
-  requireElement("seed").value = randomCode(10);
+  ui.seedInput.value =
+    randomCode(10);
 }
 
 /*
