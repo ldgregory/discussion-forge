@@ -1,3 +1,15 @@
+/*
+ * Trail Talk application
+ *
+ * This module owns application configuration, catalog
+ * validation, deck generation, rendering, user interaction,
+ * manifest creation, and application startup.
+ */
+
+/* =========================================================
+ * Imports
+ * ========================================================= */
+
 import {
   bytesToHex,
   chunkArray,
@@ -9,6 +21,16 @@ import {
 
 import { getTheme, themes } from "../themes/index.js";
 
+/* =========================================================
+ * Application identity
+ * ========================================================= */
+
+/*
+ * Canonical application-owned text used on card backs.
+ *
+ * Themes may style this text but may not redefine the
+ * application title, tagline, or brand.
+ */
 const APP_IDENTITY = Object.freeze({
   title: "TRAIL TALK",
   taglineLineOne: "Real Questions.",
@@ -16,13 +38,51 @@ const APP_IDENTITY = Object.freeze({
   brand: "Overlanding Atlas",
 });
 
+/* =========================================================
+ * Version and deck-identity contracts
+ * ========================================================= */
+
+/*
+ * Increment this only when the canonical deck-identity
+ * payload or fingerprint algorithm changes.
+ */
 const DECK_IDENTITY_VERSION = 1;
+
+/*
+ * Trail Talk generator version recorded in manifests and
+ * deterministic deck-identity payloads.
+ */
 const GENERATOR_VERSION = "0.2.0-alpha3";
+
+/*
+ * Version of the bundled catalog content used to generate
+ * a deck.
+ */
 const CATALOG_VERSION = "2026.08.01";
+
+/*
+ * Number of Base32 characters exposed as the human-readable
+ * deterministic Deck ID.
+ */
 const HUMAN_DECK_ID_LENGTH = 10;
 
+/* =========================================================
+ * Theme defaults
+ * ========================================================= */
+
+/*
+ * Trail Blue is the canonical fallback theme.
+ */
 const DEFAULT_THEME_ID = "trail-blue";
+
+/*
+ * DOM ID used for the dynamically loaded theme stylesheet.
+ */
 const THEME_STYLESHEET_ID = "active-theme-stylesheet";
+
+/* =========================================================
+ * Runtime and validation limits
+ * ========================================================= */
 
 const LIMITS = Object.freeze({
   maxCards: 5000,
@@ -35,6 +95,10 @@ const LIMITS = Object.freeze({
   maxDisplayNameLength: 100,
   maxIconLength: 16,
 });
+
+/* =========================================================
+ * Catalog allowlists
+ * ========================================================= */
 
 const ALLOWED_CARD_TYPES = new Set([
   "question",
@@ -70,29 +134,72 @@ const ALLOWED_SENSITIVITY_LEVELS = new Set(["low", "medium", "high"]);
 
 const ALLOWED_SOURCES = new Set(["original", "community"]);
 
+/* =========================================================
+ * Validation patterns
+ * ========================================================= */
+
+/*
+ * Lowercase kebab-case identifiers used by categories,
+ * editions, themes, and other trusted registry values.
+ */
 const ID_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
+/*
+ * UUID validation accepts RFC-compatible UUID versions
+ * 1 through 8 and the standard variant bits.
+ */
 const UUID_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
-const SEMVER_PATTERN =
-  /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/;
+/*
+ * Theme package versions currently use stable semantic
+ * versions without prerelease or build suffixes.
+ */
+const SEMVER_PATTERN = /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/;
 
+/*
+ * Six-digit hexadecimal color values used by catalog data.
+ */
 const HEX_COLOR_PATTERN = /^#[0-9a-f]{6}$/i;
 
+/* =========================================================
+ * Mutable application state
+ * ========================================================= */
+
+/*
+ * This is the only intentionally mutable application-level
+ * object. Catalog records are validated before being stored.
+ */
 const state = {
   cards: [],
   categories: [],
   editions: [],
   generated: [],
   manifest: null,
-  themeId: "trail-blue",
+  themeId: DEFAULT_THEME_ID,
 };
 
+/* =========================================================
+ * DOM access and application status
+ * ========================================================= */
+
+/*
+ * Return an element by ID, or null when it does not exist.
+ *
+ * Most application code should use requireElement() instead
+ * so missing required page structure fails immediately.
+ */
 function byId(id) {
   return document.getElementById(id);
 }
 
+/*
+ * Return a required page element.
+ *
+ * Trail Talk treats the IDs declared in index.html as part
+ * of the application contract. Missing required elements
+ * stop processing rather than allowing partial operation.
+ */
 function requireElement(id) {
   const element = byId(id);
 
@@ -103,14 +210,38 @@ function requireElement(id) {
   return element;
 }
 
+/*
+ * Replace the live status message shown to the user.
+ *
+ * The status element uses aria-live in index.html, so concise
+ * updates are also announced by assistive technology.
+ */
 function setStatus(message) {
   requireElement("status").textContent = message;
 }
 
+/* =========================================================
+ * Generic validation helpers
+ * ========================================================= */
+
+/*
+ * These helpers validate and normalize untrusted values
+ * before application code stores or renders them.
+ *
+ * They throw descriptive errors rather than returning
+ * partially valid data.
+ */
+
+/*
+ * Return true only for non-null, non-array objects.
+ */
 function isPlainObject(value) {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
+/*
+ * Require a plain object and return it unchanged.
+ */
 function requireObject(value, fieldName) {
   if (!isPlainObject(value)) {
     throw new TypeError(`${fieldName} must be an object.`);
@@ -119,6 +250,10 @@ function requireObject(value, fieldName) {
   return value;
 }
 
+/*
+ * Require, trim, constrain, and optionally pattern-check
+ * a string.
+ */
 function requireString(
   value,
   fieldName,
@@ -147,6 +282,12 @@ function requireString(
   return normalized;
 }
 
+/*
+ * Normalize an absent optional string to null.
+ *
+ * Present values receive the same validation as required
+ * strings.
+ */
 function optionalString(value, fieldName, { maxLength = 500 } = {}) {
   if (value === undefined || value === null || value === "") {
     return null;
@@ -158,6 +299,12 @@ function optionalString(value, fieldName, { maxLength = 500 } = {}) {
   });
 }
 
+/*
+ * Require an actual Boolean value.
+ *
+ * Truthy and falsy substitutes such as 1, 0, or strings
+ * are intentionally rejected.
+ */
 function requireBoolean(value, fieldName) {
   if (typeof value !== "boolean") {
     throw new TypeError(`${fieldName} must be true or false.`);
@@ -166,6 +313,9 @@ function requireBoolean(value, fieldName) {
   return value;
 }
 
+/*
+ * Require an integer greater than zero.
+ */
 function requirePositiveInteger(value, fieldName) {
   if (!Number.isInteger(value) || value < 1) {
     throw new TypeError(`${fieldName} must be a positive integer.`);
@@ -174,6 +324,10 @@ function requirePositiveInteger(value, fieldName) {
   return value;
 }
 
+/*
+ * Require a non-empty, size-limited array of validated
+ * strings.
+ */
 function requireStringArray(
   value,
   fieldName,
@@ -202,6 +356,10 @@ function requireStringArray(
   );
 }
 
+/*
+ * Require an array whose normalized string values all
+ * appear in a trusted allowlist.
+ */
 function requireAllowedStringArray(value, fieldName, allowedValues) {
   const items = requireStringArray(value, fieldName, {
     maxItems: allowedValues.size,
@@ -219,6 +377,12 @@ function requireAllowedStringArray(value, fieldName, allowedValues) {
   return items;
 }
 
+/*
+ * Require a parseable timestamp and return it as a Date.
+ *
+ * Callers normalize accepted timestamps with toISOString()
+ * before storing them.
+ */
 function requireIsoTimestamp(value, fieldName) {
   const timestamp = requireString(value, fieldName, {
     maxLength: 40,
@@ -233,6 +397,10 @@ function requireIsoTimestamp(value, fieldName) {
   return parsed;
 }
 
+/*
+ * Require a catalog array and enforce its maximum number
+ * of records before validating individual entries.
+ */
 function requireCatalogArray(value, catalogName, maxItems) {
   if (!Array.isArray(value)) {
     throw new TypeError(`${catalogName} must be an array.`);
@@ -247,6 +415,25 @@ function requireCatalogArray(value, catalogName, maxItems) {
   return value;
 }
 
+/* =========================================================
+ * Catalog record validation
+ * ========================================================= */
+
+/*
+ * These functions convert untrusted JSON records into
+ * normalized application records.
+ *
+ * Only the properties explicitly returned by each validator
+ * are preserved. Unknown properties are discarded.
+ */
+
+/* ---------------------------------------------------------
+ * Category records
+ * --------------------------------------------------------- */
+
+/*
+ * Validate and normalize one category catalog record.
+ */
 function validateCategory(rawCategory, index) {
   const category = requireObject(rawCategory, `categories[${index}]`);
 
@@ -281,6 +468,13 @@ function validateCategory(rawCategory, index) {
   };
 }
 
+/* ---------------------------------------------------------
+ * Edition records
+ * --------------------------------------------------------- */
+
+/*
+ * Validate and normalize one edition catalog record.
+ */
 function validateEdition(rawEdition, index) {
   const edition = requireObject(rawEdition, `editions[${index}]`);
 
@@ -306,7 +500,25 @@ function validateEdition(rawEdition, index) {
   };
 }
 
+/* ---------------------------------------------------------
+ * Card records
+ * --------------------------------------------------------- */
+
+/*
+ * Validate and normalize one card catalog record.
+ *
+ * Card validation includes:
+ * - identity and lifecycle metadata
+ * - prompt and instruction content
+ * - category and edition relationships
+ * - response and audience classifications
+ * - contributor credit
+ * - timestamps and content versioning
+ */
 function validateCard(rawCard, index) {
+  /*
+   * Required nested record sections.
+   */
   const card = requireObject(rawCard, `cards[${index}]`);
 
   const content = requireObject(card.content, `cards[${index}].content`);
@@ -315,6 +527,12 @@ function validateCard(rawCard, index) {
 
   const credit = requireObject(card.credit, `cards[${index}].credit`);
 
+  /*
+   * Single-value classifications.
+   *
+   * Each value must satisfy the identifier format and appear
+   * in its corresponding trusted allowlist.
+   */
   const type = requireString(card.type, `cards[${index}].type`, {
     maxLength: 32,
     pattern: ID_PATTERN,
@@ -393,6 +611,9 @@ function validateCard(rawCard, index) {
     );
   }
 
+  /*
+   * Multi-value audience and experience classifications.
+   */
   const experienceLevel = requireAllowedStringArray(
     card.experience_level,
     `cards[${index}].experience_level`,
@@ -411,6 +632,12 @@ function validateCard(rawCard, index) {
     ALLOWED_GROUP_FAMILIARITY,
   );
 
+  /*
+   * Lifecycle timestamps.
+   *
+   * The update timestamp may equal the creation timestamp but
+   * may not occur earlier.
+   */
   const addedAt = requireIsoTimestamp(
     card.added_to_catalog_at,
     `cards[${index}].added_to_catalog_at`,
@@ -427,6 +654,12 @@ function validateCard(rawCard, index) {
     );
   }
 
+  /*
+   * Construct the normalized trusted card record.
+   *
+   * Dates are serialized consistently and only validated
+   * properties are retained.
+   */
   return {
     card_uuid: requireString(card.card_uuid, `cards[${index}].card_uuid`, {
       maxLength: 36,
@@ -504,6 +737,14 @@ function validateCard(rawCard, index) {
   };
 }
 
+/* ---------------------------------------------------------
+ * Catalog-wide identity checks
+ * --------------------------------------------------------- */
+
+/*
+ * Require a unique value for the selected identity property
+ * across an entire validated catalog.
+ */
 function assertUniqueIds(records, collectionName, keyName) {
   const seen = new Set();
 
@@ -520,6 +761,17 @@ function assertUniqueIds(records, collectionName, keyName) {
   });
 }
 
+/* ---------------------------------------------------------
+ * Catalog relationship checks
+ * --------------------------------------------------------- */
+
+/*
+ * Validate references between cards, categories, and
+ * editions after all individual records are trusted.
+ *
+ * This prevents cards from referencing missing catalog
+ * records or using an undeclared primary category.
+ */
 function validateCatalogRelationships(cards, categories, editions) {
   const categoryIds = new Set(categories.map((category) => category.id));
 
@@ -550,6 +802,27 @@ function validateCatalogRelationships(cards, categories, editions) {
   });
 }
 
+/* =========================================================
+ * Catalog loading
+ * ========================================================= */
+
+/*
+ * Load, validate, cross-check, and store the bundled card,
+ * category, and edition catalogs before the application
+ * becomes interactive.
+ */
+
+/* ---------------------------------------------------------
+ * JSON transport
+ * --------------------------------------------------------- */
+
+/*
+ * Fetch one local JSON resource.
+ *
+ * Catalog requests use same-origin credentials and bypass
+ * the browser cache so development changes are not masked by
+ * stale data.
+ */
 async function fetchJson(path) {
   const response = await fetch(path, {
     credentials: "same-origin",
@@ -563,44 +836,93 @@ async function fetchJson(path) {
   return response.json();
 }
 
+/* ---------------------------------------------------------
+ * Catalog startup pipeline
+ * --------------------------------------------------------- */
+
+/*
+ * Load all catalogs concurrently, validate every record,
+ * enforce unique identities and valid relationships, then
+ * populate application state and initialize the builder UI.
+ */
 async function loadData() {
+  /*
+   * Fetch all catalogs concurrently.
+   */
   const [rawCards, rawCategories, rawEditions] = await Promise.all([
     fetchJson("data/cards.json"),
     fetchJson("data/categories.json"),
     fetchJson("data/editions.json"),
   ]);
 
+  /*
+   * Validate and normalize individual catalog records.
+   */
   const categories = requireCatalogArray(
     rawCategories,
     "categories",
     LIMITS.maxCategories,
   ).map(validateCategory);
 
+  /*
+   * Validate and normalize individual catalog records.
+   */
   const editions = requireCatalogArray(
     rawEditions,
     "editions",
     LIMITS.maxEditions,
   ).map(validateEdition);
 
+  /*
+   * Validate and normalize individual catalog records.
+   */
   const cards = requireCatalogArray(rawCards, "cards", LIMITS.maxCards).map(
     validateCard,
   );
 
+  /*
+   * Enforce catalog-wide identity uniqueness.
+   */
   assertUniqueIds(categories, "categories", "id");
   assertUniqueIds(editions, "editions", "id");
   assertUniqueIds(cards, "cards", "card_uuid");
 
+  /*
+   * Validate references between trusted records.
+   */
   validateCatalogRelationships(cards, categories, editions);
 
+  /*
+   * Publish only fully validated catalog data.
+   */
   state.cards = cards;
   state.categories = categories;
   state.editions = editions;
 
+  /*
+   * Activate the initial theme and populate the builder.
+   */
   loadThemeStylesheet(state.themeId);
   renderOptions();
   renderThemeOptions();
 }
 
+/* =========================================================
+ * Deck-builder controls
+ * ========================================================= */
+
+/*
+ * Build and read the user controls that define which cards
+ * are eligible for the next generated deck.
+ */
+
+/* ---------------------------------------------------------
+ * Edition and category options
+ * --------------------------------------------------------- */
+
+/*
+ * Create one safely rendered checkbox option.
+ */
 function createCheckboxOption({ name, value, labelText, checked }) {
   const label = document.createElement("label");
   label.className = "option";
@@ -619,6 +941,13 @@ function createCheckboxOption({ name, value, labelText, checked }) {
   return label;
 }
 
+/*
+ * Populate the active edition and category choices from the
+ * validated catalogs.
+ *
+ * The first active edition is selected initially, while all
+ * active categories are selected.
+ */
 function renderOptions() {
   const editionContainer = requireElement("edition-options");
 
@@ -654,6 +983,16 @@ function renderOptions() {
     });
 }
 
+/* ---------------------------------------------------------
+ * Theme lookup
+ * --------------------------------------------------------- */
+
+/*
+ * Return a validated theme package.
+ *
+ * Unknown theme identifiers fail immediately rather than
+ * silently falling back to another theme.
+ */
 function requireTheme(themeId) {
   const theme = getTheme(themeId);
 
@@ -664,23 +1003,60 @@ function requireTheme(themeId) {
   return theme;
 }
 
-// Default fail-through to the canonical theme if a requested asset is missing.
+/*
+ * Return the canonical Trail Blue fallback icon.
+ *
+ * This is the second stage of the application's icon
+ * fallback chain:
+ *
+ * Theme SVG
+ *     ↓
+ * Trail Blue SVG
+ *     ↓
+ * Emoji
+ */
 function buildDefaultThemeIconPath(category) {
   const defaultTheme = requireTheme(DEFAULT_THEME_ID);
 
   return buildThemeIconPath(defaultTheme, category);
 }
 
+/* ---------------------------------------------------------
+ * Theme asset resolution
+ * --------------------------------------------------------- */
+
+/*
+ * Construct trusted paths to theme-owned assets.
+ *
+ * These helpers never concatenate arbitrary user input into
+ * URLs. All paths originate from validated theme metadata.
+ */
+
+/*
+ * Return the SVG icon path for one category.
+ */
 function buildThemeIconPath(theme, category) {
   return `${theme.assetRoot}/icons/${category.id}.svg`;
 }
 
+/*
+ * Return the themed card-back artwork path.
+ */
 function buildThemeCardBackPath(theme) {
-  return (
-    `${theme.assetRoot}/card-back.svg`
-  );
+  return `${theme.assetRoot}/card-back.svg`;
 }
 
+/* ---------------------------------------------------------
+ * Theme activation
+ * --------------------------------------------------------- */
+
+/*
+ * Activate the selected theme stylesheet.
+ *
+ * Only one theme stylesheet is active at a time. Changing
+ * themes replaces the existing stylesheet rather than
+ * accumulating multiple active themes.
+ */
 function loadThemeStylesheet(themeId) {
   const theme = requireTheme(themeId);
 
@@ -702,6 +1078,32 @@ function loadThemeStylesheet(themeId) {
   stylesheet.href = theme.stylesheet;
 }
 
+/* =========================================================
+ * Theme subsystem
+ * ========================================================= */
+
+/*
+ * Themes are trusted application packages.
+ *
+ * The application validates each theme definition before it
+ * is used, constructs trusted asset paths beneath the theme's
+ * asset root, dynamically loads the selected stylesheet, and
+ * provides safe fallback behavior when optional assets are
+ * unavailable.
+ */
+
+/* ---------------------------------------------------------
+ * Theme definition validation
+ * --------------------------------------------------------- */
+
+/*
+ * Validate one trusted theme definition exported by the
+ * theme registry.
+ *
+ * Theme packages are application code rather than user
+ * content, but validating them here produces descriptive
+ * failures and keeps the contract centralized.
+ */
 function validateThemeDefinition(theme) {
   if (!isPlainObject(theme)) {
     return false;
@@ -710,31 +1112,22 @@ function validateThemeDefinition(theme) {
   return (
     typeof theme.id === "string" &&
     ID_PATTERN.test(theme.id) &&
-
     typeof theme.name === "string" &&
     theme.name.length > 0 &&
-    theme.name.length <=
-      LIMITS.maxDisplayNameLength &&
-
+    theme.name.length <= LIMITS.maxDisplayNameLength &&
     typeof theme.version === "string" &&
     SEMVER_PATTERN.test(theme.version) &&
-
     typeof theme.author === "string" &&
     theme.author.length > 0 &&
-    theme.author.length <=
-      LIMITS.maxDisplayNameLength &&
-
+    theme.author.length <= LIMITS.maxDisplayNameLength &&
     typeof theme.description === "string" &&
     theme.description.length > 0 &&
     theme.description.length <= 240 &&
-
     typeof theme.license === "string" &&
     theme.license.length > 0 &&
     theme.license.length <= 64 &&
-
     typeof theme.className === "string" &&
     ID_PATTERN.test(theme.className) &&
-
     typeof theme.stylesheet === "string" &&
     theme.stylesheet.length > 0 &&
     theme.stylesheet.length <= 200 &&
@@ -744,7 +1137,6 @@ function validateThemeDefinition(theme) {
     !theme.stylesheet.includes("\\") &&
     !theme.stylesheet.includes(":") &&
     !theme.stylesheet.startsWith("/") &&
-
     typeof theme.assetRoot === "string" &&
     theme.assetRoot.length > 0 &&
     theme.assetRoot.length <= 200 &&
@@ -757,6 +1149,13 @@ function validateThemeDefinition(theme) {
   );
 }
 
+/* ---------------------------------------------------------
+ * Theme selector
+ * --------------------------------------------------------- */
+
+/*
+ * Populate the Theme picker using the validated registry.
+ */
 function renderThemeOptions() {
   const selector = requireElement("theme");
 
@@ -785,6 +1184,16 @@ function renderThemeOptions() {
   selector.value = selectedTheme.id;
 }
 
+/* ---------------------------------------------------------
+ * Selected builder values
+ * --------------------------------------------------------- */
+
+/*
+ * Return the checked values for a supported option group.
+ *
+ * Restricting the accepted group names prevents arbitrary
+ * selectors from being constructed from caller input.
+ */
 function selectedValues(name) {
   if (name !== "edition" && name !== "category") {
     throw new Error(`Unsupported option group requested: ${name}`);
@@ -795,6 +1204,14 @@ function selectedValues(name) {
   );
 }
 
+/* ---------------------------------------------------------
+ * Generation input validation
+ * --------------------------------------------------------- */
+
+/*
+ * Require a whole-number playable-card count within the
+ * application limit.
+ */
 function validateDeckSize(rawValue) {
   const size = Number(rawValue);
 
@@ -811,6 +1228,12 @@ function validateDeckSize(rawValue) {
   return size;
 }
 
+/*
+ * Normalize the generation seed.
+ *
+ * An empty value falls back to the demonstration seed so
+ * generation remains deterministic.
+ */
 function validateSeed(rawSeed) {
   const normalized = typeof rawSeed === "string" ? rawSeed.trim() : "";
 
@@ -825,6 +1248,24 @@ function validateSeed(rawSeed) {
   return seed;
 }
 
+/* =========================================================
+ * Deck generation
+ * ========================================================= */
+
+/*
+ * Convert the current builder configuration and validated
+ * catalog into a reproducible, permanently positioned deck
+ * and its downloadable manifest.
+ */
+
+/* ---------------------------------------------------------
+ * Generated-state reset
+ * --------------------------------------------------------- */
+
+/*
+ * Discard the current generated deck, manifest, preview, and
+ * print output.
+ */
 function clearGeneratedOutput() {
   state.generated = [];
   state.manifest = null;
@@ -833,6 +1274,17 @@ function clearGeneratedOutput() {
   requireElement("print-output").replaceChildren();
 }
 
+/* ---------------------------------------------------------
+ * Deterministic deck identity
+ * --------------------------------------------------------- */
+
+/*
+ * Create the canonical fingerprint and human-readable Deck ID
+ * for a generated playable deck.
+ *
+ * Set-like configuration arrays are sorted, while card order
+ * is preserved because permanent deck position is meaningful.
+ */
 async function createDeckIdentity({
   seed,
   editions,
@@ -871,6 +1323,9 @@ async function createDeckIdentity({
 
   const deckId = encodeBase32(digest).slice(0, HUMAN_DECK_ID_LENGTH);
 
+  /*
+   * Return both machine-readable and human-readable identities.
+   */
   return {
     deckId,
     fingerprint,
@@ -878,7 +1333,21 @@ async function createDeckIdentity({
   };
 }
 
+/* ---------------------------------------------------------
+ * Generation transaction
+ * --------------------------------------------------------- */
+
+/*
+ * Generate one playable deck from the current builder state.
+ *
+ * The operation either completes with a matching generated
+ * deck and manifest or reports a failure without exposing
+ * partially generated output.
+ */
 async function generateDeck() {
+  /*
+   * Read and validate the requested configuration.
+   */
   try {
     const editions = selectedValues("edition");
     const categories = selectedValues("category");
@@ -887,12 +1356,19 @@ async function generateDeck() {
 
     const seed = validateSeed(requireElement("seed").value);
 
+    /*
+     * Require at least one edition and one category.
+     */
     if (editions.length === 0 || categories.length === 0) {
       setStatus("Select at least one edition and one category.");
 
       return;
     }
 
+    /*
+     * Find active, approved cards matching both the selected
+     * edition set and category set.
+     */
     const eligible = state.cards.filter(
       (card) =>
         card.active &&
@@ -901,6 +1377,10 @@ async function generateDeck() {
         card.categories.some((categoryId) => categories.includes(categoryId)),
     );
 
+    /*
+     * Clear stale output when the current configuration has no
+     * playable cards.
+     */
     if (eligible.length === 0) {
       clearGeneratedOutput();
 
@@ -909,11 +1389,19 @@ async function generateDeck() {
       return;
     }
 
+    /*
+     * Select cards deterministically without mutating the
+     * validated catalog order.
+     */
     const chosen = seededShuffle(eligible, seed).slice(
       0,
       Math.min(requested, eligible.length),
     );
 
+    /*
+     * Assign a unique manifest-instance UUID in addition to the
+     * deterministic Deck ID and fingerprint.
+     */
     const deckUuid = crypto.randomUUID();
 
     const { deckId, fingerprint } = await createDeckIdentity({
@@ -924,11 +1412,19 @@ async function generateDeck() {
       cards: chosen,
     });
 
+    /*
+     * Preserve permanent one-based positions for this generated
+     * deck.
+     */
     state.generated = chosen.map((card, index) => ({
       deck_position: index + 1,
       ...card,
     }));
 
+    /*
+     * Capture the generation configuration and immutable card
+     * content snapshots needed to identify or reproduce the deck.
+     */
     state.manifest = {
       deck_uuid: deckUuid,
       deck_id: deckId,
@@ -961,14 +1457,25 @@ async function generateDeck() {
       })),
     };
 
+    /*
+     * Report whether the requested deck size was fully satisfied.
+     */
     setStatus(
       chosen.length < requested
         ? `Only ${chosen.length} eligible cards were available.`
         : `Generated ${chosen.length} playable cards.`,
     );
 
+    /*
+     * Render preview and print output from the same generated
+     * deck state.
+     */
     renderOutput();
   } catch (error) {
+    /*
+     * Fail visibly without exposing an uncaught generation error
+     * to the user.
+     */
     console.error(error);
 
     setStatus(
@@ -979,6 +1486,27 @@ async function generateDeck() {
   }
 }
 
+/* =========================================================
+ * Shared rendering resources
+ * ========================================================= */
+
+/*
+ * Resolve validated catalog relationships and create
+ * theme-aware decorative assets shared by preview, print,
+ * and Quick List output.
+ */
+
+/* ---------------------------------------------------------
+ * Primary-category lookup
+ * --------------------------------------------------------- */
+
+/*
+ * Return the validated primary category for one card.
+ *
+ * Catalog relationship validation should guarantee that the
+ * category exists. This defensive check protects rendering if
+ * application state is ever modified incorrectly.
+ */
 function categoryFor(card) {
   const category = state.categories.find(
     (candidate) => candidate.id === card.visual.primary_category,
@@ -993,12 +1521,34 @@ function categoryFor(card) {
   return category;
 }
 
+/* ---------------------------------------------------------
+ * Category artwork
+ * --------------------------------------------------------- */
+
+/*
+ * Create a category icon with graceful fallback behavior.
+ *
+ * Fallback order:
+ *
+ * 1. Selected theme SVG
+ * 2. Trail Blue canonical SVG
+ * 3. Catalog emoji
+ *
+ * The wrapper may be decorative or may expose the category
+ * name to assistive technology, depending on its use.
+ */
 function createCategoryIcon(
   category,
   { className = "", decorative = true, themeId = state.themeId } = {},
 ) {
+  /*
+   * Resolve the requested trusted theme.
+   */
   const theme = requireTheme(themeId);
 
+  /*
+   * Create the semantic icon container.
+   */
   const wrapper = document.createElement("span");
 
   if (className) {
@@ -1011,6 +1561,9 @@ function createCategoryIcon(
     wrapper.setAttribute("aria-label", category.name);
   }
 
+  /*
+   * Attempt the selected theme asset first.
+   */
   const image = document.createElement("img");
 
   image.src = buildThemeIconPath(theme, category);
@@ -1022,6 +1575,9 @@ function createCategoryIcon(
 
   image.className = "category-svg-icon";
 
+  /*
+   * Fall through to Trail Blue, then to the catalog emoji.
+   */
   image.onerror = () => {
     if (theme.id === DEFAULT_THEME_ID) {
       wrapper.textContent = category.icon;
@@ -1040,6 +1596,19 @@ function createCategoryIcon(
   return wrapper;
 }
 
+/* ---------------------------------------------------------
+ * Card-back artwork
+ * --------------------------------------------------------- */
+
+/*
+ * Create the optional decorative card-back graphic.
+ *
+ * Fallback order:
+ *
+ * 1. Selected theme card-back.svg
+ * 2. Trail Blue canonical card-back.svg
+ * 3. No graphic; preserve the complete text-only card back
+ */
 function createCardBackGraphic({ themeId = state.themeId } = {}) {
   const theme = requireTheme(themeId);
 
@@ -1090,14 +1659,49 @@ function createCardBackGraphic({ themeId = state.themeId } = {}) {
   return wrapper;
 }
 
+/* =========================================================
+ * Canonical card renderers
+ * ========================================================= */
+
+/*
+ * These functions create the physical card faces shared by
+ * both interactive preview output and printable output.
+ *
+ * They render from the same generated deck state so preview
+ * and print remain synchronized.
+ */
+
+/* ---------------------------------------------------------
+ * Card front
+ * --------------------------------------------------------- */
+
+/*
+ * Render one complete card front:
+ *
+ * - category banner
+ * - banner icon and name
+ * - center icon
+ * - prompt
+ * - optional instruction
+ * - permanent Deck ID and position footer
+ */
 function renderFrontCard(card, { themeId = state.themeId } = {}) {
+  /*
+   * Resolve the card's primary category and requested theme.
+   */
   const category = categoryFor(card);
   const theme = requireTheme(themeId);
 
+  /*
+   * Create the physical card container.
+   */
   const article = document.createElement("article");
 
   article.classList.add("play-card", "card-front", theme.className);
 
+  /*
+   * Build the category banner.
+   */
   const band = document.createElement("div");
 
   band.classList.add("card-band", `category-${category.id}`);
@@ -1113,6 +1717,9 @@ function renderFrontCard(card, { themeId = state.themeId } = {}) {
 
   band.append(bandIcon, bandName);
 
+  /*
+   * Build the centered prompt content.
+   */
   const body = document.createElement("div");
   body.className = "card-body";
 
@@ -1128,6 +1735,9 @@ function renderFrontCard(card, { themeId = state.themeId } = {}) {
 
   bodyContent.append(cardIcon, prompt);
 
+  /*
+   * Add optional play guidance only when present.
+   */
   if (card.content.instruction) {
     const instruction = document.createElement("p");
 
@@ -1140,6 +1750,9 @@ function renderFrontCard(card, { themeId = state.themeId } = {}) {
 
   body.appendChild(bodyContent);
 
+  /*
+   * Add the deterministic Deck ID and permanent position.
+   */
   const footer = document.createElement("div");
 
   footer.className = "card-footer";
@@ -1158,27 +1771,45 @@ function renderFrontCard(card, { themeId = state.themeId } = {}) {
   return article;
 }
 
+/* ---------------------------------------------------------
+ * Card back
+ * --------------------------------------------------------- */
+
+/*
+ * Render one complete card back:
+ *
+ * - optional hole-punch guide
+ * - theme-owned decorative artwork
+ * - application-owned title
+ * - theme-styled divider
+ * - application-owned tagline
+ * - application-owned brand
+ */
 function renderBackCard({
   showPunchGuide = true,
   themeId = state.themeId,
 } = {}) {
   const theme = requireTheme(themeId);
 
-  const divider =
-  document.createElement("div");
+  /*
+   * Create the theme-styled divider as a standalone element.
+   */
+  const divider = document.createElement("div");
 
-  divider.className =
-    "card-back-divider";
+  divider.className = "card-back-divider";
 
-  divider.setAttribute(
-    "aria-hidden",
-    "true",
-  );
+  divider.setAttribute("aria-hidden", "true");
 
+  /*
+   * Create the physical card container.
+   */
   const article = document.createElement("article");
 
   article.classList.add("play-card", "card-back", theme.className);
 
+  /*
+   * Add the application-owned hole-punch guide when requested.
+   */
   if (showPunchGuide) {
     const punchGuide = document.createElement("div");
 
@@ -1189,14 +1820,23 @@ function renderBackCard({
     article.appendChild(punchGuide);
   }
 
+  /*
+   * Build the semantic card-back content stack.
+   */
   const content = document.createElement("div");
 
   content.className = "card-back-content";
 
+  /*
+   * Add optional theme artwork with graceful fallback.
+   */
   const mainGraphic = createCardBackGraphic({
     themeId,
   });
 
+  /*
+   * Add canonical application identity text.
+   */
   const heading = document.createElement("h3");
 
   heading.className = "card-back-title";
@@ -1209,11 +1849,12 @@ function renderBackCard({
 
   const taglineLineOne = document.createElement("span");
 
-  taglineLineOne.textContent = APP_IDENTITY.taglineLineOne + ' ' + APP_IDENTITY.taglineLineTwo;
+  taglineLineOne.textContent =
+    APP_IDENTITY.taglineLineOne + " " + APP_IDENTITY.taglineLineTwo;
 
   const taglineLineTwo = document.createElement("span");
 
-  taglineLineTwo.textContent = "" //APP_IDENTITY.taglineLineTwo;
+  taglineLineTwo.textContent = ""; //APP_IDENTITY.taglineLineTwo;
 
   tagline.append(taglineLineOne, taglineLineTwo);
 
@@ -1223,20 +1864,23 @@ function renderBackCard({
 
   brand.textContent = APP_IDENTITY.brand;
 
-  content.append(
-  mainGraphic,
-  heading,
-  divider,
-  tagline,
-  brand,
-  );
+  content.append(mainGraphic, heading, divider, tagline, brand);
 
   article.appendChild(content);
 
   return article;
 }
 
+/*
+ * Render one interactive preview card.
+ *
+ * Preview cards reuse the canonical front and back renderers
+ * so the preview always matches printed output.
+ */
 function renderPreviewCard(card) {
+  /*
+   * Create the interactive preview container.
+   */
   const wrapper = document.createElement("div");
 
   wrapper.className = "preview-card";
@@ -1258,12 +1902,18 @@ function renderPreviewCard(card) {
 
   frontSide.className = "preview-card-side preview-card-front";
 
+  /*
+   * Build the canonical front card face.
+   */
   frontSide.appendChild(renderFrontCard(card));
 
   const backSide = document.createElement("div");
 
   backSide.className = "preview-card-side preview-card-back";
 
+  /*
+   * Build the canonical back card face.
+   */
   backSide.appendChild(
     renderBackCard({
       showPunchGuide: true,
@@ -1276,11 +1926,28 @@ function renderPreviewCard(card) {
   return wrapper;
 }
 
+/* =========================================================
+ * Output coordination
+ * ========================================================= */
+
+/*
+ * Render every presentation of the generated deck from the
+ * same application state.
+ *
+ * Preview and printable output are always regenerated
+ * together.
+ */
 function renderOutput() {
   renderPreview();
   renderPrintOutput();
 }
 
+/*
+ * Render the summary panel shown above the preview.
+ *
+ * The panel reports the generated deck identity and the
+ * configuration used to create it.
+ */
 function renderPreviewStatus() {
   if (!state.manifest) {
     return null;
@@ -1359,6 +2026,25 @@ function renderPreviewStatus() {
   return header;
 }
 
+/* =========================================================
+ * Interactive preview
+ * ========================================================= */
+
+/*
+ * The screen preview is a complete interactive view of the
+ * generated deck.
+ *
+ * Unlike printable output, preview cards can be flipped to
+ * inspect both sides before printing.
+ */
+
+/* ---------------------------------------------------------
+ * Preview status panel
+ * --------------------------------------------------------- */
+
+/*
+ * Create one labeled value displayed in the preview summary.
+ */
 function createStatusDetail(label, value, { useCode = false } = {}) {
   const wrapper = document.createElement("div");
 
@@ -1382,6 +2068,17 @@ function createStatusDetail(label, value, { useCode = false } = {}) {
   return wrapper;
 }
 
+/* ---------------------------------------------------------
+ * Preview coordinator
+ * --------------------------------------------------------- */
+
+/*
+ * Render the complete interactive preview.
+ *
+ * This function owns only preview composition. Individual
+ * cards and status details are delegated to helper
+ * functions.
+ */
 function renderPreview() {
   const mode = requireElement("output-mode").value;
 
@@ -1426,6 +2123,13 @@ function renderPreview() {
   });
 }
 
+/* ---------------------------------------------------------
+ * Preview interaction
+ * --------------------------------------------------------- */
+
+/*
+ * Flip one preview card between its front and back faces.
+ */
 function togglePreviewCard(cardElement) {
   const isFlipped = cardElement.classList.toggle("is-flipped");
 
@@ -1437,11 +2141,24 @@ function togglePreviewCard(cardElement) {
   );
 }
 
+/* =========================================================
+ * Quick List
+ * ========================================================= */
+
+/*
+ * Render a compact printable reference list.
+ *
+ * The Quick List preserves permanent Deck IDs and positions
+ * while minimizing paper usage for last-minute trips.
+ */
 function renderQuickList(container) {
   const list = document.createElement("div");
 
   list.className = "quick-list";
 
+  /*
+   * Populate the supplied Quick List container.
+   */
   state.generated.forEach((card) => {
     const category = categoryFor(card);
 
@@ -1490,6 +2207,16 @@ function renderQuickList(container) {
   container.appendChild(list);
 }
 
+/* =========================================================
+ * Printable output
+ * ========================================================= */
+
+/*
+ * Render duplex-ready pages.
+ *
+ * Front pages are immediately followed by their matching
+ * back pages to support long-edge duplex printing.
+ */
 function renderPrintOutput() {
   const mode = requireElement("output-mode").value;
 
@@ -1497,6 +2224,9 @@ function renderPrintOutput() {
 
   output.replaceChildren();
 
+  /*
+   * Quick List mode bypasses card rendering entirely.
+   */
   if (mode === "list") {
     renderQuickList(output);
 
@@ -1505,6 +2235,9 @@ function renderPrintOutput() {
 
   const cardsPerPage = 6;
 
+  /*
+   * Group cards into printable six-card sheets.
+   */
   const cardGroups = chunkArray(state.generated, cardsPerPage);
 
   cardGroups.forEach((cards) => {
@@ -1512,6 +2245,9 @@ function renderPrintOutput() {
 
     const lastPosition = cards[cards.length - 1].deck_position;
 
+    /*
+     * Create the front page for this sheet.
+     */
     const frontPage = document.createElement("section");
 
     frontPage.className = "print-page front-page";
@@ -1531,6 +2267,9 @@ function renderPrintOutput() {
     frontPage.appendChild(frontGrid);
     output.appendChild(frontPage);
 
+    /*
+     * Create the matching back page.
+     */
     const backPage = document.createElement("section");
 
     backPage.className = "print-page back-page";
@@ -1552,6 +2291,17 @@ function renderPrintOutput() {
   });
 }
 
+/* =========================================================
+ * Manifest export
+ * ========================================================= */
+
+/*
+ * Download the generated deck manifest.
+ *
+ * The manifest contains the information required to identify
+ * or reproduce the generated deck independently of the
+ * printed cards.
+ */
 function downloadManifest() {
   if (!state.manifest) {
     setStatus("Generate a deck first.");
@@ -1582,6 +2332,21 @@ function downloadManifest() {
   }, 0);
 }
 
+/* =========================================================
+ * Application lifecycle
+ * ========================================================= */
+
+/*
+ * Register user interactions and perform application
+ * startup.
+ *
+ * Initialization order:
+ *
+ *   1. Register event handlers.
+ *   2. Load and validate catalogs.
+ *   3. Activate the default theme.
+ *   4. Render the initial builder.
+ */
 requireElement("generate").addEventListener("click", generateDeck);
 
 requireElement("random-seed").addEventListener("click", () => {
