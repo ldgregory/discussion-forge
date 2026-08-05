@@ -2347,36 +2347,68 @@ function downloadManifest() {
  *   3. Activate the default theme.
  *   4. Render the initial builder.
  */
-requireElement("generate").addEventListener("click", generateDeck);
 
-requireElement("random-seed").addEventListener("click", () => {
-  requireElement("seed").value = randomCode(10);
-});
+/* =========================================================
+ * Event handlers
+ * ========================================================= */
 
-requireElement("print").addEventListener("click", () => {
+/*
+ * Generate a new secure, human-readable seed and place it
+ * into the builder control.
+ */
+function handleRandomSeed() {
+  requireElement("seed").value =
+    randomCode(10);
+}
+
+/*
+ * Open the browser's print dialog.
+ */
+function handlePrint() {
   window.print();
-});
+}
 
-requireElement("download-manifest").addEventListener("click", downloadManifest);
+/*
+ * Download the current generated-deck manifest.
+ */
+function handleManifestDownload() {
+  downloadManifest();
+}
 
-requireElement("output-mode").addEventListener("change", () => {
+/*
+ * Re-render an existing generated deck when the user changes
+ * between Poker Cards and Quick List modes.
+ */
+function handleOutputModeChange() {
   if (state.generated.length > 0) {
     renderOutput();
   }
-});
+}
 
-requireElement("theme").addEventListener("change", (event) => {
-  const requestedThemeId = event.target.value;
+/*
+ * Activate the selected theme and re-render existing output.
+ *
+ * A rejected theme selection restores the previously active
+ * theme without modifying generated deck state.
+ */
+function handleThemeChange(event) {
+  const requestedThemeId =
+    event.target.value;
 
   try {
-    const selectedTheme = requireTheme(requestedThemeId);
+    const selectedTheme =
+      requireTheme(requestedThemeId);
 
-    state.themeId = selectedTheme.id;
+    state.themeId =
+      selectedTheme.id;
 
-    loadThemeStylesheet(state.themeId);
+    loadThemeStylesheet(
+      state.themeId,
+    );
 
     if (state.manifest) {
-      state.manifest.configuration.theme = state.themeId;
+      state.manifest.configuration.theme =
+        state.themeId;
     }
 
     if (state.generated.length > 0) {
@@ -2385,11 +2417,61 @@ requireElement("theme").addEventListener("change", (event) => {
   } catch (error) {
     console.error(error);
 
-    setStatus("The selected theme is not available.");
+    setStatus(
+      "The selected theme is not available.",
+    );
 
-    event.target.value = state.themeId;
+    event.target.value =
+      state.themeId;
   }
-});
+}
+
+/* =========================================================
+ * Event registration
+ * ========================================================= */
+
+/*
+ * Connect page controls to their application handlers.
+ */
+function registerEventListeners() {
+  requireElement("generate")
+    .addEventListener(
+      "click",
+      generateDeck,
+    );
+
+  requireElement("random-seed")
+    .addEventListener(
+      "click",
+      handleRandomSeed,
+    );
+
+  requireElement("print")
+    .addEventListener(
+      "click",
+      handlePrint,
+    );
+
+  requireElement("download-manifest")
+    .addEventListener(
+      "click",
+      handleManifestDownload,
+    );
+
+  requireElement("output-mode")
+    .addEventListener(
+      "change",
+      handleOutputModeChange,
+    );
+
+  requireElement("theme")
+    .addEventListener(
+      "change",
+      handleThemeChange,
+    );
+}
+
+registerEventListeners();
 
 loadData().catch((error) => {
   console.error(error);
