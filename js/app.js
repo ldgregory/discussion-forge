@@ -179,6 +179,43 @@ const state = {
   themeId: DEFAULT_THEME_ID,
 };
 
+/*
+ * Cached references to required application UI elements.
+ *
+ * Looking up required DOM elements once keeps rendering code
+ * concise, improves readability, and provides better editor
+ * autocomplete. Each reference is resolved through
+ * requireElement(), so missing IDs still fail immediately
+ * during application startup rather than later during use.
+ */
+const ui = Object.freeze({
+  generateButton: requireElement("generate"),
+
+  printButton: requireElement("print"),
+
+  randomSeedButton: requireElement("random-seed"),
+
+  manifestButton: requireElement("download-manifest"),
+
+  outputMode: requireElement("output-mode"),
+
+  themeSelect: requireElement("theme"),
+
+  seedInput: requireElement("seed"),
+
+  deckSizeInput: requireElement("deck-size"),
+
+  editionOptions: requireElement("edition-options"),
+
+  categoryOptions: requireElement("category-options"),
+
+  previewOutput: requireElement("preview-output"),
+
+  printOutput: requireElement("print-output"),
+
+  status: requireElement("status"),
+});
+
 /* =========================================================
  * DOM access and application status
  * ========================================================= */
@@ -217,7 +254,7 @@ function requireElement(id) {
  * updates are also announced by assistive technology.
  */
 function setStatus(message) {
-  requireElement("status").textContent = message;
+  ui.status.textContent = message;
 }
 
 /* =========================================================
@@ -949,9 +986,9 @@ function createCheckboxOption({ name, value, labelText, checked }) {
  * active categories are selected.
  */
 function renderOptions() {
-  const editionContainer = requireElement("edition-options");
+  const editionContainer = ui.editionOptions;
 
-  const categoryContainer = requireElement("category-options");
+  const categoryContainer = ui.categoryOptions;
 
   editionContainer.replaceChildren();
   categoryContainer.replaceChildren();
@@ -1157,7 +1194,7 @@ function validateThemeDefinition(theme) {
  * Populate the Theme picker using the validated registry.
  */
 function renderThemeOptions() {
-  const selector = requireElement("theme");
+  const selector = ui.themeSelect;
 
   selector.replaceChildren();
 
@@ -1270,8 +1307,8 @@ function clearGeneratedOutput() {
   state.generated = [];
   state.manifest = null;
 
-  requireElement("preview-output").replaceChildren();
-  requireElement("print-output").replaceChildren();
+  ui.previewOutput.replaceChildren();
+  ui.printOutput.replaceChildren();
 }
 
 /* ---------------------------------------------------------
@@ -1352,9 +1389,9 @@ async function generateDeck() {
     const editions = selectedValues("edition");
     const categories = selectedValues("category");
 
-    const requested = validateDeckSize(requireElement("deck-size").value);
+    const requested = validateDeckSize(ui.deckSizeInput.value);
 
-    const seed = validateSeed(requireElement("seed").value);
+    const seed = validateSeed(ui.seedInput.value);
 
     /*
      * Require at least one edition and one category.
@@ -2357,8 +2394,7 @@ function downloadManifest() {
  * into the builder control.
  */
 function handleRandomSeed() {
-  requireElement("seed").value =
-    randomCode(10);
+  requireElement("seed").value = randomCode(10);
 }
 
 /*
@@ -2392,23 +2428,17 @@ function handleOutputModeChange() {
  * theme without modifying generated deck state.
  */
 function handleThemeChange(event) {
-  const requestedThemeId =
-    event.target.value;
+  const requestedThemeId = event.target.value;
 
   try {
-    const selectedTheme =
-      requireTheme(requestedThemeId);
+    const selectedTheme = requireTheme(requestedThemeId);
 
-    state.themeId =
-      selectedTheme.id;
+    state.themeId = selectedTheme.id;
 
-    loadThemeStylesheet(
-      state.themeId,
-    );
+    loadThemeStylesheet(state.themeId);
 
     if (state.manifest) {
-      state.manifest.configuration.theme =
-        state.themeId;
+      state.manifest.configuration.theme = state.themeId;
     }
 
     if (state.generated.length > 0) {
@@ -2417,12 +2447,9 @@ function handleThemeChange(event) {
   } catch (error) {
     console.error(error);
 
-    setStatus(
-      "The selected theme is not available.",
-    );
+    setStatus("The selected theme is not available.");
 
-    event.target.value =
-      state.themeId;
+    event.target.value = state.themeId;
   }
 }
 
@@ -2434,41 +2461,23 @@ function handleThemeChange(event) {
  * Connect page controls to their application handlers.
  */
 function registerEventListeners() {
-  requireElement("generate")
-    .addEventListener(
-      "click",
-      generateDeck,
-    );
+  requireElement("generate").addEventListener("click", generateDeck);
 
-  requireElement("random-seed")
-    .addEventListener(
-      "click",
-      handleRandomSeed,
-    );
+  requireElement("random-seed").addEventListener("click", handleRandomSeed);
 
-  requireElement("print")
-    .addEventListener(
-      "click",
-      handlePrint,
-    );
+  requireElement("print").addEventListener("click", handlePrint);
 
-  requireElement("download-manifest")
-    .addEventListener(
-      "click",
-      handleManifestDownload,
-    );
+  requireElement("download-manifest").addEventListener(
+    "click",
+    handleManifestDownload,
+  );
 
-  requireElement("output-mode")
-    .addEventListener(
-      "change",
-      handleOutputModeChange,
-    );
+  requireElement("output-mode").addEventListener(
+    "change",
+    handleOutputModeChange,
+  );
 
-  requireElement("theme")
-    .addEventListener(
-      "change",
-      handleThemeChange,
-    );
+  requireElement("theme").addEventListener("change", handleThemeChange);
 }
 
 registerEventListeners();
