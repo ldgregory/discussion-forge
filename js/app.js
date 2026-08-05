@@ -1472,6 +1472,19 @@ function buildManifest({
   };
 }
 
+/*
+ * Assign permanent one-based positions to the generated deck.
+ *
+ * These positions become part of the deck identity and remain
+ * stable for this generated deck.
+ */
+function assignDeckPositions(cards) {
+  return cards.map((card, index) => ({
+    deck_position: index + 1,
+    ...card,
+  }));
+}
+
 /* ---------------------------------------------------------
  * Generation transaction
  * --------------------------------------------------------- */
@@ -1551,10 +1564,7 @@ async function generateDeck() {
      * Preserve permanent one-based positions for this generated
      * deck.
      */
-    state.generated = chosen.map((card, index) => ({
-      deck_position: index + 1,
-      ...card,
-    }));
+    state.generated = assignDeckPositions(chosen);
 
     /*
      * Capture the generation configuration and immutable card
