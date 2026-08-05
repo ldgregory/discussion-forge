@@ -1417,6 +1417,61 @@ function cardMatchesSelection(card, editions, categories) {
   );
 }
 
+/*
+ * Build the manifest describing one generated deck.
+ *
+ * This preserves the generation configuration, deterministic
+ * identity fields, and immutable card-content snapshots used
+ * to identify or reproduce the deck.
+ */
+function buildManifest({
+  deckUuid,
+  deckId,
+  fingerprint,
+  seed,
+  editions,
+  categories,
+  requested,
+  generated,
+}) {
+  return {
+    deck_uuid: deckUuid,
+    deck_id: deckId,
+    deck_fingerprint: fingerprint,
+    deck_identity_version: DECK_IDENTITY_VERSION,
+
+    generated_at: new Date().toISOString(),
+
+    seed,
+
+    generator_version: GENERATOR_VERSION,
+
+    catalog_version: CATALOG_VERSION,
+
+    configuration: {
+      editions: [...editions],
+      categories: [...categories],
+      theme: state.themeId,
+      requested_card_count: requested,
+      playable_card_count: generated.length,
+    },
+
+    cards: generated.map((card) => ({
+      deck_position: card.deck_position,
+
+      card_uuid: card.card_uuid,
+
+      content_version: card.content_version,
+
+      content_snapshot: {
+        prompt: card.content.prompt,
+
+        instruction: card.content.instruction,
+      },
+    })),
+  };
+}
+
 /* ---------------------------------------------------------
  * Generation transaction
  * --------------------------------------------------------- */
@@ -1505,37 +1560,16 @@ async function generateDeck() {
      * Capture the generation configuration and immutable card
      * content snapshots needed to identify or reproduce the deck.
      */
-    state.manifest = {
-      deck_uuid: deckUuid,
-      deck_id: deckId,
-      deck_fingerprint: fingerprint,
-      deck_identity_version: DECK_IDENTITY_VERSION,
-
-      generated_at: new Date().toISOString(),
+    state.manifest = buildManifest({
+      deckUuid,
+      deckId,
+      fingerprint,
       seed,
-
-      generator_version: GENERATOR_VERSION,
-      catalog_version: CATALOG_VERSION,
-
-      configuration: {
-        editions: [...editions],
-        categories: [...categories],
-        theme: state.themeId,
-        requested_card_count: requested,
-        playable_card_count: state.generated.length,
-      },
-
-      cards: state.generated.map((card) => ({
-        deck_position: card.deck_position,
-        card_uuid: card.card_uuid,
-        content_version: card.content_version,
-
-        content_snapshot: {
-          prompt: card.content.prompt,
-          instruction: card.content.instruction,
-        },
-      })),
-    };
+      editions,
+      categories,
+      requested,
+      generated: state.generated,
+    });
 
     /*
      * Report whether the requested deck size was fully satisfied.
