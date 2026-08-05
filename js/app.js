@@ -1237,17 +1237,14 @@ function renderThemeOptions() {
   selector.value = selectedTheme.id;
 }
 
-/* ---------------------------------------------------------
- * Selected builder values
- * --------------------------------------------------------- */
-
 /*
- * Return the checked values for a supported option group.
+ * Return the selected checkbox values for one builder option
+ * group.
  *
- * Restricting the accepted group names prevents arbitrary
+ * Restricting accepted group names prevents arbitrary CSS
  * selectors from being constructed from caller input.
  */
-function selectedValues(name) {
+function getSelectedOptionValues(name) {
   if (name !== "edition" && name !== "category") {
     throw new Error(`Unsupported option group requested: ${name}`);
   }
@@ -1495,8 +1492,7 @@ function assignDeckPositions(cards) {
 function createDeckUuid() {
   if (
     !globalThis.crypto ||
-    typeof globalThis.crypto.randomUUID !==
-      "function"
+    typeof globalThis.crypto.randomUUID !== "function"
   ) {
     throw new Error(
       "Secure UUID generation is not available in this browser context.",
@@ -1522,8 +1518,8 @@ async function generateDeck() {
    * Read and validate the requested configuration.
    */
   try {
-    const editions = selectedValues("edition");
-    const categories = selectedValues("category");
+    const editions = getSelectedOptionValues("edition");
+    const categories = getSelectedOptionValues("category");
 
     const requested = validateDeckSize(ui.deckSizeInput.value);
 
