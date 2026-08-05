@@ -4,8 +4,8 @@
 
 ### General
 
-- [ ] Make deck identifier deterministic from the generated deck
-- [ ] Remove the legacy deck summary (yellow box)
+- [x] Make deck identifier deterministic from the generated deck
+- [x] Remove the legacy deck summary (yellow box)
 - [ ] Make preview cards visually match the printed cards
 - [ ] Keep the print renderer completely independent of interactive preview styles
 
@@ -21,9 +21,16 @@
 
 ### General
 
-- [ ] Replace emoji with SVG icons
+- [x] Replace emoji with SVG icons (emoji is still full failthrough)
 - [ ] Add subtle category banner patterns
-- [ ] Dynamically load theme CSS from the trusted theme registry
+- [x] Dynamically load theme CSS from the trusted theme registry
+- [ ] But I think we can make that significantly cleaner in a later pass by having renderPreviewCard() return a fully interactive card instead of a passive one.
+
+### Generation UX
+
+- [ ] If deck generation fails for any reason (validation or no eligible cards),
+clear the existing preview and print output so the UI never displays a stale
+deck that does not correspond to the current builder settings.
 
 ---
 

@@ -81,6 +81,18 @@ Future category additions will introduce additional required icons.
 
 ---
 
+## Recommended SVG Editor
+
+For simple edits to icons and artwork, we recommend:
+
+- SVG Viewer: https://www.svgviewer.dev/
+
+Its live source and preview panes make it ideal for adjusting paths,
+fills, strokes, and transforms without requiring a full vector graphics
+editor.
+
+---
+
 ## Canonical Icon Names
 
 gear.svg

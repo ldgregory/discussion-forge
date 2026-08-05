@@ -1,5 +1,21 @@
 /*
- * Bundled title font.
+ * Trail Charcoal theme
+ *
+ * This stylesheet controls the visual presentation of
+ * Trail Charcoal cards. Shared card dimensions, structural
+ * layout, and print geometry remain in css/styles.css.
+ */
+
+
+/* =========================================================
+ * Bundled fonts
+ * ========================================================= */
+
+/*
+ * Display font used for the TRAIL TALK title.
+ *
+ * The font file is stored locally in the theme package,
+ * allowing consistent rendering without a remote service.
  */
 @font-face {
   font-family: "Trail Charcoal Title";
@@ -11,18 +27,28 @@
   font-display: swap;
 }
 
+
+/* =========================================================
+ * Card back — canvas and shared presentation
+ * ========================================================= */
+
 /*
- * Trail Charcoal card-back background.
+ * Overall card-back background.
+ *
+ * This paints the full back of every Trail Charcoal card
+ * charcoal gray. The card-back SVG is rendered separately
+ * on top of it.
  */
 .card-back.theme-trail-charcoal {
   background: #36454f;
 }
 
 /*
- * Optional hole-punch guide.
+ * Optional hole-punch guide in the upper-left corner.
  *
- * Shared CSS owns its size and position.
- * Trail Charcoal supplies a visible color for the navy back.
+ * Shared CSS controls its position, diameter, and shape.
+ * Trail Charcoal provides a light border so it remains
+ * visible against the dark background.
  */
 .card-back.theme-trail-charcoal
   .punch-safe-back {
@@ -32,12 +58,14 @@
 }
 
 /*
- * Shared card-back text color.
+ * Shared text color for all card-back identity text.
  *
  * This affects:
  * - TRAIL TALK
  * - Real Questions. Real Connections.
  * - Overlanding Atlas
+ *
+ * It does not affect the SVG artwork or card background.
  */
 .card-back.theme-trail-charcoal
   .card-back-title,
@@ -48,9 +76,18 @@
   color: white;
 }
 
+
+/* =========================================================
+ * Card back — title row
+ * ========================================================= */
+
 /*
  * Main title row:
+ *
  * star + TRAIL TALK + star
+ *
+ * The title is a flex container so the two decorative
+ * pseudo-elements remain horizontally aligned with the text.
  */
 .card-back.theme-trail-charcoal
   .card-back-title {
@@ -73,7 +110,10 @@
 }
 
 /*
- * Decorative title stars.
+ * Decorative red stars on either side of TRAIL TALK.
+ *
+ * The star SVG acts as a mask. The background color below
+ * determines the visible color of both stars.
  */
 .card-back.theme-trail-charcoal
   .card-back-title::before,
@@ -102,10 +142,16 @@
   mask-repeat: no-repeat;
 }
 
+
+/* =========================================================
+ * Card back — divider and tagline
+ * ========================================================= */
+
 /*
- * Standalone red divider beneath the title.
+ * Red horizontal divider beneath the title.
  *
- * Its width is independent of the tagline width.
+ * This is a standalone renderer element, so its width can
+ * change independently of the tagline text below it.
  */
 .card-back.theme-trail-charcoal
   .card-back-divider {
@@ -118,7 +164,10 @@
 
 /*
  * Tagline:
+ *
  * Real Questions. Real Connections.
+ *
+ * The text remains on one line at the current card width.
  */
 .card-back.theme-trail-charcoal
   .card-back-tagline {
@@ -134,9 +183,18 @@
   white-space: nowrap;
 }
 
+
+/* =========================================================
+ * Card back — brand
+ * ========================================================= */
+
 /*
- * Brand:
+ * Brand line:
+ *
  * Overlanding Atlas
+ *
+ * This is intentionally smaller and quieter than the title
+ * so it reads as a signature rather than a competing heading.
  */
 .card-back.theme-trail-charcoal
   .card-back-brand {
@@ -146,31 +204,45 @@
     "Arial Black",
     "Arial Bold",
     sans-serif;
-  font-size: 0.50rem;
+  font-size: 0.5rem;
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   opacity: 0.9;
 }
 
+
+/* =========================================================
+ * Card fronts — category banners
+ * ========================================================= */
+
 /*
- * Category banner colors on card fronts.
+ * Gear & Vehicle banner.
  */
 .theme-trail-charcoal
   .category-gear {
   background-color: #3f6b45;
 }
 
+/*
+ * Story Time banner.
+ */
 .theme-trail-charcoal
   .category-story-time {
   background-color: #76528b;
 }
 
+/*
+ * Lightning Round banner.
+ */
 .theme-trail-charcoal
   .category-lightning {
   background-color: #59636e;
 }
 
+/*
+ * Wild Card banner.
+ */
 .theme-trail-charcoal
   .category-wildcard {
   background-color: #a33a2b;

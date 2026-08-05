@@ -2,7 +2,7 @@
   <title id="title">Trail Blue card-back graphic</title>
   <desc id="desc">A white compass rose with a wandering dashed trail ending at a red flag.</desc>
 
-  <path d="M26 188 C18 166 48 157 64 172 C83 190 113 183 125 164 C139 141 130 122 151 105 C169 90 190 93 194 74 C198 58 188 48 204 36"
+  <path d="M26 188 C18 166 48 157 64 172 C83 190 113 183 125 146 C139 141 130 122 151 105 C169 90 190 93 194 74 C198 58 188 48 204 36"
         fill="none" stroke="#FFFDF8" stroke-width="4" stroke-linecap="round" stroke-dasharray="5 8"/>
 
   <circle cx="118" cy="93" r="55" fill="none" stroke="#FFFDF8" stroke-width="2.5"/>
