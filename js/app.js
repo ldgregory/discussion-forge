@@ -1232,13 +1232,41 @@ function renderThemeOptions() {
  * selectors from being constructed from caller input.
  */
 function selectedValues(name) {
-  if (name !== "edition" && name !== "category") {
-    throw new Error(`Unsupported option group requested: ${name}`);
+  if (
+    name !== "edition" &&
+    name !== "category"
+  ) {
+    throw new Error(
+      `Unsupported option group requested: ${name}`,
+    );
   }
 
-  return [...document.querySelectorAll(`input[name="${name}"]:checked`)].map(
-    (input) => input.value,
+  const selected = [
+    ...document.querySelectorAll(
+      `input[name="${name}"]:checked`,
+    ),
+  ].map((input) => input.value);
+
+  const records =
+    name === "edition"
+      ? state.editions
+      : state.categories;
+
+  const allowedIds = new Set(
+    records
+      .filter((record) => record.active)
+      .map((record) => record.id),
   );
+
+  selected.forEach((value) => {
+    if (!allowedIds.has(value)) {
+      throw new Error(
+        `Unsupported ${name} selection: ${value}`,
+      );
+    }
+  });
+
+  return selected;
 }
 
 /* ---------------------------------------------------------
