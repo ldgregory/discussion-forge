@@ -1248,37 +1248,23 @@ function renderThemeOptions() {
  * selectors from being constructed from caller input.
  */
 function selectedValues(name) {
-  if (
-    name !== "edition" &&
-    name !== "category"
-  ) {
-    throw new Error(
-      `Unsupported option group requested: ${name}`,
-    );
+  if (name !== "edition" && name !== "category") {
+    throw new Error(`Unsupported option group requested: ${name}`);
   }
 
   const selected = [
-    ...document.querySelectorAll(
-      `input[name="${name}"]:checked`,
-    ),
+    ...document.querySelectorAll(`input[name="${name}"]:checked`),
   ].map((input) => input.value);
 
-  const records =
-    name === "edition"
-      ? state.editions
-      : state.categories;
+  const records = name === "edition" ? state.editions : state.categories;
 
   const allowedIds = new Set(
-    records
-      .filter((record) => record.active)
-      .map((record) => record.id),
+    records.filter((record) => record.active).map((record) => record.id),
   );
 
   selected.forEach((value) => {
     if (!allowedIds.has(value)) {
-      throw new Error(
-        `Unsupported ${name} selection: ${value}`,
-      );
+      throw new Error(`Unsupported ${name} selection: ${value}`);
     }
   });
 
@@ -1414,6 +1400,23 @@ async function createDeckIdentity({
   };
 }
 
+/*
+ * Return true when a card is playable for the selected
+ * editions and categories.
+ *
+ * A playable card must be active, approved, and associated
+ * with at least one selected edition and one selected
+ * category.
+ */
+function cardMatchesSelection(card, editions, categories) {
+  return (
+    card.active &&
+    card.status === "approved" &&
+    card.editions.some((editionId) => editions.includes(editionId)) &&
+    card.categories.some((categoryId) => categories.includes(categoryId))
+  );
+}
+
 /* ---------------------------------------------------------
  * Generation transaction
  * --------------------------------------------------------- */
@@ -1450,12 +1453,8 @@ async function generateDeck() {
      * Find active, approved cards matching both the selected
      * edition set and category set.
      */
-    const eligible = state.cards.filter(
-      (card) =>
-        card.active &&
-        card.status === "approved" &&
-        card.editions.some((editionId) => editions.includes(editionId)) &&
-        card.categories.some((categoryId) => categories.includes(categoryId)),
+    const eligible = state.cards.filter((card) =>
+      cardMatchesSelection(card, editions, categories),
     );
 
     /*
@@ -2438,8 +2437,7 @@ function downloadManifest() {
  * into the builder control.
  */
 function handleRandomSeed() {
-  ui.seedInput.value =
-    randomCode(RANDOM_SEED_LENGTH);
+  ui.seedInput.value = randomCode(RANDOM_SEED_LENGTH);
 }
 
 /*
