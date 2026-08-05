@@ -2117,9 +2117,9 @@ function createStatusDetail(label, value, { useCode = false } = {}) {
  * functions.
  */
 function renderPreview() {
-  const mode = requireElement("output-mode").value;
+  const mode = ui.outputMode.value;
 
-  const output = requireElement("preview-output");
+  const output = ui.previewOutput;
 
   output.replaceChildren();
 
@@ -2255,9 +2255,9 @@ function renderQuickList(container) {
  * back pages to support long-edge duplex printing.
  */
 function renderPrintOutput() {
-  const mode = requireElement("output-mode").value;
+  const mode = ui.outputMode.value;
 
-  const output = requireElement("print-output");
+  const output = ui.printOutput;
 
   output.replaceChildren();
 
@@ -2461,23 +2461,17 @@ function handleThemeChange(event) {
  * Connect page controls to their application handlers.
  */
 function registerEventListeners() {
-  requireElement("generate").addEventListener("click", generateDeck);
+  ui.generateButton.addEventListener("click", generateDeck);
 
-  requireElement("random-seed").addEventListener("click", handleRandomSeed);
+  ui.randomSeedButton.addEventListener("click", handleRandomSeed);
 
-  requireElement("print").addEventListener("click", handlePrint);
+  ui.printButton.addEventListener("click", handlePrint);
 
-  requireElement("download-manifest").addEventListener(
-    "click",
-    handleManifestDownload,
-  );
+  ui.manifestButton.addEventListener("click", handleManifestDownload);
 
-  requireElement("output-mode").addEventListener(
-    "change",
-    handleOutputModeChange,
-  );
+  ui.outputMode.addEventListener("change", handleOutputModeChange);
 
-  requireElement("theme").addEventListener("change", handleThemeChange);
+  ui.themeSelect.addEventListener("change", handleThemeChange);
 }
 
 registerEventListeners();
