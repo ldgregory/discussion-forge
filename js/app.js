@@ -1470,10 +1470,11 @@ function buildManifest({
 }
 
 /*
- * Assign permanent one-based positions to the generated deck.
+ * Return a copy of the generated deck with permanent
+ * one-based positions assigned.
  *
- * These positions become part of the deck identity and remain
- * stable for this generated deck.
+ * These positions become part of the deck identity and
+ * remain stable for this generated deck.
  */
 function assignDeckPositions(cards) {
   return cards.map((card, index) => ({
