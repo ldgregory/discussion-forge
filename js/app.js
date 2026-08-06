@@ -106,17 +106,50 @@ const LIMITS = Object.freeze({
   maxEditions: 100,
   maxDeckSize: 250,
   maxSeedLength: 128,
+  maxCategoryIdLength: 64,
+  maxEditionIdLength: 64,
+  maxThemeIdLength: 64,
+  maxIsoTimestampLength: 40,
+  maxColorValueLength: 32,
+  maxDescriptionLength: 500,
+  maxCardTypeLength: 32,
+  maxCardStatusLength: 32,
+  maxCardResponseStyleLength: 32,
+  maxCardAnswerLength: 32,
+  maxCardSensitivityLength: 32,
+  maxCardSourceLength: 48,
+  maxCardPrimaryCategoryLength: 64,
 
   /*
    * Card content limits.
    *
-   * These values preserve readability on a standard
-   * Trail Talk poker card.
+   * These values preserve readability and layout on a
+   * standard Trail Talk poker card.
    */
   maxPromptLength: 140,
   maxInstructionLength: 120,
   maxCategoryNameLength: 32,
-  maxIconLength: 16,
+  maxIconNameLength: 16,
+});
+
+/* =========================================================
+ * Canonical catalog paths
+ * ========================================================= */
+
+/*
+ * Trail Talk's bundled catalog pack.
+ *
+ * These paths define the canonical cards, categories, and
+ * editions loaded during application startup. Future catalog
+ * packs can be added through a dedicated pack registry without
+ * changing the trusted runtime state model.
+ */
+const CORE_CATALOG_PATHS = Object.freeze({
+  cards: "data/trail-talk/cards.json",
+
+  categories: "data/trail-talk/categories.json",
+
+  editions: "data/trail-talk/editions.json",
 });
 
 /* =========================================================
@@ -445,7 +478,7 @@ function requireAllowedStringArray(value, fieldName, allowedValues) {
  */
 function requireIsoTimestamp(value, fieldName) {
   const timestamp = requireString(value, fieldName, {
-    maxLength: 40,
+    maxLength: LIMITS.maxIsoTimestampLength,
   });
 
   const parsed = new Date(timestamp);
@@ -499,7 +532,7 @@ function validateCategory(rawCategory, index) {
 
   return {
     id: requireString(category.id, `categories[${index}].id`, {
-      maxLength: 64,
+      maxLength: LIMITS.maxCategoryIdLength,
       pattern: ID_PATTERN,
     }),
 
@@ -516,11 +549,11 @@ function validateCategory(rawCategory, index) {
     ),
 
     icon: requireString(category.icon, `categories[${index}].icon`, {
-      maxLength: LIMITS.maxIconLength,
+      maxLength: LIMITS.maxIconNameLength,
     }),
 
     color: requireString(category.color, `categories[${index}].color`, {
-      maxLength: 7,
+      maxLength: LIMITS.maxColorValueLength,
       pattern: HEX_COLOR_PATTERN,
     }),
 
@@ -540,7 +573,7 @@ function validateEdition(rawEdition, index) {
 
   return {
     id: requireString(edition.id, `editions[${index}].id`, {
-      maxLength: 64,
+      maxLength: LIMITS.maxEditionIdLength,
       pattern: ID_PATTERN,
     }),
 
@@ -552,7 +585,7 @@ function validateEdition(rawEdition, index) {
       edition.description,
       `editions[${index}].description`,
       {
-        maxLength: 500,
+        maxLength: LIMITS.maxDescriptionLength,
       },
     ),
 
@@ -594,7 +627,7 @@ function validateCard(rawCard, index) {
    * in its corresponding trusted allowlist.
    */
   const type = requireString(card.type, `cards[${index}].type`, {
-    maxLength: 32,
+    maxLength: LIMITS.maxCardTypeLength,
     pattern: ID_PATTERN,
   });
 
@@ -605,7 +638,7 @@ function validateCard(rawCard, index) {
   }
 
   const status = requireString(card.status, `cards[${index}].status`, {
-    maxLength: 32,
+    maxLength: LIMITS.maxCardStatusLength,
     pattern: ID_PATTERN,
   });
 
@@ -619,7 +652,7 @@ function validateCard(rawCard, index) {
     card.response_style,
     `cards[${index}].response_style`,
     {
-      maxLength: 32,
+      maxLength: LIMITS.maxCardResponseStyleLength,
       pattern: ID_PATTERN,
     },
   );
@@ -634,7 +667,7 @@ function validateCard(rawCard, index) {
     card.answer_length,
     `cards[${index}].answer_length`,
     {
-      maxLength: 32,
+      maxLength: LIMITS.maxCardAnswerLength,
       pattern: ID_PATTERN,
     },
   );
@@ -649,7 +682,7 @@ function validateCard(rawCard, index) {
     card.sensitivity,
     `cards[${index}].sensitivity`,
     {
-      maxLength: 32,
+      maxLength: LIMITS.maxCardSensitivityLength,
       pattern: ID_PATTERN,
     },
   );
@@ -661,7 +694,7 @@ function validateCard(rawCard, index) {
   }
 
   const source = requireString(card.source, `cards[${index}].source`, {
-    maxLength: 32,
+    maxLength: LIMITS.maxCardSourceLength,
     pattern: ID_PATTERN,
   });
 
@@ -722,7 +755,7 @@ function validateCard(rawCard, index) {
    */
   return {
     card_uuid: requireString(card.card_uuid, `cards[${index}].card_uuid`, {
-      maxLength: 36,
+      maxLength: LIMITS.maxCardUuidLength,
       pattern: UUID_PATTERN,
     }),
 
@@ -761,7 +794,7 @@ function validateCard(rawCard, index) {
         visual.primary_category,
         `cards[${index}].visual.primary_category`,
         {
-          maxLength: 64,
+          maxLength: LIMITS.maxCardPrimaryCategoryLength,
           pattern: ID_PATTERN,
         },
       ),
@@ -910,9 +943,11 @@ async function loadData() {
    * Fetch all catalogs concurrently.
    */
   const [rawCards, rawCategories, rawEditions] = await Promise.all([
-    fetchJson("data/cards.json"),
-    fetchJson("data/categories.json"),
-    fetchJson("data/editions.json"),
+    fetchJson(CORE_CATALOG_PATHS.cards),
+
+    fetchJson(CORE_CATALOG_PATHS.categories),
+
+    fetchJson(CORE_CATALOG_PATHS.editions),
   ]);
 
   /*
@@ -1332,22 +1367,6 @@ function validateSeed(rawSeed) {
  * catalog into a reproducible, permanently positioned deck
  * and its downloadable manifest.
  */
-
-/* ---------------------------------------------------------
- * Generated-state reset
- * --------------------------------------------------------- */
-
-/*
- * Discard the current generated deck, manifest, preview, and
- * print output.
- */
-function clearGeneratedOutput() {
-  state.generated = [];
-  state.manifest = null;
-
-  ui.previewOutput.replaceChildren();
-  ui.printOutput.replaceChildren();
-}
 
 /* ---------------------------------------------------------
  * Deterministic deck identity
@@ -2022,6 +2041,21 @@ function renderBackCard({
   article.appendChild(content);
 
   return article;
+}
+
+/*
+ * Clear all generated deck state and rendered output.
+ *
+ * This resets the application after generation errors
+ * or when the current builder configuration produces
+ * no playable cards.
+ */
+function clearGeneratedOutput() {
+  state.generated = [];
+  state.manifest = null;
+
+  ui.previewOutput.replaceChildren();
+  ui.printOutput.replaceChildren();
 }
 
 /*
