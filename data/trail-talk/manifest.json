@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "pack_type": "cards",
+
+  "id": "trail-talk",
+  "display_name": "Trail Talk Canonical Deck",
+  "version": "1.0.0",
+
+  "card_back_render_details": {
+    "title": "TRAIL TALK",
+    "tagline": ["Real Questions.", "Real Connections."],
+    "brand": "Overlanding Atlas"
+  },
+
+  "author": {
+    "name": "Atlas",
+    "email": "",
+    "website": "",
+    "github": ""
+  },
+
+  "released_at": "2026-08-02",
+
+  "description": "The canonical Trail Talk conversation deck designed to encourage meaningful conversations on the trail and around the campfire while helping travelers learn more about one another.",
+
+  "license": "Apache-2.0",
+
+  "minimum_application_version": "0.4.0",
+
+  "dependencies": [],
+
+  "tags": ["overlanding", "camping", "off-roading", "conversation"],
+
+  "editions": ["core", "campfire", "recovery"],
+
+  "categories": ["gear-vehicle", "story-time", "lightning-round", "wild-cards"],
+
+  "card_count": 32
+}
