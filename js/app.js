@@ -1,10 +1,12 @@
-/*
- * Trail Talk application
+/******************************************************
+ * Discussion Forge
+ *
+ * Generic conversation deck generation application.
  *
  * This module owns application configuration, catalog
- * validation, deck generation, rendering, user interaction,
- * manifest creation, and application startup.
- */
+ * validation, deck generation, rendering, user
+ * interaction, manifest creation, and startup.
+ ******************************************************/
 
 /* =========================================================
  * Imports
@@ -20,6 +22,34 @@ import {
 } from "./utils.js";
 
 import { getTheme, themes } from "../themes/index.js";
+
+/* =========================================================
+ * Version and deck-identity contracts
+ * ========================================================= */
+
+/*
+ * Increment this only when the canonical deck-identity
+ * payload or fingerprint algorithm changes.
+ */
+const DECK_IDENTITY_VERSION = 1;
+
+/*
+ * Discussion Forge application version recorded in
+ * generated deck manifests and compatibility metadata.
+ */
+const GENERATOR_VERSION = "0.2.0-alpha3";
+
+/*
+ * Version of the canonical Trail Talk catalog pack used
+ * when generating decks.
+ */
+const CATALOG_VERSION = "2026.08.01";
+
+/*
+ * Number of Base32 characters exposed as the human-readable
+ * deterministic Deck ID.
+ */
+const HUMAN_DECK_ID_LENGTH = 10;
 
 /* =========================================================
  * Application identity
@@ -38,34 +68,6 @@ const APPLICATION = Object.freeze({
 
   version: GENERATOR_VERSION,
 });
-
-/* =========================================================
- * Version and deck-identity contracts
- * ========================================================= */
-
-/*
- * Increment this only when the canonical deck-identity
- * payload or fingerprint algorithm changes.
- */
-const DECK_IDENTITY_VERSION = 1;
-
-/*
- * Trail Talk generator version recorded in manifests and
- * deterministic deck-identity payloads.
- */
-const GENERATOR_VERSION = "0.2.0-alpha3";
-
-/*
- * Version of the bundled catalog content used to generate
- * a deck.
- */
-const CATALOG_VERSION = "2026.08.01";
-
-/*
- * Number of Base32 characters exposed as the human-readable
- * deterministic Deck ID.
- */
-const HUMAN_DECK_ID_LENGTH = 10;
 
 /* =========================================================
  * Theme defaults
@@ -131,6 +133,11 @@ const LIMITS = Object.freeze({
   maxInstructionLength: 120,
   maxCategoryNameLength: 32,
   maxIconNameLength: 16,
+  maxCardBackTitleLength: 40,
+  maxCardBackTaglineLength: 80,
+  maxCardBackBrandLength: 64,
+  maxCardPackIdLength: 64,
+  maxCardPackDisplayNameLength: 100,
 });
 
 /* =========================================================
@@ -145,7 +152,9 @@ const LIMITS = Object.freeze({
  * packs can be added through a dedicated pack registry without
  * changing the trusted runtime state model.
  */
-const CORE_CATALOG_PATHS = Object.freeze({
+const TRAIL_TALK_PACK_PATHS = Object.freeze({
+  manifest: "data/trail-talk/manifest.json",
+
   cards: "data/trail-talk/cards.json",
 
   categories: "data/trail-talk/categories.json",
@@ -228,6 +237,7 @@ const HEX_COLOR_PATTERN = /^#[0-9a-f]{6}$/i;
  * object. Catalog records are validated before being stored.
  */
 const state = {
+  cardPack: null,
   cards: [],
   categories: [],
   editions: [],
@@ -507,6 +517,72 @@ function requireCatalogArray(value, catalogName, maxItems) {
   }
 
   return value;
+}
+
+/* ---------------------------------------------------------
+ * Card-pack manifest
+ * --------------------------------------------------------- */
+
+/*
+ * Validate and normalize the active card pack metadata used
+ * by the runtime.
+ *
+ * Only explicitly returned properties enter trusted
+ * application state. Additional manifest fields remain
+ * available for future validation work but are not trusted
+ * or consumed here.
+ */
+function validateCardPackManifest(rawManifest) {
+  const manifest = requireObject(rawManifest, "manifest");
+
+  const cardBack = requireObject(manifest.card_back, "manifest.card_back");
+
+  if (!Array.isArray(cardBack.tagline)) {
+    throw new TypeError("manifest.card_back.tagline must be an array.");
+  }
+
+  if (cardBack.tagline.length > 2) {
+    throw new RangeError(
+      "manifest.card_back.tagline may contain at most two lines.",
+    );
+  }
+
+  return {
+    id: requireString(manifest.id, "manifest.id", {
+      maxLength: LIMITS.maxCategoryIdLength,
+      pattern: ID_PATTERN,
+    }),
+
+    displayName: requireString(manifest.display_name, "manifest.display_name", {
+      maxLength: LIMITS.maxDescriptionLength,
+    }),
+
+    version: requireString(manifest.version, "manifest.version", {
+      maxLength: 32,
+      pattern: SEMVER_PATTERN,
+    }),
+
+    cardBack: {
+      title: requireString(cardBack.title, "manifest.card_back.title", {
+        maxLength: LIMITS.maxCardBackTitleLength,
+      }),
+
+      tagline: [0, 1].map((index) =>
+        requireString(
+          cardBack.tagline[index] ?? "",
+          `manifest.card_back.tagline[${index}]`,
+          {
+            minLength: 0,
+            maxLength: LIMITS.maxCardBackTaglineLength,
+          },
+        ),
+      ),
+
+      brand: requireString(cardBack.brand, "manifest.card_back.brand", {
+        maxLength: LIMITS.maxCardBackBrandLength,
+      }),
+    },
+  };
 }
 
 /* =========================================================
@@ -941,18 +1017,26 @@ async function fetchJson(path) {
  */
 async function loadData() {
   /*
-   * Fetch all catalogs concurrently.
+   * Fetch all pack resources concurrently.
    */
-  const [rawCards, rawCategories, rawEditions] = await Promise.all([
-    fetchJson(CORE_CATALOG_PATHS.cards),
+  const [rawPackManifest, rawCards, rawCategories, rawEditions] =
+    await Promise.all([
+      fetchJson(TRAIL_TALK_PACK_PATHS.manifest),
 
-    fetchJson(CORE_CATALOG_PATHS.categories),
+      fetchJson(TRAIL_TALK_PACK_PATHS.cards),
 
-    fetchJson(CORE_CATALOG_PATHS.editions),
-  ]);
+      fetchJson(TRAIL_TALK_PACK_PATHS.categories),
+
+      fetchJson(TRAIL_TALK_PACK_PATHS.editions),
+    ]);
 
   /*
-   * Validate and normalize individual catalog records.
+   * Validate card-pack metadata consumed by the runtime.
+   */
+  const cardPack = validateCardPackManifest(rawPackManifest);
+
+  /*
+   * Validate and normalize category records.
    */
   const categories = requireCatalogArray(
     rawCategories,
@@ -960,9 +1044,6 @@ async function loadData() {
     LIMITS.maxCategories,
   ).map(validateCategory);
 
-  /*
-   * Validate and normalize individual catalog records.
-   */
   const editions = requireCatalogArray(
     rawEditions,
     "editions",
@@ -991,6 +1072,7 @@ async function loadData() {
   /*
    * Publish only fully validated catalog data.
    */
+  state.cardPack = cardPack;
   state.cards = cards;
   state.categories = categories;
   state.editions = editions;
@@ -1955,14 +2037,21 @@ function renderFrontCard(card, { themeId = state.themeId } = {}) {
  * - theme-owned decorative artwork
  * - application-owned title
  * - theme-styled divider
- * - application-owned tagline
- * - application-owned brand
+ * - card-pack title
+ * - card-pack tagline
+ * - card-pack brand
  */
 function renderBackCard({
   showPunchGuide = true,
   themeId = state.themeId,
 } = {}) {
   const theme = requireTheme(themeId);
+
+  if (!state.cardPack) {
+    throw new Error("No validated card pack is active.");
+  }
+
+  const cardBack = state.cardPack.cardBack;
 
   /*
    * Create the theme-styled divider as a standalone element.
@@ -2008,34 +2097,47 @@ function renderBackCard({
   });
 
   /*
-   * Add canonical application identity text.
+   * Add identity text supplied by the active card pack.
    */
   const heading = document.createElement("h3");
 
   heading.className = "card-back-title";
 
-  heading.textContent = APP_IDENTITY.title;
+  heading.textContent = cardBack.title;
 
   const tagline = document.createElement("p");
 
   tagline.className = "card-back-tagline";
 
-  const taglineLineOne = document.createElement("span");
+  /*
+   * Render exactly two optional tagline positions.
+   *
+   * Empty strings remain as empty spans so a card pack may
+   * intentionally use only the upper line, only the lower
+   * line, both lines, or neither line.
+   */
+  const taglineLineOne =
+    document.createElement("span");
 
   taglineLineOne.textContent =
-    APP_IDENTITY.taglineLineOne + " " + APP_IDENTITY.taglineLineTwo;
+    cardBack.tagline[0];
 
-  const taglineLineTwo = document.createElement("span");
+  const taglineLineTwo =
+    document.createElement("span");
 
-  taglineLineTwo.textContent = ""; //APP_IDENTITY.taglineLineTwo;
+  taglineLineTwo.textContent =
+    cardBack.tagline[1];
 
-  tagline.append(taglineLineOne, taglineLineTwo);
+  tagline.append(
+    taglineLineOne,
+    taglineLineTwo,
+  );
 
   const brand = document.createElement("p");
 
   brand.className = "card-back-brand";
 
-  brand.textContent = APP_IDENTITY.brand;
+  brand.textContent = cardBack.brand;
 
   content.append(mainGraphic, heading, divider, tagline, brand);
 

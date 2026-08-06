@@ -6,12 +6,6 @@
   "display_name": "Trail Talk Canonical Deck",
   "version": "1.0.0",
 
-  "card_back_render_details": {
-    "title": "TRAIL TALK",
-    "tagline": ["Real Questions.", "Real Connections."],
-    "brand": "Overlanding Atlas"
-  },
-
   "author": {
     "name": "Atlas",
     "email": "",
@@ -22,6 +16,12 @@
   "released_at": "2026-08-02",
 
   "description": "The canonical Trail Talk conversation deck designed to encourage meaningful conversations on the trail and around the campfire while helping travelers learn more about one another.",
+
+  "card_back": {
+    "title": "TRAIL TALK",
+    "tagline": ["Real Questions. Real Connections."],
+    "brand": "Overlanding Atlas"
+  },
 
   "license": "Apache-2.0",
 
