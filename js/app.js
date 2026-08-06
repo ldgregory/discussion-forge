@@ -26,16 +26,17 @@ import { getTheme, themes } from "../themes/index.js";
  * ========================================================= */
 
 /*
- * Canonical application-owned text used on card backs.
+ * Stable identity for the Discussion Forge application.
  *
- * Themes may style this text but may not redefine the
- * application title, tagline, or brand.
+ * Conversation content, branding, and card-back text belong
+ * to installed card packs rather than to the application
+ * itself.
  */
-const APP_IDENTITY = Object.freeze({
-  title: "TRAIL TALK",
-  taglineLineOne: "Real Questions.",
-  taglineLineTwo: "Real Connections.",
-  brand: "Overlanding Atlas",
+const APPLICATION = Object.freeze({
+  id: "discussion-forge",
+  displayName: "Discussion Forge",
+
+  version: GENERATOR_VERSION,
 });
 
 /* =========================================================
