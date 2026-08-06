@@ -1,8 +1,8 @@
 /*
- * Trail Blue theme
+ * Trail Charcoal theme
  *
  * This stylesheet controls the visual presentation of
- * Trail Blue cards. Shared card dimensions, structural
+ * Trail Charcoal cards. Shared card dimensions, structural
  * layout, and print geometry remain in css/styles.css.
  */
 
@@ -18,7 +18,7 @@
  * allowing consistent rendering without a remote service.
  */
 @font-face {
-  font-family: "Trail Blue Title";
+  font-family: "Trail Charcoal Title";
   src:
     url("./assets/fonts/ChunkFive-Regular.otf")
     format("opentype");
@@ -35,21 +35,22 @@
 /*
  * Overall card-back background.
  *
- * This paints the full back of every Trail Blue card navy.
- * The card-back SVG is rendered separately on top of it.
+ * This paints the full back of every Trail Charcoal card
+ * charcoal gray. The card-back SVG is rendered separately
+ * on top of it.
  */
-.card-back.theme-trail-blue {
-  background: #173b63;
+.card-back.theme-trail-charcoal {
+  background: #36454f;
 }
 
 /*
  * Optional hole-punch guide in the upper-left corner.
  *
  * Shared CSS controls its position, diameter, and shape.
- * Trail Blue provides a light border so it remains visible
- * against the navy background.
+ * Trail Charcoal provides a light border so it remains
+ * visible against the dark background.
  */
-.card-back.theme-trail-blue
+.card-back.theme-trail-charcoal
   .punch-safe-back {
   border-color: rgb(255 255 255 / 75%);
   border-width: 2px;
@@ -66,11 +67,11 @@
  *
  * It does not affect the SVG artwork or card background.
  */
-.card-back.theme-trail-blue
+.card-back.theme-trail-charcoal
   .card-back-title,
-.card-back.theme-trail-blue
+.card-back.theme-trail-charcoal
   .card-back-tagline,
-.card-back.theme-trail-blue
+.card-back.theme-trail-charcoal
   .card-back-brand {
   color: white;
 }
@@ -88,7 +89,7 @@
  * The title is a flex container so the two decorative
  * pseudo-elements remain horizontally aligned with the text.
  */
-.card-back.theme-trail-blue
+.card-back.theme-trail-charcoal
   .card-back-title {
   display: flex;
   align-items: center;
@@ -98,7 +99,7 @@
   margin: 0 0 0.08in;
 
   font-family:
-    "Trail Blue Title",
+    "Trail Charcoal Title",
     Impact,
     sans-serif;
   font-size: 1.12rem;
@@ -114,9 +115,9 @@
  * The star SVG acts as a mask. The background color below
  * determines the visible color of both stars.
  */
-.card-back.theme-trail-blue
+.card-back.theme-trail-charcoal
   .card-back-title::before,
-.card-back.theme-trail-blue
+.card-back.theme-trail-charcoal
   .card-back-title::after {
   content: "";
 
@@ -152,7 +153,7 @@
  * This is a standalone renderer element, so its width can
  * change independently of the tagline text below it.
  */
-.card-back.theme-trail-blue
+.card-back.theme-trail-charcoal
   .card-back-divider {
   width: 95%;
   height: 2px;
@@ -168,7 +169,7 @@
  *
  * The text remains on one line at the current card width.
  */
-.card-back.theme-trail-blue
+.card-back.theme-trail-charcoal
   .card-back-tagline {
   width: 100%;
   margin: 0;
@@ -195,7 +196,7 @@
  * This is intentionally smaller and quieter than the title
  * so it reads as a signature rather than a competing heading.
  */
-.card-back.theme-trail-blue
+.card-back.theme-trail-charcoal
   .card-back-brand {
   margin: 0.14in 0 0;
 
@@ -218,7 +219,7 @@
 /*
  * Gear & Vehicle banner.
  */
-.theme-trail-blue
+.theme-trail-charcoal
   .category-gear {
   background-color: #3f6b45;
 }
@@ -226,7 +227,7 @@
 /*
  * Story Time banner.
  */
-.theme-trail-blue
+.theme-trail-charcoal
   .category-story-time {
   background-color: #76528b;
 }
@@ -234,7 +235,7 @@
 /*
  * Lightning Round banner.
  */
-.theme-trail-blue
+.theme-trail-charcoal
   .category-lightning {
   background-color: #59636e;
 }
@@ -242,7 +243,7 @@
 /*
  * Wild Card banner.
  */
-.theme-trail-blue
+.theme-trail-charcoal
   .category-wildcard {
   background-color: #a33a2b;
 }

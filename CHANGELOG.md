@@ -6,46 +6,52 @@ The project follows a Keep a Changelog–style format during development.
 
 ---
 
+## [Unreleased]
+
+### Added
+
+### Changed
+
+### Fixed
+
+### Security
+
+---
+
 ## [0.2.0-alpha3]
 
 ### Added
 
-- Interactive preview card flipping.
-- Theme selection.
+- Deterministic deck identities and SHA-256 deck fingerprints.
+- Complete Secure by Design documentation and security policy.
+- Theme package specification and contributor documentation.
+- Interactive preview card flipping with keyboard focus support.
 - Live deck preview status panel.
-- Separate preview and print renderers.
-- Trusted theme registry.
-- Self-contained theme package architecture.
-- Theme package specification.
-- Secure by Design documentation.
-- Project architecture documentation.
+- Root-level theme package architecture.
 
 ### Changed
 
-- Rebranded application from **Convoy Conversations** to **Trail Talk**.
-- Reduced printed card size to **2.40 × 3.40 inches** for easier lamination.
+- Refactored themes into self-contained packages with dedicated assets.
+- Separated preview rendering from print rendering.
+- Reorganized project documentation into dedicated architecture, security, theme, and project guides.
 - Moved category presentation into theme packages.
-- Refactored utility functions into `utils.js`.
-- Converted themes into self-contained packages.
-- Added complete catalog validation before rendering.
-- Replaced inline presentation with semantic CSS classes.
-- Improved preview card interaction and keyboard accessibility.
-- Hardened HTML metadata and browser input constraints.
-
-### Fixed
-
-- Duplex printing now produces correctly paired front/back pages.
-- Hole-punch guide now appears only on card backs.
-- Theme switching now correctly updates preview and printed card backs.
-- Front cards no longer inherit card-back theme backgrounds.
+- Improved project portability through declarative theme registration.
+- Updated repository structure for future community theme support.
 
 ### Security
 
-- Hardened DOM rendering to eliminate HTML injection paths.
-- Added validation for themes, catalogs, identifiers, and relationships.
-- Preserved validated card metadata.
-- Removed inline category styling in preparation for a strict Content Security Policy.
-- Established explicit trust boundaries for themes and community assets.
+- Hardened DOM rendering by eliminating HTML injection paths.
+- Added strict validation for catalog, theme, and metadata content.
+- Introduced explicit trust boundaries throughout the application.
+- Hardened utility functions and input validation.
+- Established Secure by Design engineering standards based on OWASP and MITRE guidance.
+
+### Fixed
+
+- Removed the legacy deck summary panel.
+- Improved preview accessibility and keyboard focus visibility.
+- Corrected theme rendering consistency between card fronts and backs.
+- Unified preview and print rendering behavior.
 
 ---
 

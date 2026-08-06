@@ -1,7 +1,7 @@
 /*
- * Trail Blue
+ * Trail Charcoal
  *
- * The canonical Trail Talk theme.
+ * A darker alternative to the canonical Trail Talk theme.
  *
  * This package defines the visual appearance of the application,
  * including its colors, typography, artwork, and icons.
@@ -12,8 +12,8 @@ export const theme = Object.freeze({
   /*
    * Theme identity
    */
-  id: "trail-blue",
-  name: "Trail Blue",
+  id: "trail-charcoal",
+  name: "Trail Charcoal",
 
   /*
    * Package metadata
@@ -21,15 +21,15 @@ export const theme = Object.freeze({
   version: "1.0.0",
   author: "Overlanding Atlas",
   description:
-    "The canonical Trail Talk theme with navy card backs, " +
-    "expedition-inspired artwork, and colorful category banners.",
+    "A darker Trail Talk theme with charcoal styling " +
+    "and high-contrast card artwork.",
   license: "Apache-2.0",
 
   /*
    * Theme resources
    */
-  className: "theme-trail-blue",
-  stylesheet: "themes/trail-blue/theme.css",
-  assetRoot: "themes/trail-blue/assets",
+  className: "theme-trail-charcoal",
+  stylesheet: "themes/trail-charcoal/theme.css",
+  assetRoot: "themes/trail-charcoal/assets",
 
 });

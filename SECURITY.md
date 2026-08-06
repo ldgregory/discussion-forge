@@ -132,15 +132,12 @@ Themes may not contain:
 
 ## SVG Security
 
-SVG files are XML documents and must be treated as executable content until
-reviewed.
+Detailed SVG acceptance, sanitization, allowlist, testing, licensing, and
+fallback requirements are documented in `THEMES.md`.
 
-Community supplied SVG files shall be reviewed and sanitized before inclusion.
-
-Active content including scripts, event handlers, external references, and
-embedded executable content is prohibited.
-
-SVG assets become trusted only after review and inclusion in the project repository.
+Trail Talk shall not render community-supplied SVG files directly. SVG assets
+become trusted only after review, sanitization, testing, and inclusion in the
+project repository.
 
 ---
 

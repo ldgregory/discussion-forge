@@ -1,0 +1,81 @@
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 24 24"
+  role="img"
+  aria-labelledby="title desc"
+>
+  <title id="title">Wild Card</title>
+  <desc id="desc">
+    A trail marker with arrows pointing in several directions.
+  </desc>
+
+  <!-- Trail Blue badge -->
+  <circle
+    cx="12"
+    cy="12"
+    r="10.5"
+    fill="#FFFDF8"
+    stroke="#173B63"
+    stroke-width="1.5"
+  />
+
+  <!-- Short signpost -->
+  <path
+    d="M12 14.1v5"
+    fill="none"
+    stroke="#173B63"
+    stroke-width="1.8"
+    stroke-linecap="round"
+  />
+
+  <!-- Post base -->
+  <path
+    d="M9.5 19.3h5"
+    fill="none"
+    stroke="#173B63"
+    stroke-width="1.8"
+    stroke-linecap="round"
+  />
+
+  <!-- Taller trail marker -->
+  <rect
+    x="5.7"
+    y="4.8"
+    width="12.6"
+    height="9.5"
+    rx="1.25"
+    fill="#173B63"
+    stroke="#173B63"
+    stroke-width="1.4"
+  />
+
+  <!-- Left-pointing trail arrow -->
+  <path
+    d="M11 7.1H7.7m0 0 1.35-1.15M7.7 7.1l1.35 1.15"
+    fill="none"
+    stroke="#FFFDF8"
+    stroke-width="1.25"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+
+  <!-- Upper-right trail arrow -->
+  <path
+    d="M12.8 8.2 15.4 5.8m0 0-1.75.05m1.75-.05-.05 1.75"
+    fill="none"
+    stroke="#FFFDF8"
+    stroke-width="1.25"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+
+  <!-- Lower-right trail arrow, used as the red accent -->
+  <path
+    d="M10.8 11.6h4.1m0 0-1.4-1.2m1.4 1.2-1.4 1.2"
+    fill="none"
+    stroke="#C9483C"
+    stroke-width="1.35"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+</svg>
