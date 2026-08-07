@@ -163,12 +163,12 @@ const TRAIL_TALK_PACK = Object.freeze({
 });
 
 /*
- * Installed card packs bundled with Discussion Forge.
+ * Registry of bundled card packs.
  *
- * The first entry becomes the default active pack until
- * pack selection is introduced.
+ * Additional card packs register themselves here so they
+ * can be resolved by ID.
  */
-const INSTALLED_CARD_PACKS = Object.freeze([
+const CARD_PACK_REGISTRY = Object.freeze([
   TRAIL_TALK_PACK,
 ]);
 
@@ -1009,7 +1009,7 @@ function validateCatalogRelationships(cards, categories, editions) {
  * arbitrary resource paths.
  */
 function requireCardPack(cardPackId) {
-  const cardPack = INSTALLED_CARD_PACKS.find(
+  const cardPack = CARD_PACK_REGISTRY.find(
     (installedCardPack) => installedCardPack.id === cardPackId,
   );
 
