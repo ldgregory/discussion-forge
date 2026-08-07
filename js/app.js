@@ -1111,31 +1111,41 @@ async function loadCardPack(cardPackId) {
 }
 
 /* ---------------------------------------------------------
- * Catalog startup pipeline
+ * Card-pack activation
  * --------------------------------------------------------- */
 
 /*
- * Load the default card pack, publish its validated data,
- * and initialize the builder UI.
+ * Load a registered card pack and publish its validated data
+ * to application state.
  */
-async function loadData() {
-  const { cardPack, cards, categories, editions } = await loadCardPack(
-    CARD_PACK_REGISTRY.defaultCardPackId,
-  );
+async function activateCardPack(cardPackId) {
+  const { cardPack, cards, categories, editions } =
+    await loadCardPack(cardPackId);
 
-  /*
-   * Publish only fully validated card-pack data.
-   */
   state.cardPack = cardPack;
   state.cards = cards;
   state.categories = categories;
   state.editions = editions;
 
   /*
-   * Activate the initial theme and populate the builder.
+   * Refresh controls whose available values depend on the
+   * active card pack.
    */
-  loadThemeStylesheet(state.themeId);
   renderOptions();
+}
+
+/* ---------------------------------------------------------
+ * Catalog startup pipeline
+ * --------------------------------------------------------- */
+
+/*
+ * Activate the default card pack and initialize application
+ * presentation.
+ */
+async function loadData() {
+  await activateCardPack(CARD_PACK_REGISTRY.defaultCardPackId);
+
+  loadThemeStylesheet(state.themeId);
   renderThemeOptions();
 }
 
