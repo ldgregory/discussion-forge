@@ -2671,7 +2671,7 @@ function downloadManifest() {
 
   anchor.href = url;
 
-  anchor.download = `trailtalk-${state.manifest.deck_id}` + "-manifest.json";
+  anchor.download = `discussionforge-${state.manifest.deck_id}` + "-manifest.json";
 
   anchor.hidden = true;
 
