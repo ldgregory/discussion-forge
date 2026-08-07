@@ -160,6 +160,16 @@ const TRAIL_TALK_PACK = Object.freeze({
   editions: "data/trail-talk/editions.json",
 });
 
+/*
+ * Installed card packs bundled with Discussion Forge.
+ *
+ * The first entry becomes the default active pack until
+ * pack selection is introduced.
+ */
+const INSTALLED_CARD_PACKS = Object.freeze([
+  TRAIL_TALK_PACK,
+]);
+
 /* =========================================================
  * Catalog allowlists
  * ========================================================= */
@@ -1015,17 +1025,22 @@ async function fetchJson(path) {
  */
 async function loadData() {
   /*
+   * Load the default installed card pack.
+   *
+   * Card-pack selection will eventually replace this with
+   * the user's selected pack.
+   */
+  const activeCardPack = INSTALLED_CARD_PACKS[0];
+
+  /*
    * Fetch all pack resources concurrently.
    */
   const [rawPackManifest, rawCards, rawCategories, rawEditions] =
     await Promise.all([
-      fetchJson(TRAIL_TALK_PACK.manifest),
-
-      fetchJson(TRAIL_TALK_PACK.cards),
-
-      fetchJson(TRAIL_TALK_PACK.categories),
-
-      fetchJson(TRAIL_TALK_PACK.editions),
+      fetchJson(activeCardPack.manifest),
+      fetchJson(activeCardPack.cards),
+      fetchJson(activeCardPack.categories),
+      fetchJson(activeCardPack.editions),
     ]);
 
   /*
@@ -2114,22 +2129,15 @@ function renderBackCard({
    * intentionally use only the upper line, only the lower
    * line, both lines, or neither line.
    */
-  const taglineLineOne =
-    document.createElement("span");
+  const taglineLineOne = document.createElement("span");
 
-  taglineLineOne.textContent =
-    cardBack.tagline[0];
+  taglineLineOne.textContent = cardBack.tagline[0];
 
-  const taglineLineTwo =
-    document.createElement("span");
+  const taglineLineTwo = document.createElement("span");
 
-  taglineLineTwo.textContent =
-    cardBack.tagline[1];
+  taglineLineTwo.textContent = cardBack.tagline[1];
 
-  tagline.append(
-    taglineLineOne,
-    taglineLineTwo,
-  );
+  tagline.append(taglineLineOne, taglineLineTwo);
 
   const brand = document.createElement("p");
 
