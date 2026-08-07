@@ -169,9 +169,7 @@ const TRAIL_TALK_PACK = Object.freeze({
 const CARD_PACK_REGISTRY = Object.freeze({
   defaultCardPackId: "trail-talk",
 
-  packs: [
-    TRAIL_TALK_PACK,
-  ],
+  packs: [TRAIL_TALK_PACK],
 });
 
 /* =========================================================
@@ -251,9 +249,9 @@ const HEX_COLOR_PATTERN = /^#[0-9a-f]{6}$/i;
  */
 const state = {
   catalog: {
-  cards: [],
-  categories: [],
-  editions: [],
+    cards: [],
+    categories: [],
+    editions: [],
   },
 
   editions: [],
@@ -1105,9 +1103,12 @@ async function loadCardPack(cardPackId) {
 
   return {
     cardPack,
-    cards,
-    categories,
-    editions,
+
+    catalog: {
+      cards,
+      categories,
+      editions,
+    },
   };
 }
 
@@ -1116,17 +1117,14 @@ async function loadCardPack(cardPackId) {
  * --------------------------------------------------------- */
 
 /*
- * Load a registered card pack and publish its validated data
- * to application state.
+ * Load a registered card pack and publish its validated
+ * catalog to application state.
  */
 async function activateCardPack(cardPackId) {
-  const { cardPack, cards, categories, editions } =
-    await loadCardPack(cardPackId);
+  const { cardPack, catalog } = await loadCardPack(cardPackId);
 
   state.activeCardPack = cardPack;
-  state.catalog.cards = cards;
-  state.catalog.categories = categories;
-  state.catalog.editions = editions;
+  state.catalog = catalog;
 
   /*
    * Refresh controls whose available values depend on the
@@ -1447,7 +1445,8 @@ function getSelectedOptionValues(name) {
     ...document.querySelectorAll(`input[name="${name}"]:checked`),
   ].map((input) => input.value);
 
-  const records = name === "edition" ? state.catalog.editions : state.catalog.categories;
+  const records =
+    name === "edition" ? state.catalog.editions : state.catalog.categories;
 
   const allowedIds = new Set(
     records.filter((record) => record.active).map((record) => record.id),
@@ -2675,7 +2674,8 @@ function downloadManifest() {
 
   anchor.href = url;
 
-  anchor.download = `discussion-forge-${state.manifest.deck_id}` + "-manifest.json";
+  anchor.download =
+    `discussion-forge-${state.manifest.deck_id}` + "-manifest.json";
 
   anchor.hidden = true;
 
