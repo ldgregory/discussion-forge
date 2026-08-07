@@ -141,24 +141,22 @@ const LIMITS = Object.freeze({
 });
 
 /* =========================================================
- * Canonical catalog paths
+ * Card Pack Registrations
  * ========================================================= */
 
 /*
- * Trail Talk's bundled catalog pack.
+ * Canonical Trail Talk card pack bundled with
+ * Discussion Forge.
  *
- * These paths define the canonical cards, categories, and
- * editions loaded during application startup. Future catalog
- * packs can be added through a dedicated pack registry without
- * changing the trusted runtime state model.
+ * Additional installed card packs will eventually
+ * register themselves using the same structure.
  */
-const TRAIL_TALK_PACK_PATHS = Object.freeze({
+const TRAIL_TALK_PACK = Object.freeze({
+  id: "trail-talk",
+
   manifest: "data/trail-talk/manifest.json",
-
   cards: "data/trail-talk/cards.json",
-
   categories: "data/trail-talk/categories.json",
-
   editions: "data/trail-talk/editions.json",
 });
 
@@ -1021,13 +1019,13 @@ async function loadData() {
    */
   const [rawPackManifest, rawCards, rawCategories, rawEditions] =
     await Promise.all([
-      fetchJson(TRAIL_TALK_PACK_PATHS.manifest),
+      fetchJson(TRAIL_TALK_PACK.manifest),
 
-      fetchJson(TRAIL_TALK_PACK_PATHS.cards),
+      fetchJson(TRAIL_TALK_PACK.cards),
 
-      fetchJson(TRAIL_TALK_PACK_PATHS.categories),
+      fetchJson(TRAIL_TALK_PACK.categories),
 
-      fetchJson(TRAIL_TALK_PACK_PATHS.editions),
+      fetchJson(TRAIL_TALK_PACK.editions),
     ]);
 
   /*
