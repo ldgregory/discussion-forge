@@ -249,7 +249,7 @@ const HEX_COLOR_PATTERN = /^#[0-9a-f]{6}$/i;
  * object. Catalog records are validated before being stored.
  */
 const state = {
-  cardPack: null,
+  activeCardPack: null,
   cards: [],
   categories: [],
   editions: [],
@@ -1119,7 +1119,7 @@ async function activateCardPack(cardPackId) {
   const { cardPack, cards, categories, editions } =
     await loadCardPack(cardPackId);
 
-  state.cardPack = cardPack;
+  state.activeCardPack = cardPack;
   state.cards = cards;
   state.categories = categories;
   state.editions = editions;
@@ -1751,7 +1751,7 @@ async function generateDeck() {
     const deckUuid = createDeckUuid();
 
     const { deckId, fingerprint } = await createDeckIdentity({
-      cardPack: state.cardPack,
+      cardPack: state.activeCardPack,
       seed,
       editions,
       categories,
@@ -1770,7 +1770,7 @@ async function generateDeck() {
      * content snapshots needed to identify or reproduce the deck.
      */
     state.manifest = buildManifest({
-      cardPack: state.cardPack,
+      cardPack: state.activeCardPack,
       deckUuid,
       deckId,
       fingerprint,
@@ -2116,11 +2116,11 @@ function renderBackCard({
 } = {}) {
   const theme = requireTheme(themeId);
 
-  if (!state.cardPack) {
+  if (!state.activeCardPack) {
     throw new Error("No validated card pack is active.");
   }
 
-  const cardBack = state.cardPack.cardBack;
+  const cardBack = state.activeCardPack.cardBack;
 
   /*
    * Create the theme-styled divider as a standalone element.
