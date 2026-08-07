@@ -1043,32 +1043,27 @@ async function fetchJson(path) {
 }
 
 /* ---------------------------------------------------------
- * Catalog startup pipeline
+ * Card-pack loading
  * --------------------------------------------------------- */
 
 /*
- * Load all catalogs concurrently, validate every record,
- * enforce unique identities and valid relationships, then
- * populate application state and initialize the builder UI.
+ * Load and validate one registered card pack.
+ *
+ * The returned data is fully validated but is not published
+ * to application state.
  */
-async function loadData() {
-  /*
-   * Load the configured default card pack.
-   *
-   * Card-pack selection will eventually provide this ID from
-   * the builder interface.
-   */
-  const activeCardPack = requireCardPack(CARD_PACK_REGISTRY.defaultCardPackId);
+async function loadCardPack(cardPackId) {
+  const registeredCardPack = requireCardPack(cardPackId);
 
   /*
    * Fetch all pack resources concurrently.
    */
   const [rawPackManifest, rawCards, rawCategories, rawEditions] =
     await Promise.all([
-      fetchJson(activeCardPack.paths.manifest),
-      fetchJson(activeCardPack.paths.cards),
-      fetchJson(activeCardPack.paths.categories),
-      fetchJson(activeCardPack.paths.editions),
+      fetchJson(registeredCardPack.paths.manifest),
+      fetchJson(registeredCardPack.paths.cards),
+      fetchJson(registeredCardPack.paths.categories),
+      fetchJson(registeredCardPack.paths.editions),
     ]);
 
   /*
@@ -1077,7 +1072,7 @@ async function loadData() {
   const cardPack = validateCardPackManifest(rawPackManifest);
 
   /*
-   * Validate and normalize category records.
+   * Validate and normalize catalog records.
    */
   const categories = requireCatalogArray(
     rawCategories,
@@ -1091,9 +1086,6 @@ async function loadData() {
     LIMITS.maxEditions,
   ).map(validateEdition);
 
-  /*
-   * Validate and normalize individual catalog records.
-   */
   const cards = requireCatalogArray(rawCards, "cards", LIMITS.maxCards).map(
     validateCard,
   );
@@ -1110,8 +1102,29 @@ async function loadData() {
    */
   validateCatalogRelationships(cards, categories, editions);
 
+  return {
+    cardPack,
+    cards,
+    categories,
+    editions,
+  };
+}
+
+/* ---------------------------------------------------------
+ * Catalog startup pipeline
+ * --------------------------------------------------------- */
+
+/*
+ * Load the default card pack, publish its validated data,
+ * and initialize the builder UI.
+ */
+async function loadData() {
+  const { cardPack, cards, categories, editions } = await loadCardPack(
+    CARD_PACK_REGISTRY.defaultCardPackId,
+  );
+
   /*
-   * Publish only fully validated catalog data.
+   * Publish only fully validated card-pack data.
    */
   state.cardPack = cardPack;
   state.cards = cards;
