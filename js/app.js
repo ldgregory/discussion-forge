@@ -154,10 +154,12 @@ const LIMITS = Object.freeze({
 const TRAIL_TALK_PACK = Object.freeze({
   id: "trail-talk",
 
-  manifest: "data/trail-talk/manifest.json",
-  cards: "data/trail-talk/cards.json",
-  categories: "data/trail-talk/categories.json",
-  editions: "data/trail-talk/editions.json",
+  paths: {
+    manifest: "data/trail-talk/manifest.json",
+    cards: "data/trail-talk/cards.json",
+    categories: "data/trail-talk/categories.json",
+    editions: "data/trail-talk/editions.json",
+  },
 });
 
 /*
@@ -1037,10 +1039,10 @@ async function loadData() {
    */
   const [rawPackManifest, rawCards, rawCategories, rawEditions] =
     await Promise.all([
-      fetchJson(activeCardPack.manifest),
-      fetchJson(activeCardPack.cards),
-      fetchJson(activeCardPack.categories),
-      fetchJson(activeCardPack.editions),
+      fetchJson(activeCardPack.paths.manifest),
+      fetchJson(activeCardPack.paths.cards),
+      fetchJson(activeCardPack.paths.categories),
+      fetchJson(activeCardPack.paths.editions),
     ]);
 
   /*
