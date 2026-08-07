@@ -165,18 +165,16 @@ const TRAIL_TALK_PACK = Object.freeze({
 /*
  * Registry of bundled card packs.
  *
- * Additional card packs register themselves here so they
- * can be resolved by ID.
+ * The registry owns the default pack selection and all
+ * card-pack definitions available to the application.
  */
-const CARD_PACK_REGISTRY = Object.freeze([
-  TRAIL_TALK_PACK,
-]);
+const CARD_PACK_REGISTRY = Object.freeze({
+  defaultCardPackId: "trail-talk",
 
-/*
- * Card pack loaded by default until the builder provides a
- * user-selected pack ID.
- */
-const DEFAULT_CARD_PACK_ID = "trail-talk";
+  packs: [
+    TRAIL_TALK_PACK,
+  ],
+});
 
 /* =========================================================
  * Catalog allowlists
@@ -1009,8 +1007,8 @@ function validateCatalogRelationships(cards, categories, editions) {
  * arbitrary resource paths.
  */
 function requireCardPack(cardPackId) {
-  const cardPack = CARD_PACK_REGISTRY.find(
-    (installedCardPack) => installedCardPack.id === cardPackId,
+  const cardPack = CARD_PACK_REGISTRY.packs.find(
+    (registeredCardPack) => registeredCardPack.id === cardPackId,
   );
 
   if (!cardPack) {
@@ -1060,7 +1058,7 @@ async function loadData() {
    * Card-pack selection will eventually provide this ID from
    * the builder interface.
    */
-  const activeCardPack = requireCardPack(DEFAULT_CARD_PACK_ID);
+  const activeCardPack = requireCardPack(CARD_PACK_REGISTRY.defaultCardPackId);
 
   /*
    * Fetch all pack resources concurrently.
