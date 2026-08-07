@@ -1,5 +1,5 @@
 {
-  "schema_version": 1,
+  "deck_identity_schema_version": 2,
   "pack_type": "cards",
 
   "id": "trail-talk",
