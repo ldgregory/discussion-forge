@@ -172,6 +172,12 @@ const INSTALLED_CARD_PACKS = Object.freeze([
   TRAIL_TALK_PACK,
 ]);
 
+/*
+ * Card pack loaded by default until the builder provides a
+ * user-selected pack ID.
+ */
+const DEFAULT_CARD_PACK_ID = "trail-talk";
+
 /* =========================================================
  * Catalog allowlists
  * ========================================================= */
@@ -993,6 +999,28 @@ function validateCatalogRelationships(cards, categories, editions) {
  */
 
 /* ---------------------------------------------------------
+ * Card-pack lookup
+ * --------------------------------------------------------- */
+
+/*
+ * Return an installed card-pack definition by ID.
+ *
+ * Rejecting unknown IDs prevents callers from constructing
+ * arbitrary resource paths.
+ */
+function requireCardPack(cardPackId) {
+  const cardPack = INSTALLED_CARD_PACKS.find(
+    (installedCardPack) => installedCardPack.id === cardPackId,
+  );
+
+  if (!cardPack) {
+    throw new Error(`Unsupported card pack: ${cardPackId}`);
+  }
+
+  return cardPack;
+}
+
+/* ---------------------------------------------------------
  * JSON transport
  * --------------------------------------------------------- */
 
@@ -1027,12 +1055,12 @@ async function fetchJson(path) {
  */
 async function loadData() {
   /*
-   * Load the default installed card pack.
+   * Load the configured default card pack.
    *
-   * Card-pack selection will eventually replace this with
-   * the user's selected pack.
+   * Card-pack selection will eventually provide this ID from
+   * the builder interface.
    */
-  const activeCardPack = INSTALLED_CARD_PACKS[0];
+  const activeCardPack = requireCardPack(DEFAULT_CARD_PACK_ID);
 
   /*
    * Fetch all pack resources concurrently.
