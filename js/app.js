@@ -246,12 +246,16 @@ const HEX_COLOR_PATTERN = /^#[0-9a-f]{6}$/i;
 
 /*
  * This is the only intentionally mutable application-level
- * object. Catalog records are validated before being stored.
+ * object. Card-pack and catalog data are validated before
+ * being stored.
  */
 const state = {
-  activeCardPack: null,
+  catalog: {
   cards: [],
   categories: [],
+  editions: [],
+  },
+
   editions: [],
   generated: [],
   manifest: null,
@@ -1120,9 +1124,9 @@ async function activateCardPack(cardPackId) {
     await loadCardPack(cardPackId);
 
   state.activeCardPack = cardPack;
-  state.cards = cards;
-  state.categories = categories;
-  state.editions = editions;
+  state.catalog.cards = cards;
+  state.catalog.categories = categories;
+  state.catalog.editions = editions;
 
   /*
    * Refresh controls whose available values depend on the
@@ -1195,7 +1199,7 @@ function renderOptions() {
   editionContainer.replaceChildren();
   categoryContainer.replaceChildren();
 
-  state.editions
+  state.catalog.editions
     .filter((edition) => edition.active)
     .forEach((edition, index) => {
       editionContainer.appendChild(
@@ -1208,7 +1212,7 @@ function renderOptions() {
       );
     });
 
-  state.categories
+  state.catalog.categories
     .filter((category) => category.active)
     .forEach((category) => {
       categoryContainer.appendChild(
@@ -1443,7 +1447,7 @@ function getSelectedOptionValues(name) {
     ...document.querySelectorAll(`input[name="${name}"]:checked`),
   ].map((input) => input.value);
 
-  const records = name === "edition" ? state.editions : state.categories;
+  const records = name === "edition" ? state.catalog.editions : state.catalog.categories;
 
   const allowedIds = new Set(
     records.filter((record) => record.active).map((record) => record.id),
@@ -1719,7 +1723,7 @@ async function generateDeck() {
      * Find active, approved cards matching both the selected
      * edition set and category set.
      */
-    const eligible = state.cards.filter((card) =>
+    const eligible = state.catalog.cards.filter((card) =>
       cardMatchesSelection(card, editions, categories),
     );
 
@@ -1832,7 +1836,7 @@ async function generateDeck() {
  * application state is ever modified incorrectly.
  */
 function categoryFor(card) {
-  const category = state.categories.find(
+  const category = state.catalog.categories.find(
     (candidate) => candidate.id === card.visual.primary_category,
   );
 
@@ -2315,14 +2319,14 @@ function renderPreviewStatus() {
 
   const editionNames = configuration.editions
     .map((editionId) =>
-      state.editions.find((edition) => edition.id === editionId),
+      state.catalog.editions.find((edition) => edition.id === editionId),
     )
     .filter(Boolean)
     .map((edition) => edition.name);
 
   const categoryNames = configuration.categories
     .map((categoryId) =>
-      state.categories.find((category) => category.id === categoryId),
+      state.catalog.categories.find((category) => category.id === categoryId),
     )
     .filter(Boolean)
     .map((category) => category.name);
@@ -2671,7 +2675,7 @@ function downloadManifest() {
 
   anchor.href = url;
 
-  anchor.download = `discussionforge-${state.manifest.deck_id}` + "-manifest.json";
+  anchor.download = `discussion-forge-${state.manifest.deck_id}` + "-manifest.json";
 
   anchor.hidden = true;
 
