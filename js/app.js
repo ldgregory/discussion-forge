@@ -248,13 +248,14 @@ const HEX_COLOR_PATTERN = /^#[0-9a-f]{6}$/i;
  * being stored.
  */
 const state = {
+  activeCardPack: null,
+
   catalog: {
     cards: [],
     categories: [],
     editions: [],
   },
 
-  editions: [],
   generated: [],
   manifest: null,
   themeId: DEFAULT_THEME_ID,
@@ -279,6 +280,8 @@ const ui = Object.freeze({
   manifestButton: requireElement("download-manifest"),
 
   outputMode: requireElement("output-mode"),
+
+  cardPackSelect: requireElement("card-pack"),
 
   themeSelect: requireElement("theme"),
 
@@ -1142,6 +1145,8 @@ async function activateCardPack(cardPackId) {
  * presentation.
  */
 async function loadData() {
+  renderCardPackOptions();
+
   await activateCardPack(CARD_PACK_REGISTRY.defaultCardPackId);
 
   loadThemeStylesheet(state.themeId);
@@ -1156,6 +1161,37 @@ async function loadData() {
  * Build and read the user controls that define which cards
  * are eligible for the next generated deck.
  */
+
+/* ---------------------------------------------------------
+ * Card-pack selector
+ * --------------------------------------------------------- */
+
+/*
+ * Populate the Card Pack picker from the trusted registry.
+ *
+ * Registry IDs are converted to human-readable labels without
+ * duplicating display metadata from individual pack manifests.
+ */
+function renderCardPackOptions() {
+  const selector = ui.cardPackSelect;
+
+  selector.replaceChildren();
+
+  CARD_PACK_REGISTRY.packs.forEach((registeredCardPack) => {
+    const option = document.createElement("option");
+
+    option.value = registeredCardPack.id;
+
+    option.textContent = registeredCardPack.id
+      .split("-")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
+
+    selector.appendChild(option);
+  });
+
+  selector.value = CARD_PACK_REGISTRY.defaultCardPackId;
+}
 
 /* ---------------------------------------------------------
  * Edition and category options
@@ -2741,6 +2777,38 @@ function handleOutputModeChange() {
 }
 
 /*
+ * Activate the selected card pack and clear output generated
+ * from the previously active pack.
+ *
+ * A rejected selection restores the previously active pack
+ * without disturbing trusted runtime state.
+ */
+async function handleCardPackChange(event) {
+  const requestedCardPackId = event.target.value;
+
+  const previousCardPackId =
+    state.activeCardPack?.id ?? CARD_PACK_REGISTRY.defaultCardPackId;
+
+  if (requestedCardPackId === previousCardPackId) {
+    return;
+  }
+
+  try {
+    await activateCardPack(requestedCardPackId);
+
+    clearGeneratedOutput();
+
+    setStatus(`Loaded card pack: ${state.activeCardPack.displayName}.`);
+  } catch (error) {
+    console.error(error);
+
+    event.target.value = previousCardPackId;
+
+    setStatus("The selected card pack could not be loaded safely.");
+  }
+}
+
+/*
  * Activate the selected theme and re-render existing output.
  *
  * A rejected theme selection restores the previously active
@@ -2790,7 +2858,10 @@ function registerEventListeners() {
 
   ui.outputMode.addEventListener("change", handleOutputModeChange);
 
+  ui.cardPackSelect.addEventListener("change", handleCardPackChange);
+
   ui.themeSelect.addEventListener("change", handleThemeChange);
+
 }
 
 registerEventListeners();
