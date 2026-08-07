@@ -1,131 +1,50 @@
 # TODO
 
-## Application and Trail Talk Pack Decoupling
-
-### Application-owned branding
-
-- [ ] index.html page title, heading, metadata, and noscript text
-- [ ] README.md application description
-- [ ] SECURITY.md project terminology
-- [ ] PROJECT.md application terminology
-- [ ] CHANGELOG.md current header wording only
-- [ ] css/styles.css file-level comment
-- [ ] js/app.js file-level and runtime comments
-- [ ] js/utils.js generic encoding comment
-- [ ] themes/index.js registry wording
-
-### Trail Talk pack-owned identity
-
-- [ ] Move card-back title into pack metadata
-- [ ] Move tagline into pack metadata
-- [ ] Move brand into pack metadata
-- [ ] Validate card-back metadata
-- [ ] Render active pack identity
-- [ ] Include pack identity in generated manifests
-- [ ] Include pack ID and version in deterministic deck identity
-
-### Theme documentation and comments
-
-- [ ] Replace fixed Trail Talk text references with semantic names
-- [ ] Decide whether bundled themes are generic or Trail Talk-specific
-- [ ] Rename THEMES.md to THEME-PACK.md
-- [ ] Generalize theme specification wording
-
-### Card-pack documentation
-
-- [ ] Replace application-level Trail Talk wording with “the application”
-- [ ] Preserve Trail Talk as the canonical example pack
-
 ## High Priority
 
-### General
+### Discussion Forge / card-pack separation
 
-- [x] Make deck identifier deterministic from the generated deck
-- [x] Remove the legacy deck summary (yellow box)
-- [ ] Make preview cards visually match the printed cards
-- [ ] Keep the print renderer completely independent of interactive preview styles
+- [ ] Complete application-owned branding cleanup:
+  - `index.html` page title, heading, metadata, and noscript text
+  - `README.md` application description
+  - `SECURITY.md` project terminology
+  - `PROJECT.md` application terminology
+  - `CHANGELOG.md` current header wording only
+  - `css/styles.css` file-level comment
+  - `js/app.js` remaining Trail Talk-specific runtime comments
+  - `js/utils.js` generic encoding comment
+  - `themes/index.js` registry wording
+- [ ] Include active card-pack identity in generated deck manifests.
+- [ ] Include active card-pack ID and version in deterministic deck identity.
+- [ ] Add a card-pack selector to the builder.
+- [ ] Populate the selector from `CARD_PACK_REGISTRY` rather than hardcoded UI options.
+- [ ] Switch packs through `activateCardPack(cardPackId)` and rebuild pack-dependent controls.
+- [ ] Clear generated preview, print output, and stale manifest data when the active card pack changes.
+- [ ] Validate that a loaded pack manifest ID matches its registry ID.
 
-### Security
+### Card-pack runtime and validation
 
-- [x] Define SVG acceptance and sanitization workflow
-- [ ] Document recommended production security headers
-- [ ] Add Content Security Policy deployment guidance
+- [ ] Expand `validateCardPackManifest()` beyond the currently consumed runtime fields.
+- [ ] Validate pack compatibility using `minimum_application_version`.
+- [ ] Validate pack dependencies before activation.
+- [ ] Report card-pack validation failures with the originating pack ID.
+- [ ] Decide whether registry entries should be deeply frozen or otherwise protected from accidental mutation.
+- [ ] Preserve fail-closed activation: a failed pack load must leave the previously active trusted state intact.
+
+### Theme decoupling
+
+- [ ] Decide whether bundled themes are generic Discussion Forge themes or Trail Talk-specific themes.
+- [ ] Replace fixed Trail Talk text references in theme comments and documentation with semantic names where appropriate.
+- [ ] Rename `THEMES.md` to `THEME-PACK.md`.
+- [ ] Generalize the theme specification wording around the application/pack ownership model.
 
 ---
 
 ## Medium Priority
 
-### General
+### Builder evolution
 
-- [x] Replace emoji with SVG icons (emoji is still full failthrough)
-- [ ] Add subtle category banner patterns
-- [x] Dynamically load theme CSS from the trusted theme registry
-- [ ] But I think we can make that significantly cleaner in a later pass by having renderPreviewCard() return a fully interactive card instead of a passive one.
-
-### Generation UX
-
-- [ ] If deck generation fails for any reason (validation or no eligible cards),
-clear the existing preview and print output so the UI never displays a stale
-deck that does not correspond to the current builder settings.
-
----
-
-## Application and Canonical Pack Separation
-
-Decouple the generic conversation-deck application from the
-Trail Talk canonical card pack.
-
-The application will own deck generation, validation, themes,
-printing, and installed-pack management.
-
-Trail Talk will become one installed card pack under:
-
-data/trail-talk/
-
----
-
-
-## Catalog Pack System
-
-Replace the three hardcoded core catalog paths with an
-explicit registry of installed catalog packs.
-
-A catalog pack is a distribution boundary, while an edition
-remains a semantic card-selection boundary.
-
-Each pack may contribute:
-
-- cards
-- categories
-- editions
-- pack metadata such as ID, name, version, author, and license
-
-Runtime requirements:
-
-- Load registered packs concurrently.
-- Combine each catalog type in memory.
-- Validate every record using existing validators.
-- Enforce global uniqueness across all installed packs.
-- Validate relationships after all packs are merged.
-- Reject the entire startup transaction if any pack fails.
-- Preserve the existing `state.cards`, `state.categories`,
-  and `state.editions` runtime model.
-- Report validation errors with the originating pack ID.
-
-Future considerations:
-
-- Optional catalog files
-- Pack dependencies
-- Compatibility versions
-- Enable/disable controls
-- Pack provenance in manifests
-- Standalone pack validation tooling
-
----
-
-## Builder Evolution
-
-Expand the deck builder to support additional generation filters.
+Expand the deck builder with additional generation filters only after the card-pack selector and activation flow are stable.
 
 Potential controls:
 
@@ -137,40 +56,63 @@ Potential controls:
 - Time available
 - Group size (optional)
 
-Requirements:
+Requirements for each new filter:
 
-- UI controls
+- UI control
 - Input validation
 - Manifest support
 - Deterministic Deck ID participation
 - Builder state persistence
 
+### Preview and rendering
+
+- [ ] Make preview cards visually match printed cards more closely.
+- [ ] Keep the print renderer completely independent of interactive preview styles.
+- [ ] Refactor `renderPreviewCard()` so it can return a fully interactive card rather than a passive preview.
+- [ ] Add subtle category banner patterns.
+
+### Generation UX
+
+- [ ] If deck generation fails for any reason, clear existing preview and print output so stale output never represents invalid or changed builder settings.
+
+### Security
+
+- [ ] Document recommended production security headers.
+- [ ] Add Content Security Policy deployment guidance.
+- [ ] Create standalone validation tooling for submitted card packs before approval.
+
+### Documentation
+
+- [ ] Create `ARCHITECTURE.md` after the current identity/card-pack refactor stabilizes.
+- [ ] Create `CONTRIBUTING.md` after the pack contribution workflow stabilizes.
+- [ ] Update `CARD-PACK.md` to use generic application terminology while preserving Trail Talk as the canonical example pack.
+
 ---
 
-## Documentation
+## Low Priority
 
-- [ ] Create ARCHITECTURE.md
-- [ ] Create CONTRIBUTING.md
+### Card-pack ecosystem
 
----
-
-## Someday
+- [ ] Optional catalog files within a card pack.
+- [ ] Enable/disable controls for installed card packs.
+- [ ] Pack provenance details in generated manifests.
+- [ ] Additional compatibility/version negotiation beyond the minimum application version.
+- [ ] Consider whether card-pack discovery should eventually move from static registration to a data-driven registry.
 
 ### Features
 
-- [ ] QR code support
-- [ ] Community question submission
+- [ ] QR code support.
+- [ ] Community question submission and approval workflow.
 
-### Theme System
+### Theme system
 
-- [ ] Add additional official themes
+- [ ] Add additional official themes:
   - Classic
   - Dark
   - Topographic
   - National Parks
   - Retro Camp
-
-- [ ] Expand renderer options
+- [ ] Expand renderer configuration options, for example:
 
 ```javascript
 renderPrintPage(cards, {
