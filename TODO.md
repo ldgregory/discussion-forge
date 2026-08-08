@@ -12,16 +12,6 @@
 - [ ] Decide whether registry entries should be deeply frozen or otherwise protected from accidental mutation.
 - [ ] Decide whether `sample-trivia` remains bundled as a visible example pack, moves to developer/test fixtures, or becomes documentation-only sample content.
 
-### Application / card-pack decoupling cleanup
-
-- [ ] Complete remaining application-owned branding and terminology cleanup in code and comments:
-  - `css/styles.css` file-level comments
-  - `js/app.js` remaining Trail Talk-specific comments that describe application behavior rather than the Trail Talk pack
-  - `js/utils.js` generic encoding comments
-  - `themes/index.js` registry wording
-- [ ] Decide whether bundled themes are generic Discussion Forge themes or Trail Talk-specific themes.
-- [ ] Replace fixed Trail Talk text references in theme comments with semantic names where appropriate.
-
 ### Documentation synchronization
 
 - [ ] Create `ARCHITECTURE.md` now that the application/card-pack separation and validator boundaries have stabilized.
