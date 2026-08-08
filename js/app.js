@@ -585,16 +585,16 @@ function requireTheme(themeId) {
 }
 
 /*
- * Return the canonical Trail Blue fallback icon.
+ * Return the default theme fallback icon.
  *
  * This is the second stage of the application's icon
  * fallback chain:
  *
- * Theme SVG
+ * Selected theme SVG
  *     ↓
- * Trail Blue SVG
+ * Default theme SVG
  *     ↓
- * Emoji
+ * Catalog emoji
  */
 function buildDefaultThemeIconPath(category) {
   const defaultTheme = requireTheme(DEFAULT_THEME_ID);
@@ -1178,7 +1178,7 @@ function categoryFor(card) {
  * Fallback order:
  *
  * 1. Selected theme SVG
- * 2. Trail Blue canonical SVG
+ * 2. Default theme SVG
  * 3. Catalog emoji
  *
  * The wrapper may be decorative or may expose the category
@@ -1223,7 +1223,7 @@ function createCategoryIcon(
   image.className = "category-svg-icon";
 
   /*
-   * Fall through to Trail Blue, then to the catalog emoji.
+   * Fall through to the default theme, then to the catalog emoji.
    */
   image.onerror = () => {
     if (theme.id === DEFAULT_THEME_ID) {
@@ -1253,7 +1253,7 @@ function createCategoryIcon(
  * Fallback order:
  *
  * 1. Selected theme card-back.svg
- * 2. Trail Blue canonical card-back.svg
+ * 2. Default theme card-back.svg
  * 3. No graphic; preserve the complete text-only card back
  */
 function createCardBackGraphic({ themeId = state.themeId } = {}) {
@@ -1279,7 +1279,6 @@ function createCardBackGraphic({ themeId = state.themeId } = {}) {
 
   image.onerror = () => {
     /*
-     * Trail Blue is the canonical fallback theme.
      * Do not request the same missing asset twice.
      */
     if (theme.id === DEFAULT_THEME_ID) {

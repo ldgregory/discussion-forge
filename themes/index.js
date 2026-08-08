@@ -7,7 +7,7 @@ import {
 } from "./trail-charcoal/index.js";
 
 /*
- * Trusted theme packages bundled with Trail Talk.
+ * Trusted theme packages bundled with Discussion Forge.
  *
  * New trusted themes must be imported and added here.
  * Theme IDs must remain unique.
