@@ -122,6 +122,36 @@ h1 {
   margin: 0 0 1rem;
 }
 
+.builder-selection-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.6rem;
+
+  padding: 0.75rem;
+
+  background: var(--paper);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.builder-selection-summary div {
+  display: grid;
+  gap: 0.15rem;
+}
+
+.builder-summary-label {
+  font-size: 0.78rem;
+}
+
+.builder-selection-summary strong {
+  font-size: 1.1rem;
+}
+
+.builder-summary-warning {
+  font-weight: 800;
+  text-decoration: underline;
+}
+
 .content-option-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -425,8 +455,10 @@ button.primary {
 }
 
 @media (max-width: 900px) {
-  .card-grid {
-    grid-template-columns: repeat(2, 2.4in);
+  .control-grid,
+  .content-option-grid,
+  .builder-selection-summary {
+    grid-template-columns: 1fr;
   }
 }
 

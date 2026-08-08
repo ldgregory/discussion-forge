@@ -37,11 +37,29 @@
       </noscript>
 
       <section class="controls" aria-labelledby="builder-title">
-        <h2 id="builder-title">Build Your Deck</h2>
+        <div class="builder-heading-row">
+          <h2 id="builder-title">Build Your Deck</h2>
+
+          <div class="builder-selection-summary" aria-live="polite">
+            <div>
+              <span class="builder-summary-label">Available cards</span>
+              <strong id="available-card-count">0</strong>
+            </div>
+
+            <div>
+              <span class="builder-summary-label">Selected editions</span>
+              <strong id="selected-edition-count">0</strong>
+            </div>
+
+            <div>
+              <span class="builder-summary-label">Selected categories</span>
+              <strong id="selected-category-count">0</strong>
+            </div>
+          </div>
+        </div>
 
         <div class="control-grid">
           <div class="builder-panel content-panel">
-            <h3>Content</h3>
 
             <div class="stack">
               <label for="card-pack">Card pack</label>
@@ -70,10 +88,26 @@
           </div>
 
           <div class="builder-panel builder-settings-panel">
-            <h3>Builder</h3>
 
             <div class="stack">
               <label for="deck-size">Playable cards</label>
+
+              <div class="builder-selection-summary" aria-live="polite">
+                <div>
+                  <span class="builder-summary-label">Available cards</span>
+                  <strong id="available-card-count">0</strong>
+                </div>
+
+                <div>
+                  <span class="builder-summary-label">Selected editions</span>
+                  <strong id="selected-edition-count">0</strong>
+                </div>
+
+                <div>
+                  <span class="builder-summary-label">Selected categories</span>
+                  <strong id="selected-category-count">0</strong>
+                </div>
+              </div>
 
               <input
                 id="deck-size"
