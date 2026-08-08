@@ -24,6 +24,7 @@ import {
 import { getTheme, themes } from "../themes/index.js";
 import { validateCardPackManifest } from "./validators/card-pack-validator.js";
 import { validateCard } from "./validators/card-validator.js";
+import { validateCategory } from "./validators/category-validator.js";
 
 /* =========================================================
  * Version and deck-identity contracts
@@ -424,46 +425,6 @@ function requireCatalogArray(value, catalogName, maxItems) {
  * are preserved. Unknown properties are discarded.
  */
 
-/* ---------------------------------------------------------
- * Category records
- * --------------------------------------------------------- */
-
-/*
- * Validate and normalize one category catalog record.
- */
-function validateCategory(rawCategory, index) {
-  const category = requireObject(rawCategory, `categories[${index}]`);
-
-  return {
-    id: requireString(category.id, `categories[${index}].id`, {
-      maxLength: LIMITS.maxCategoryIdLength,
-      pattern: ID_PATTERN,
-    }),
-
-    name: requireString(category.name, `categories[${index}].name`, {
-      maxLength: LIMITS.maxCategoryNameLength,
-    }),
-
-    short_name: optionalString(
-      category.short_name,
-      `categories[${index}].short_name`,
-      {
-        maxLength: LIMITS.maxCategoryNameLength,
-      },
-    ),
-
-    icon: requireString(category.icon, `categories[${index}].icon`, {
-      maxLength: LIMITS.maxIconNameLength,
-    }),
-
-    color: requireString(category.color, `categories[${index}].color`, {
-      maxLength: LIMITS.maxColorValueLength,
-      pattern: HEX_COLOR_PATTERN,
-    }),
-
-    active: requireBoolean(category.active, `categories[${index}].active`),
-  };
-}
 
 /* ---------------------------------------------------------
  * Edition records
