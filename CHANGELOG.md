@@ -10,11 +10,28 @@ The project follows a Keep a Changelog–style format during development.
 
 ### Added
 
+- Dedicated category-record validator module.
+- Dedicated edition-record validator module.
+- Dedicated catalog-integrity validator for cross-catalog uniqueness and relationship checks.
+- Dedicated theme-definition validator module.
+- Live builder statistics for available cards and selected editions/categories.
+- Visual warning when the requested deck size exceeds the currently available card count.
+- Advanced Deck Settings accordion placeholder for future metadata-driven filters.
+
 ### Changed
+
+- Removed obsolete validation helpers, allowlists, patterns, and limits from `app.js` after validator extraction.
+- Reframed `app.js` around loading, orchestration, deck generation, rendering, interaction, and trusted-state publication rather than record validation.
+- Reorganized the builder into content-selection and builder-option columns.
+- Moved live deck-selection statistics beside the Build Your Deck heading.
 
 ### Fixed
 
 ### Security
+
+- Catalog record, catalog-integrity, and theme validation now have explicit module boundaries.
+- Theme resource-path validation remains constrained to trusted relative theme namespaces after extraction from `app.js`.
+- Cross-catalog category, edition, primary-category, and identity checks remain fail closed before replacement catalog state is published.
 
 ---
 
