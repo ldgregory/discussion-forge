@@ -8,6 +8,7 @@
 - [ ] Validate pack compatibility using `minimum_application_version`.
 - [ ] Validate pack dependencies before activation.
 - [ ] Report card-pack validation failures with the originating pack ID.
+- [ ] Add automated regression tests for manifest, card, category, edition, catalog-integrity, and theme validators.
 - [ ] Decide whether registry entries should be deeply frozen or otherwise protected from accidental mutation.
 - [ ] Decide whether `sample-trivia` remains bundled as a visible example pack, moves to developer/test fixtures, or becomes documentation-only sample content.
 
@@ -23,7 +24,7 @@
 
 ### Documentation synchronization
 
-- [ ] Create `ARCHITECTURE.md` now that the application/card-pack separation has stabilized.
+- [ ] Create `ARCHITECTURE.md` now that the application/card-pack separation and validator boundaries have stabilized.
 
 ---
 
