@@ -1,176 +1,115 @@
 # TODO
 
-## Application and Trail Talk Pack Decoupling
-
-### Application-owned branding
-
-- [ ] index.html page title, heading, metadata, and noscript text
-- [ ] README.md application description
-- [ ] SECURITY.md project terminology
-- [ ] PROJECT.md application terminology
-- [ ] CHANGELOG.md current header wording only
-- [ ] css/styles.css file-level comment
-- [ ] js/app.js file-level and runtime comments
-- [ ] js/utils.js generic encoding comment
-- [ ] themes/index.js registry wording
-
-### Trail Talk pack-owned identity
-
-- [ ] Move card-back title into pack metadata
-- [ ] Move tagline into pack metadata
-- [ ] Move brand into pack metadata
-- [ ] Validate card-back metadata
-- [ ] Render active pack identity
-- [ ] Include pack identity in generated manifests
-- [ ] Include pack ID and version in deterministic deck identity
-
-### Theme documentation and comments
-
-- [ ] Replace fixed Trail Talk text references with semantic names
-- [ ] Decide whether bundled themes are generic or Trail Talk-specific
-- [ ] Rename THEMES.md to THEME-PACK.md
-- [ ] Generalize theme specification wording
-
-### Card-pack documentation
-
-- [ ] Replace application-level Trail Talk wording with “the application”
-- [ ] Preserve Trail Talk as the canonical example pack
-
 ## High Priority
 
-### General
+### Card-pack runtime and validation
 
-- [x] Make deck identifier deterministic from the generated deck
-- [x] Remove the legacy deck summary (yellow box)
-- [ ] Make preview cards visually match the printed cards
-- [ ] Keep the print renderer completely independent of interactive preview styles
+- [ ] Expand `validateCardPackManifest()` beyond the currently consumed runtime fields.
+- [ ] Validate pack compatibility using `minimum_application_version`.
+- [ ] Validate pack dependencies before activation.
+- [ ] Report card-pack validation failures with the originating pack ID.
+- [ ] Decide whether registry entries should be deeply frozen or otherwise protected from accidental mutation.
+- [ ] Decide whether `sample-trivia` remains bundled as a visible example pack, moves to developer/test fixtures, or becomes documentation-only sample content.
 
-### Security
+### Application / card-pack decoupling cleanup
 
-- [x] Define SVG acceptance and sanitization workflow
-- [ ] Document recommended production security headers
-- [ ] Add Content Security Policy deployment guidance
+- [ ] Complete remaining application-owned branding and terminology cleanup in code and comments:
+  - `css/styles.css` file-level comments
+  - `js/app.js` remaining Trail Talk-specific comments that describe application behavior rather than the Trail Talk pack
+  - `js/utils.js` generic encoding comments
+  - `themes/index.js` registry wording
+- [ ] Decide whether bundled themes are generic Discussion Forge themes or Trail Talk-specific themes.
+- [ ] Replace fixed Trail Talk text references in theme comments with semantic names where appropriate.
+
+### Documentation synchronization
+
+- [ ] Create `ARCHITECTURE.md` now that the application/card-pack separation has stabilized.
 
 ---
 
 ## Medium Priority
 
-### General
+### Preview and rendering
 
-- [x] Replace emoji with SVG icons (emoji is still full failthrough)
-- [ ] Add subtle category banner patterns
-- [x] Dynamically load theme CSS from the trusted theme registry
-- [ ] But I think we can make that significantly cleaner in a later pass by having renderPreviewCard() return a fully interactive card instead of a passive one.
+- [ ] Add subtle category banner patterns.
+- [ ] Add regression tests or a repeatable manual test checklist to ensure preview and printable output continue to use the same canonical card renderers.
 
 ### Generation UX
 
-- [ ] If deck generation fails for any reason (validation or no eligible cards),
-clear the existing preview and print output so the UI never displays a stale
-deck that does not correspond to the current builder settings.
+- [ ] If deck generation fails for any reason, clear existing preview and print output so stale output never represents invalid or changed builder settings.
+- [ ] Consider displaying active card-pack name/version in the preview summary so generated output is visually attributable before manifest download.
+
+### Security
+
+- [ ] Document recommended production security headers.
+- [ ] Add Content Security Policy deployment guidance.
+- [ ] Create standalone validation tooling for submitted card packs before approval.
+
+### Contribution workflow
+
+- [ ] Create `CONTRIBUTING.md` after the pack contribution workflow and validation requirements stabilize.
+- [ ] Define a repeatable acceptance checklist for bundled/community card packs.
 
 ---
 
-## Application and Canonical Pack Separation
+## Low Priority
 
-Decouple the generic conversation-deck application from the
-Trail Talk canonical card pack.
+### Advanced deck settings
 
-The application will own deck generation, validation, themes,
-printing, and installed-pack management.
+Add an **Advanced Deck Settings** area for optional card metadata filters after the v1.0 release.
 
-Trail Talk will become one installed card pack under:
+The area should be hidden or collapsed by default and populated dynamically from metadata actually present in the active card pack. A filter should appear only when the loaded cards contain meaningful values for that field. For example, if a pack uses `experience_level` but never uses `sensitivity`, the advanced settings should expose experience-level controls and omit sensitivity controls entirely.
 
-data/trail-talk/
+Potential dynamic filters include:
 
----
-
-
-## Catalog Pack System
-
-Replace the three hardcoded core catalog paths with an
-explicit registry of installed catalog packs.
-
-A catalog pack is a distribution boundary, while an edition
-remains a semantic card-selection boundary.
-
-Each pack may contribute:
-
-- cards
-- categories
-- editions
-- pack metadata such as ID, name, version, author, and license
-
-Runtime requirements:
-
-- Load registered packs concurrently.
-- Combine each catalog type in memory.
-- Validate every record using existing validators.
-- Enforce global uniqueness across all installed packs.
-- Validate relationships after all packs are merged.
-- Reject the entire startup transaction if any pack fails.
-- Preserve the existing `state.cards`, `state.categories`,
-  and `state.editions` runtime model.
-- Report validation errors with the originating pack ID.
-
-Future considerations:
-
-- Optional catalog files
-- Pack dependencies
-- Compatibility versions
-- Enable/disable controls
-- Pack provenance in manifests
-- Standalone pack validation tooling
-
----
-
-## Builder Evolution
-
-Expand the deck builder to support additional generation filters.
-
-Potential controls:
-
-- Audience (Family / Mixed / Adults)
+- Experience level
+- Audience
 - Sensitivity level
-- Card-type selection
-- Difficulty
+- Response style
+- Answer length
+- Card type
+- Group familiarity
+- Difficulty or other future pack-defined metadata
 - Icebreaker mode
 - Time available
 - Group size (optional)
 
-Requirements:
+Requirements for advanced filters:
 
-- UI controls
-- Input validation
-- Manifest support
-- Deterministic Deck ID participation
-- Builder state persistence
+- Discover available filter dimensions and values from the validated active catalog rather than hardcoding pack-specific controls.
+- Render only controls that are relevant to the active card pack.
+- Rebuild advanced settings whenever the active card pack changes.
+- Prefer checkboxes for multi-select dimensions and dropdowns/radios where a single selection is more appropriate.
+- Keep the basic deck-builder experience uncluttered when advanced settings are not needed.
+- Validate all selected values before generation.
+- Include filter state in generated manifests.
+- Include filters in deterministic Deck ID inputs whenever they can change the generated card set.
+- Preserve builder state only where doing so is safe and meaningful across pack changes.
+- Clear or invalidate generated output when an advanced filter changes in a way that makes existing output stale.
 
----
+### Card-pack ecosystem
 
-## Documentation
-
-- [ ] Create ARCHITECTURE.md
-- [ ] Create CONTRIBUTING.md
-
----
-
-## Someday
+- [ ] Optional catalog files within a card pack.
+- [ ] Enable/disable controls for installed card packs.
+- [ ] Pack provenance details in generated manifests.
+- [ ] Additional compatibility/version negotiation beyond the minimum application version.
+- [ ] Consider whether card-pack discovery should eventually move from static registration to a data-driven registry.
+- [ ] Consider whether selector display labels should come from registry metadata, preloaded manifest metadata, or the current humanized pack ID.
 
 ### Features
 
-- [ ] QR code support
-- [ ] Community question submission
+- [ ] QR code support.
+- [ ] Community question submission and approval workflow.
 
-### Theme System
+### Theme system
 
-- [ ] Add additional official themes
+- [ ] Add additional official themes:
   - Classic
   - Dark
   - Topographic
   - National Parks
   - Retro Camp
-
-- [ ] Expand renderer options
+- [ ] Expand renderer configuration options, for example:
 
 ```javascript
 renderPrintPage(cards, {

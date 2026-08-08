@@ -1,0 +1,50 @@
+{
+  "deck_identity_schema_version": 2,
+  "pack_type": "cards",
+
+  "id": "sample-trivia",
+  "display_name": "Sample Trivia",
+  "version": "1.0.0",
+
+  "author": {
+    "name": "Discussion Forge",
+    "email": "",
+    "website": "",
+    "github": ""
+  },
+
+  "released_at": "2026-08-07",
+
+  "description": "A small general-trivia card pack used to demonstrate and test Discussion Forge card-pack switching.",
+
+  "card_back": {
+    "title": "SAMPLE TRIVIA",
+    "tagline": [
+      "Test Your Knowledge",
+      "Learn Something New"
+    ],
+    "brand": "Discussion Forge"
+  },
+
+  "license": "Apache-2.0",
+
+  "minimum_application_version": "0.4.0",
+
+  "dependencies": [],
+
+  "tags": [
+    "trivia",
+    "sample",
+    "testing"
+  ],
+
+  "editions": [
+    "general"
+  ],
+
+  "categories": [
+    "trivia"
+  ],
+
+  "card_count": 6
+}

@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to Trail Talk will be documented in this file.
+All notable changes to Discussion Forge will be documented in this file.
 
 The project follows a Keep a Changelog–style format during development.
 
@@ -15,6 +15,51 @@ The project follows a Keep a Changelog–style format during development.
 ### Fixed
 
 ### Security
+
+---
+
+## [0.3.0-alpha1]
+
+### Added
+
+- Discussion Forge application identity separated from Trail Talk content identity.
+- Trusted `CARD_PACK_REGISTRY` for bundled card-pack definitions.
+- Card-pack loading and activation pipeline.
+- Runtime separation between the active card pack and validated catalog.
+- Card Pack selector populated from the trusted registry.
+- Multi-pack switching with pack-dependent edition and category controls.
+- Active card-pack ID and version in generated deck manifests.
+- Active card-pack ID and version in deterministic deck identity schema version 2.
+- Sample Trivia reference pack for multi-pack regression testing.
+- Dedicated card-pack manifest validator module.
+- Dedicated card-record validator module.
+- `CARD-PACK.md` specification updated for the multi-pack runtime.
+- `THEME-PACK.md` specification replacing the previous `THEMES.md` filename.
+
+### Changed
+
+- Renamed the application identity from Trail Talk to Discussion Forge.
+- Repositioned Trail Talk as the canonical bundled card pack.
+- Card-back title, taglines, and brand now come from the active card-pack manifest.
+- Deck identity contract now uses `DECK_IDENTITY_SCHEMA_VERSION` and schema version 2.
+- Validated cards, categories, and editions are grouped under a catalog runtime object.
+- Generated manifest filenames use Discussion Forge application naming rather than Trail Talk naming.
+- Project, security, card-pack, and theme documentation updated to reflect the application/content separation.
+- Validation responsibilities began moving out of `app.js` into dedicated validator modules.
+
+### Fixed
+
+- Cleared stale generated output after successful card-pack changes.
+- Preserved the previously active trusted pack when a replacement pack fails to load or validate.
+- Enforced exact agreement between a registered card-pack ID and the ID declared by its manifest.
+- Corrected Trail Talk manifest category identifiers to match the catalog.
+
+### Security
+
+- Card-pack IDs are resolved through a trusted registry rather than arbitrary resource paths.
+- Card-pack catalog data is validated before entering trusted runtime state.
+- Failed card-pack activation remains fail closed and does not publish partially validated replacement state.
+- Card-pack manifest and card-record validation now have dedicated module boundaries.
 
 ---
 
@@ -70,7 +115,7 @@ The project follows a Keep a Changelog–style format during development.
 
 ### Added
 
-- Initial Trail Talk prototype.
+- Initial Trail Talk prototype that later evolved into Discussion Forge.
 - JSON card catalog.
 - Seeded deck generation.
 - Printable poker card output.

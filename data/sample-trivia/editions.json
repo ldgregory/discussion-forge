@@ -1,0 +1,8 @@
+[
+  {
+    "id": "general",
+    "name": "General Edition",
+    "description": "A small collection of general-knowledge trivia questions.",
+    "active": true
+  }
+]
