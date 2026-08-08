@@ -36,6 +36,7 @@ The current runtime model is:
 ```text
 Discussion Forge
 ├── Card Pack Registry
+├── Validation Layer
 ├── Active Card Pack
 ├── Validated Catalog
 │   ├── cards
@@ -66,6 +67,10 @@ requireCardPack()
         ↓
 loadCardPack()
         ↓
+record validators
+        ↓
+catalog-integrity validator
+        ↓
 validated card pack + catalog
         ↓
 activateCardPack()
@@ -76,6 +81,28 @@ application state
 Unknown pack IDs are rejected before resource paths are constructed. Pack resources are validated before they enter trusted runtime state.
 
 Changing the active card pack replaces the validated catalog, rebuilds pack-dependent builder controls, and clears generated output only after successful activation.
+
+---
+
+## Validation Architecture
+
+Validation is separated from application orchestration. `app.js` loads resources, enforces loading-boundary safeguards, invokes validators, and publishes only trusted results.
+
+Dedicated modules currently own these contracts:
+
+- `card-pack-validator.js` — validates and normalizes card-pack manifest fields consumed by the runtime.
+- `card-validator.js` — validates and normalizes individual card records and allowlisted card metadata.
+- `category-validator.js` — validates and normalizes category records.
+- `edition-validator.js` — validates and normalizes edition records.
+- `catalog-integrity-validator.js` — enforces uniqueness and relationships across already-validated cards, categories, and editions.
+- `theme-validator.js` — validates trusted theme definitions and theme-owned resource-path contracts.
+
+The runtime intentionally keeps two checks at the loading boundary rather than treating them as intrinsic record validation:
+
+- Raw catalog resources must be arrays and remain within application size limits.
+- A validated card-pack manifest ID must exactly match the trusted registry ID used to request it.
+
+This separation keeps validation contracts explicit while allowing `app.js` to remain primarily an orchestration layer.
 
 ---
 
@@ -137,6 +164,7 @@ Back:
 - Downloadable generated manifests
 - Card-pack registry and dynamic card-pack selector
 - Runtime separation between active card-pack metadata and validated catalog data
+- Dedicated validator modules for pack, catalog, integrity, and theme contracts
 - Theme registry with self-contained trusted theme packages
 
 ---
