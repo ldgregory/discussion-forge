@@ -1,14 +1,12 @@
 # Security Policy
 
-This document defines the security engineering standards used throughout the Trail Talk project.
+This document defines the security engineering standards used throughout the Discussion Forge project.
 
 ## Philosophy
 
-Trail Talk is developed using **Secure by Design** principles.
+Discussion Forge is developed using **Secure by Design** principles.
 
-Security is an engineering requirement, not a feature added later. Every
-new feature, architectural decision, and code review considers security before
-implementation begins.
+Security is an engineering requirement, not a feature added later. Every new feature, architectural decision, and code review considers security before implementation begins.
 
 If a feature cannot be implemented securely, it will not be implemented.
 
@@ -29,16 +27,18 @@ Our security philosophy is guided by:
 
 Implemented protections include:
 
-- DOM-only rendering for user content
-- Validation of all catalog data
+- DOM-only rendering for user and pack-supplied text
+- Validation of card-pack catalogs before trusted-state publication
+- Trusted card-pack registry for bundled pack resource paths
 - Trusted theme registry
-- Immutable theme definitions
-- Declarative theme packages
+- Immutable trusted theme definitions
+- Declarative theme architecture
 - Explicit trust boundaries
-- Browser cryptographic random source
-- No executable community assets
+- Browser cryptographic random sources for UUID and random-seed generation
+- No runtime loading of arbitrary executable community assets
+- Fail-closed pack activation
 
-Future deployment hardening (such as Content Security Policy, HTTP security headers, and deployment configuration) will be introduced as deployment targets are added.
+Future deployment hardening, including Content Security Policy guidance, HTTP security headers, and deployment configuration, will be introduced as deployment targets are formalized.
 
 ---
 
@@ -46,40 +46,83 @@ Future deployment hardening (such as Content Security Policy, HTTP security head
 
 Everything is considered **untrusted** until it has been validated or reviewed.
 
-## Trusted
+## Trusted Bundled Content
 
-The following components are maintained as part of the Trail Talk repository
-and are considered trusted.
+The following components are maintained as part of the Discussion Forge repository and are trusted after review:
 
-Application source code
-Bundled CSS
-Bundled JavaScript modules
-Bundled JSON catalogs
-Bundled SVG assets
-Bundled themes
+- Application source code
+- Bundled CSS
+- Bundled JavaScript modules
+- Card-pack registry definitions
+- Bundled card-pack JSON resources after runtime validation
+- Bundled SVG assets after review and sanitization
+- Bundled theme packages
 
-## Conditionally Trusted
+## Conditionally Trusted Contributions
 
-These items become trusted only after review and approval.
+These items become trusted only after review, validation, and approval:
 
-- Community question submissions
-- Community theme packs
-- Approved SVG artwork
-- Approved catalog updates
+- Community card submissions
+- Community card packs
+- Community theme packages
+- SVG artwork
+- Catalog updates
 
-## Untrusted
+## Untrusted Input
 
-The following must always be treated as untrusted input.
+The following must always be treated as untrusted input:
 
 - User input
 - Community submissions
 - Imported manifests
+- Imported or uploaded pack files
 - External files
 - External URIs
 - Browser query parameters
 - Future API requests
 - Uploaded images
 - Uploaded SVG files
+
+---
+
+# Card-Pack Security
+
+## Trusted Registration
+
+Discussion Forge currently loads bundled card packs only from `CARD_PACK_REGISTRY`.
+
+Registry entries provide trusted pack IDs and relative resource paths. Callers request a registered ID rather than constructing arbitrary file paths.
+
+Unknown IDs are rejected before pack resources are fetched.
+
+## Validate Before Activation
+
+Card-pack JSON is treated as untrusted data even when it is bundled with the application.
+
+A pack is not published into trusted runtime state until its consumed manifest fields, catalog records, identifiers, metadata values, and cross-catalog relationships have been validated.
+
+The runtime separates:
+
+```text
+activeCardPack
+catalog
+  cards
+  categories
+  editions
+```
+
+A newly requested pack replaces those trusted objects only after successful loading and validation.
+
+## Fail-Closed Switching
+
+If a requested card pack fails to load or validate:
+
+- The failed pack is not activated.
+- The previously active trusted pack remains in runtime state.
+- The selector is restored to the previous active pack.
+- Existing generated output is not cleared merely because an invalid replacement was requested.
+
+Generated output is cleared after a successful pack change so stale output cannot be mistaken for content from the newly active pack.
 
 ---
 
@@ -94,11 +137,13 @@ Validation should prefer allowlists over denylists whenever practical.
 Examples include:
 
 - UUID validation
+- Card-pack ID validation
 - Theme ID validation
-- Category validation
-- JSON schema validation
+- Category and edition ID validation
+- Allowlisted card metadata values
 - Color validation
 - Relationship validation
+- Trusted resource-path construction
 
 ---
 
@@ -106,47 +151,35 @@ Examples include:
 
 If validation fails, processing stops.
 
-The application should never attempt to continue operating using partially
-validated data.
+The application should never continue using partially validated replacement data.
 
 ---
 
 ## Executable Content
 
-Community contributions must never introduce executable code.
+Community contributions must never gain executable runtime privileges merely by being packaged as content or presentation.
 
-Themes may contain:
+Card packs are data packages. They must not contain executable application logic.
 
-- SVG assets
-- CSS
-- Declarative JSON
-
-Themes may not contain:
-
-- JavaScript
-- Embedded scripts
-- Event handlers
-- Remote code
+Theme contributions may contain reviewed presentation assets and CSS, but must not introduce arbitrary executable behavior.
 
 ---
 
 ## SVG Security
 
-Detailed SVG acceptance, sanitization, allowlist, testing, licensing, and
-fallback requirements are documented in `THEMES.md`.
+Detailed SVG acceptance, sanitization, allowlist, testing, licensing, and fallback requirements are documented in `THEME-PACK.md`.
 
-Trail Talk shall not render community-supplied SVG files directly. SVG assets
-become trusted only after review, sanitization, testing, and inclusion in the
-project repository.
+Discussion Forge does not render arbitrary community-supplied SVG files directly at runtime. SVG assets become trusted only after review, sanitization, testing, and inclusion in a trusted bundled theme package.
 
 ---
 
 ## Rendering
 
-User-supplied text is rendered using DOM APIs and `textContent`.
+Pack-supplied and user-supplied text is rendered using DOM APIs and `textContent`.
 
-Application code shall avoid using `innerHTML` and `insertAdjacentHTML`
-for untrusted content.
+Application code shall avoid using `innerHTML` and `insertAdjacentHTML` for untrusted content.
+
+Decorative SVG assets are loaded from trusted theme-owned paths rather than from arbitrary catalog URLs.
 
 ---
 
@@ -154,13 +187,13 @@ for untrusted content.
 
 The application shall remain compatible with a strict Content Security Policy.
 
-Future development should avoid unnecessary inline styles or inline scripts.
+Future development should avoid unnecessary inline styles or inline scripts and should preserve same-origin/offline-friendly resource loading.
 
 ---
 
 # Dependency Policy
 
-Trail Talk intentionally minimizes third-party dependencies.
+Discussion Forge intentionally minimizes third-party dependencies.
 
 Before adding a dependency, consider:
 
@@ -168,6 +201,7 @@ Before adding a dependency, consider:
 - Is it necessary?
 - Does the browser already provide this functionality?
 - Does it increase attack surface?
+- Does it weaken offline or portable deployment?
 
 ---
 
@@ -190,21 +224,23 @@ If a security issue is discovered:
 Before merging significant changes, consider:
 
 - Are trust boundaries maintained?
-- Is all external input validated?
-- Are relationships validated?
-- Are identifiers allowlisted?
-- Is executable content prohibited?
-- Does this increase attack surface?
-- Does this introduce new dependencies?
-- Does this violate Secure by Design?
-- Does this preserve the project's architectural principles?
+- Is all external or pack-supplied input validated before use?
+- Are cross-catalog relationships validated?
+- Are identifiers constrained and allowlisted where practical?
+- Are resource paths derived only from trusted registry metadata?
+- Does failed activation preserve previously trusted state?
+- Is executable content prohibited from data packages?
+- Are theme assets reviewed and sanitized?
+- Does the change increase attack surface?
+- Does it introduce new dependencies?
+- Does it remain compatible with strict CSP goals?
+- Does it preserve Secure by Design and the project's architectural principles?
 
 ---
 
 ## Release Criteria
 
-Significant features are considered complete only after functional,
-architectural, and security review.
+Significant features are considered complete only after functional, architectural, accessibility, and security review appropriate to the change.
 
 ---
 
@@ -212,5 +248,4 @@ architectural, and security review.
 
 Security is an ongoing engineering discipline.
 
-This document will evolve alongside the project as new features,
-architectures, and deployment models are introduced.
+This document will evolve alongside Discussion Forge as card-pack distribution, contributor workflows, deployment models, and additional extension points are introduced.
