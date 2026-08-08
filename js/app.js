@@ -25,6 +25,7 @@ import { getTheme, themes } from "../themes/index.js";
 import { validateCardPackManifest } from "./validators/card-pack-validator.js";
 import { validateCard } from "./validators/card-validator.js";
 import { validateCategory } from "./validators/category-validator.js";
+import { validateEdition } from "./validators/edition-validator.js";
 
 /* =========================================================
  * Version and deck-identity contracts
@@ -424,39 +425,6 @@ function requireCatalogArray(value, catalogName, maxItems) {
  * Only the properties explicitly returned by each validator
  * are preserved. Unknown properties are discarded.
  */
-
-
-/* ---------------------------------------------------------
- * Edition records
- * --------------------------------------------------------- */
-
-/*
- * Validate and normalize one edition catalog record.
- */
-function validateEdition(rawEdition, index) {
-  const edition = requireObject(rawEdition, `editions[${index}]`);
-
-  return {
-    id: requireString(edition.id, `editions[${index}].id`, {
-      maxLength: LIMITS.maxEditionIdLength,
-      pattern: ID_PATTERN,
-    }),
-
-    name: requireString(edition.name, `editions[${index}].name`, {
-      maxLength: LIMITS.maxCategoryNameLength,
-    }),
-
-    description: optionalString(
-      edition.description,
-      `editions[${index}].description`,
-      {
-        maxLength: LIMITS.maxDescriptionLength,
-      },
-    ),
-
-    active: requireBoolean(edition.active, `editions[${index}].active`),
-  };
-}
 
 /* ---------------------------------------------------------
  * Catalog-wide identity checks
