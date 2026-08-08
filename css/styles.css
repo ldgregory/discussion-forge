@@ -106,8 +106,105 @@ h1 {
 
 .control-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
   gap: 1rem;
+}
+
+.builder-panel {
+  min-width: 0;
+  padding: 1rem;
+
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+
+.builder-panel h3 {
+  margin: 0 0 1rem;
+}
+
+.builder-heading-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+
+  margin-bottom: 1rem;
+}
+
+.builder-heading-row h2 {
+  margin: 0;
+}
+
+.builder-selection-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, auto));
+  gap: 1.5rem;
+
+  padding: 0.7rem 1rem;
+
+  background: var(--paper);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.builder-selection-summary div {
+  display: grid;
+  gap: 0.15rem;
+  min-width: 7rem;
+}
+
+.builder-summary-label {
+  font-size: 0.78rem;
+}
+
+.builder-selection-summary strong {
+  font-size: 1.1rem;
+}
+
+.builder-selection-summary.builder-summary-shortage {
+  background: #fff4ce;
+  border-color: #d39b2a;
+}
+
+.builder-summary-warning {
+  color: #8a4b08;
+  font-weight: 800;
+}
+
+.content-option-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.8rem;
+
+  margin-top: 1rem;
+}
+
+.scrollable-options {
+  max-height: 15rem;
+  overflow-y: auto;
+  padding-right: 0.25rem;
+}
+
+.advanced-settings {
+  margin-top: 1rem;
+
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+
+.advanced-settings summary {
+  padding: 0.8rem 1rem;
+
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.advanced-settings-content {
+  padding: 0 1rem 1rem;
+}
+
+.advanced-settings-content p {
+  margin: 0;
 }
 
 fieldset {
@@ -185,8 +282,15 @@ button.primary {
 }
 
 @media (max-width: 900px) {
-  .control-grid {
+  .control-grid,
+  .content-option-grid,
+  .builder-selection-summary {
     grid-template-columns: 1fr;
+  }
+
+  .builder-heading-row {
+    align-items: stretch;
+    flex-direction: column;
   }
 }
 
@@ -376,8 +480,10 @@ button.primary {
 }
 
 @media (max-width: 900px) {
-  .card-grid {
-    grid-template-columns: repeat(2, 2.4in);
+  .control-grid,
+  .content-option-grid,
+  .builder-selection-summary {
+    grid-template-columns: 1fr;
   }
 }
 

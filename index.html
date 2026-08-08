@@ -12,7 +12,7 @@
 
     <meta name="referrer" content="no-referrer" />
 
-      <title>Discussion Forge</title>
+    <title>Discussion Forge</title>
 
     <link rel="stylesheet" href="css/styles.css" />
   </head>
@@ -20,7 +20,7 @@
   <body>
     <header class="site-header">
       <div>
-                <p class="eyebrow">Conversation Deck Generator</p>
+        <p class="eyebrow">Conversation Deck Generator</p>
 
         <h1>Discussion Forge</h1>
 
@@ -37,66 +37,110 @@
       </noscript>
 
       <section class="controls" aria-labelledby="builder-title">
-        <h2 id="builder-title">Build Your Deck</h2>
+        <div class="builder-heading-row">
+          <h2 id="builder-title">Build Your Deck</h2>
 
-        <div class="control-grid">
-          <fieldset>
-            <legend>Editions</legend>
-
-            <div id="edition-options" class="option-list"></div>
-          </fieldset>
-
-          <fieldset>
-            <legend>Categories</legend>
-
-            <div id="category-options" class="option-list"></div>
-          </fieldset>
-
-          <div class="stack">
-            <label for="card-pack"> Card pack </label>
-            <select id="card-pack"></select>
-
-            <label for="deck-size"> Playable cards </label>
-
-            <input
-              id="deck-size"
-              type="number"
-              min="1"
-              max="250"
-              step="1"
-              value="24"
-              inputmode="numeric"
-            />
-
-            <label for="seed"> Generation seed </label>
-
-            <div class="seed-row">
-              <input
-                id="seed"
-                type="text"
-                value="discussion-forge"
-                maxlength="128"
-                autocomplete="off"
-                autocapitalize="off"
-                spellcheck="false"
-              />
-
-              <button id="random-seed" type="button">Random</button>
+          <div id="builder-selection-summary" class="builder-selection-summary" aria-live="polite">
+            <div>
+              <span class="builder-summary-label">Available cards</span>
+              <strong id="available-card-count">0</strong>
             </div>
 
-            <label for="output-mode"> Preview mode </label>
+            <div>
+              <span class="builder-summary-label">Selected editions</span>
+              <strong id="selected-edition-count">0</strong>
+            </div>
 
-            <select id="output-mode">
-              <option value="cards">Poker cards</option>
-
-              <option value="list">Quick list</option>
-            </select>
-
-            <label for="theme"> Card theme </label>
-
-            <select id="theme"></select>
+            <div>
+              <span class="builder-summary-label">Selected categories</span>
+              <strong id="selected-category-count">0</strong>
+            </div>
           </div>
         </div>
+
+        <div class="control-grid">
+          <div class="builder-panel content-panel">
+
+            <div class="stack">
+              <label for="card-pack">Card pack</label>
+              <select id="card-pack"></select>
+            </div>
+
+            <div class="content-option-grid">
+              <fieldset>
+                <legend>Editions</legend>
+
+                <div
+                  id="edition-options"
+                  class="option-list scrollable-options"
+                ></div>
+              </fieldset>
+
+              <fieldset>
+                <legend>Categories</legend>
+
+                <div
+                  id="category-options"
+                  class="option-list scrollable-options"
+                ></div>
+              </fieldset>
+            </div>
+          </div>
+
+          <div class="builder-panel builder-settings-panel">
+
+            <div class="stack">
+              <label for="deck-size">Playable cards</label>
+
+              <input
+                id="deck-size"
+                type="number"
+                min="1"
+                max="250"
+                step="1"
+                value="24"
+                inputmode="numeric"
+              />
+
+              <label for="seed">Generation seed</label>
+
+              <div class="seed-row">
+                <input
+                  id="seed"
+                  type="text"
+                  value="discussion-forge"
+                  maxlength="128"
+                  autocomplete="off"
+                  autocapitalize="off"
+                  spellcheck="false"
+                />
+
+                <button id="random-seed" type="button">Random</button>
+              </div>
+
+              <label for="output-mode">Preview mode</label>
+
+              <select id="output-mode">
+                <option value="cards">Poker cards</option>
+                <option value="list">Quick list</option>
+              </select>
+
+              <label for="theme">Card theme</label>
+              <select id="theme"></select>
+            </div>
+          </div>
+        </div>
+
+        <details class="advanced-settings">
+          <summary>Advanced Deck Settings</summary>
+
+          <div class="advanced-settings-content">
+            <p>
+              Additional deck filters will appear here when supported by the
+              active card pack.
+            </p>
+          </div>
+        </details>
 
         <div class="actions">
           <button id="generate" type="button" class="primary">

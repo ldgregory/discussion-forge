@@ -306,6 +306,14 @@ const ui = Object.freeze({
 
   deckSizeInput: requireElement("deck-size"),
 
+  builderSelectionSummary: requireElement("builder-selection-summary"),
+
+  availableCardCount: requireElement("available-card-count"),
+
+  selectedEditionCount: requireElement("selected-edition-count"),
+
+  selectedCategoryCount: requireElement("selected-category-count"),
+
   editionOptions: requireElement("edition-options"),
 
   categoryOptions: requireElement("category-options"),
@@ -976,6 +984,7 @@ function renderOptions() {
         }),
       );
     });
+  renderBuilderSelectionSummary();
 }
 
 /* ---------------------------------------------------------
@@ -1215,6 +1224,32 @@ function getSelectedOptionValues(name) {
   return selected;
 }
 
+/*
+ * Refresh live builder statistics from the current validated
+ * catalog and content selections.
+ */
+function renderBuilderSelectionSummary() {
+  const editions = getSelectedOptionValues("edition");
+  const categories = getSelectedOptionValues("category");
+
+  const eligibleCards = getEligibleCards(editions, categories);
+
+  ui.availableCardCount.textContent = String(eligibleCards.length);
+  ui.selectedEditionCount.textContent = String(editions.length);
+  ui.selectedCategoryCount.textContent = String(categories.length);
+
+  let requested = Number(ui.deckSizeInput.value);
+
+  if (!Number.isInteger(requested) || requested < 1) {
+    requested = 0;
+  }
+
+  const hasShortage = requested > eligibleCards.length;
+
+  ui.availableCardCount.classList.toggle("builder-summary-warning", hasShortage);
+  ui.builderSelectionSummary.classList.toggle("builder-summary-shortage", hasShortage);
+}
+
 /* ---------------------------------------------------------
  * Generation input validation
  * --------------------------------------------------------- */
@@ -1348,6 +1383,23 @@ function cardMatchesSelection(card, editions, categories) {
 }
 
 /*
+ * Return all currently playable cards for the supplied
+ * edition and category selections.
+ *
+ * An empty edition or category selection produces no eligible
+ * cards rather than treating the missing filter as unrestricted.
+ */
+function getEligibleCards(editions, categories) {
+  if (editions.length === 0 || categories.length === 0) {
+    return [];
+  }
+
+  return state.catalog.cards.filter((card) =>
+    cardMatchesSelection(card, editions, categories),
+  );
+}
+
+/*
  * Build the manifest describing one generated deck.
  *
  * This preserves the generation configuration, deterministic
@@ -1476,9 +1528,7 @@ async function generateDeck() {
      * Find active, approved cards matching both the selected
      * edition set and category set.
      */
-    const eligible = state.catalog.cards.filter((card) =>
-      cardMatchesSelection(card, editions, categories),
-    );
+    const eligible = getEligibleCards(editions, categories);
 
     /*
      * Clear stale output when the current configuration has no
@@ -2478,6 +2528,14 @@ function handlePrint() {
 }
 
 /*
+ * Refresh builder statistics when edition or category
+ * selections change.
+ */
+function handleBuilderSelectionChange() {
+  renderBuilderSelectionSummary();
+}
+
+/*
  * Download the current generated-deck manifest.
  */
 function handleManifestDownload() {
@@ -2575,6 +2633,12 @@ function registerEventListeners() {
   ui.manifestButton.addEventListener("click", handleManifestDownload);
 
   ui.outputMode.addEventListener("change", handleOutputModeChange);
+
+  ui.deckSizeInput.addEventListener("input", renderBuilderSelectionSummary);
+
+  ui.editionOptions.addEventListener("change", handleBuilderSelectionChange);
+
+  ui.categoryOptions.addEventListener("change", handleBuilderSelectionChange);
 
   ui.cardPackSelect.addEventListener("change", handleCardPackChange);
 
