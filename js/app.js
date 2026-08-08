@@ -111,33 +111,14 @@ const LIMITS = Object.freeze({
   maxSeedLength: 128,
   maxCategoryIdLength: 64,
   maxEditionIdLength: 64,
-  maxThemeIdLength: 64,
-  maxIsoTimestampLength: 40,
   maxColorValueLength: 32,
   maxDescriptionLength: 500,
-  maxCardTypeLength: 32,
-  maxCardStatusLength: 32,
-  maxCardResponseStyleLength: 32,
-  maxCardAnswerLength: 32,
-  maxCardSensitivityLength: 32,
-  maxCardSourceLength: 48,
-  maxCardPrimaryCategoryLength: 64,
 
   /*
-   * Card content limits.
-   *
-   * These values preserve readability and layout on a
-   * standard poker-size conversation card.
+   * Category and edition presentation limits.
    */
-  maxPromptLength: 140,
-  maxInstructionLength: 120,
   maxCategoryNameLength: 32,
   maxIconNameLength: 16,
-  maxCardBackTitleLength: 40,
-  maxCardBackTaglineLength: 80,
-  maxCardBackBrandLength: 64,
-  maxCardPackIdLength: 64,
-  maxCardPackDisplayNameLength: 100,
 });
 
 /* =========================================================
@@ -190,44 +171,6 @@ const CARD_PACK_REGISTRY = Object.freeze({
 });
 
 /* =========================================================
- * Catalog allowlists
- * ========================================================= */
-
-const ALLOWED_CARD_TYPES = new Set([
-  "question",
-  "story",
-  "lightning",
-  "wildcard",
-]);
-
-const ALLOWED_CARD_STATUSES = new Set([
-  "draft",
-  "pending",
-  "approved",
-  "rejected",
-  "retired",
-]);
-
-const ALLOWED_RESPONSE_STYLES = new Set([
-  "discussion",
-  "story",
-  "quick",
-  "challenge",
-]);
-
-const ALLOWED_ANSWER_LENGTHS = new Set(["short", "medium", "long"]);
-
-const ALLOWED_EXPERIENCE_LEVELS = new Set(["beginner", "experienced"]);
-
-const ALLOWED_AUDIENCES = new Set(["general"]);
-
-const ALLOWED_GROUP_FAMILIARITY = new Set(["new-group", "friends"]);
-
-const ALLOWED_SENSITIVITY_LEVELS = new Set(["low", "medium", "high"]);
-
-const ALLOWED_SOURCES = new Set(["original", "community"]);
-
-/* =========================================================
  * Validation patterns
  * ========================================================= */
 
@@ -236,13 +179,6 @@ const ALLOWED_SOURCES = new Set(["original", "community"]);
  * editions, themes, and other trusted registry values.
  */
 const ID_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
-
-/*
- * UUID validation accepts RFC-compatible UUID versions
- * 1 through 8 and the standard variant bits.
- */
-const UUID_PATTERN =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 /*
  * Theme package versions currently use stable semantic
@@ -456,90 +392,6 @@ function requireBoolean(value, fieldName) {
   }
 
   return value;
-}
-
-/*
- * Require an integer greater than zero.
- */
-function requirePositiveInteger(value, fieldName) {
-  if (!Number.isInteger(value) || value < 1) {
-    throw new TypeError(`${fieldName} must be a positive integer.`);
-  }
-
-  return value;
-}
-
-/*
- * Require a non-empty, size-limited array of validated
- * strings.
- */
-function requireStringArray(
-  value,
-  fieldName,
-  { maxItems = 100, itemPattern = null } = {},
-) {
-  if (!Array.isArray(value)) {
-    throw new TypeError(`${fieldName} must be an array.`);
-  }
-
-  if (value.length === 0) {
-    throw new RangeError(`${fieldName} cannot be empty.`);
-  }
-
-  if (value.length > maxItems) {
-    throw new RangeError(
-      `${fieldName} cannot contain more than ${maxItems} items.`,
-    );
-  }
-
-  return value.map((item, index) =>
-    requireString(item, `${fieldName}[${index}]`, {
-      minLength: 1,
-      maxLength: 100,
-      pattern: itemPattern,
-    }),
-  );
-}
-
-/*
- * Require an array whose normalized string values all
- * appear in a trusted allowlist.
- */
-function requireAllowedStringArray(value, fieldName, allowedValues) {
-  const items = requireStringArray(value, fieldName, {
-    maxItems: allowedValues.size,
-    itemPattern: ID_PATTERN,
-  });
-
-  items.forEach((item) => {
-    if (!allowedValues.has(item)) {
-      throw new TypeError(
-        `${fieldName} contains an unsupported value: "${item}".`,
-      );
-    }
-  });
-
-  return items;
-}
-
-/*
- * Require a parseable timestamp and return it as a Date.
- *
- * Callers normalize accepted timestamps with toISOString()
- * before storing them.
- */
-function requireIsoTimestamp(value, fieldName) {
-  const timestamp = requireString(value, fieldName, {
-    maxLength: LIMITS.maxIsoTimestampLength,
-  });
-
-  const parsed = new Date(timestamp);
-
-  if (Number.isNaN(parsed.getTime())) {
-    throw new TypeError(`${fieldName} must be a valid ISO timestamp.`);
-  }
-
-  return parsed;
 }
 
 /*
