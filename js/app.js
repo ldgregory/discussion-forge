@@ -1234,10 +1234,7 @@ function renderBuilderSelectionSummary() {
 
   const eligibleCards = getEligibleCards(editions, categories);
 
-  const hasShortage = requested > eligibleCards.length;
-
-  ui.availableCardCount.classList.toggle("builder-summary-warning", hasShortage);
-  ui.builderSelectionSummary.classList.toggle("builder-summary-shortage", hasShortage);
+  ui.availableCardCount.textContent = String(eligibleCards.length);
   ui.selectedEditionCount.textContent = String(editions.length);
   ui.selectedCategoryCount.textContent = String(categories.length);
 
@@ -1247,10 +1244,10 @@ function renderBuilderSelectionSummary() {
     requested = 0;
   }
 
-  ui.availableCardCount.classList.toggle(
-    "builder-summary-warning",
-    requested > eligibleCards.length,
-  );
+  const hasShortage = requested > eligibleCards.length;
+
+  ui.availableCardCount.classList.toggle("builder-summary-warning", hasShortage);
+  ui.builderSelectionSummary.classList.toggle("builder-summary-shortage", hasShortage);
 }
 
 /* ---------------------------------------------------------
