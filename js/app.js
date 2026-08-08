@@ -111,16 +111,11 @@ const LIMITS = Object.freeze({
   maxEditions: 100,
   maxDeckSize: 250,
   maxSeedLength: 128,
-  maxCategoryIdLength: 64,
-  maxEditionIdLength: 64,
-  maxColorValueLength: 32,
-  maxDescriptionLength: 500,
 
   /*
-   * Category and edition presentation limits.
+   * Theme metadata limits.
    */
-  maxCategoryNameLength: 32,
-  maxIconNameLength: 16,
+  maxThemeNameLength: 32,
 });
 
 /* =========================================================
@@ -187,11 +182,6 @@ const ID_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
  * versions without prerelease or build suffixes.
  */
 const SEMVER_PATTERN = /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/;
-
-/*
- * Six-digit hexadecimal color values used by catalog data.
- */
-const HEX_COLOR_PATTERN = /^#[0-9a-f]{6}$/i;
 
 /* =========================================================
  * Mutable application state
@@ -323,80 +313,6 @@ function isPlainObject(value) {
 }
 
 /*
- * Require a plain object and return it unchanged.
- */
-function requireObject(value, fieldName) {
-  if (!isPlainObject(value)) {
-    throw new TypeError(`${fieldName} must be an object.`);
-  }
-
-  return value;
-}
-
-/*
- * Require, trim, constrain, and optionally pattern-check
- * a string.
- */
-function requireString(
-  value,
-  fieldName,
-  { minLength = 1, maxLength = 500, pattern = null } = {},
-) {
-  if (typeof value !== "string") {
-    throw new TypeError(`${fieldName} must be a string.`);
-  }
-
-  const normalized = value.trim();
-
-  if (normalized.length < minLength) {
-    throw new RangeError(
-      `${fieldName} must contain at least ${minLength} character(s).`,
-    );
-  }
-
-  if (normalized.length > maxLength) {
-    throw new RangeError(`${fieldName} cannot exceed ${maxLength} characters.`);
-  }
-
-  if (pattern && !pattern.test(normalized)) {
-    throw new TypeError(`${fieldName} has an invalid format.`);
-  }
-
-  return normalized;
-}
-
-/*
- * Normalize an absent optional string to null.
- *
- * Present values receive the same validation as required
- * strings.
- */
-function optionalString(value, fieldName, { maxLength = 500 } = {}) {
-  if (value === undefined || value === null || value === "") {
-    return null;
-  }
-
-  return requireString(value, fieldName, {
-    minLength: 1,
-    maxLength,
-  });
-}
-
-/*
- * Require an actual Boolean value.
- *
- * Truthy and falsy substitutes such as 1, 0, or strings
- * are intentionally rejected.
- */
-function requireBoolean(value, fieldName) {
-  if (typeof value !== "boolean") {
-    throw new TypeError(`${fieldName} must be true or false.`);
-  }
-
-  return value;
-}
-
-/*
  * Require a catalog array and enforce its maximum number
  * of records before validating individual entries.
  */
@@ -415,16 +331,8 @@ function requireCatalogArray(value, catalogName, maxItems) {
 }
 
 /* =========================================================
- * Catalog record validation
+ * Catalog integrity validation
  * ========================================================= */
-
-/*
- * These functions convert untrusted JSON records into
- * normalized application records.
- *
- * Only the properties explicitly returned by each validator
- * are preserved. Unknown properties are discarded.
- */
 
 /* ---------------------------------------------------------
  * Catalog-wide identity checks
@@ -899,12 +807,12 @@ function validateThemeDefinition(theme) {
     ID_PATTERN.test(theme.id) &&
     typeof theme.name === "string" &&
     theme.name.length > 0 &&
-    theme.name.length <= LIMITS.maxCategoryNameLength &&
+    theme.name.length <= LIMITS.maxThemeNameLength &&
     typeof theme.version === "string" &&
     SEMVER_PATTERN.test(theme.version) &&
     typeof theme.author === "string" &&
     theme.author.length > 0 &&
-    theme.author.length <= LIMITS.maxCategoryNameLength &&
+    theme.author.length <= LIMITS.maxThemeNameLength &&
     typeof theme.description === "string" &&
     theme.description.length > 0 &&
     theme.description.length <= 240 &&
