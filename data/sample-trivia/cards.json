@@ -1,0 +1,176 @@
+[
+  {
+    "card_uuid": "1c90e017-7925-4ab6-97f1-17190c321001",
+    "type": "question",
+    "content": {
+      "prompt": "What is the largest planet in our solar system?",
+      "instruction": "Answer: Jupiter"
+    },
+    "categories": ["trivia"],
+    "editions": ["general"],
+    "visual": {
+      "primary_category": "trivia"
+    },
+    "response_style": "discussion",
+    "answer_length": "short",
+    "experience_level": ["beginner", "experienced"],
+    "audience": ["general"],
+    "group_familiarity": ["new-group", "friends"],
+    "sensitivity": "low",
+    "credit": {
+      "name": "Anonymous",
+      "display": false
+    },
+    "source": "original",
+    "status": "approved",
+    "active": true,
+    "added_to_catalog_at": "2026-08-07T00:00:00Z",
+    "updated_at": "2026-08-07T00:00:00Z",
+    "content_version": 1
+  },
+  {
+    "card_uuid": "db275b09-a80f-41f3-8ef8-17190c321002",
+    "type": "question",
+    "content": {
+      "prompt": "What is the capital city of Australia?",
+      "instruction": "Answer: Canberra"
+    },
+    "categories": ["trivia"],
+    "editions": ["general"],
+    "visual": {
+      "primary_category": "trivia"
+    },
+    "response_style": "discussion",
+    "answer_length": "short",
+    "experience_level": ["beginner", "experienced"],
+    "audience": ["general"],
+    "group_familiarity": ["new-group", "friends"],
+    "sensitivity": "low",
+    "credit": {
+      "name": "Anonymous",
+      "display": false
+    },
+    "source": "original",
+    "status": "approved",
+    "active": true,
+    "added_to_catalog_at": "2026-08-07T00:00:00Z",
+    "updated_at": "2026-08-07T00:00:00Z",
+    "content_version": 1
+  },
+  {
+    "card_uuid": "b59683be-a991-45e4-b612-17190c321003",
+    "type": "question",
+    "content": {
+      "prompt": "Which element has the chemical symbol Au?",
+      "instruction": "Answer: Gold"
+    },
+    "categories": ["trivia"],
+    "editions": ["general"],
+    "visual": {
+      "primary_category": "trivia"
+    },
+    "response_style": "discussion",
+    "answer_length": "short",
+    "experience_level": ["beginner", "experienced"],
+    "audience": ["general"],
+    "group_familiarity": ["new-group", "friends"],
+    "sensitivity": "low",
+    "credit": {
+      "name": "Anonymous",
+      "display": false
+    },
+    "source": "original",
+    "status": "approved",
+    "active": true,
+    "added_to_catalog_at": "2026-08-07T00:00:00Z",
+    "updated_at": "2026-08-07T00:00:00Z",
+    "content_version": 1
+  },
+  {
+    "card_uuid": "98da3d99-2bb4-4714-a575-17190c321004",
+    "type": "question",
+    "content": {
+      "prompt": "How many sides does a dodecagon have?",
+      "instruction": "Answer: 12"
+    },
+    "categories": ["trivia"],
+    "editions": ["general"],
+    "visual": {
+      "primary_category": "trivia"
+    },
+    "response_style": "discussion",
+    "answer_length": "short",
+    "experience_level": ["beginner", "experienced"],
+    "audience": ["general"],
+    "group_familiarity": ["new-group", "friends"],
+    "sensitivity": "low",
+    "credit": {
+      "name": "Anonymous",
+      "display": false
+    },
+    "source": "original",
+    "status": "approved",
+    "active": true,
+    "added_to_catalog_at": "2026-08-07T00:00:00Z",
+    "updated_at": "2026-08-07T00:00:00Z",
+    "content_version": 1
+  },
+  {
+    "card_uuid": "7e0ad4fe-c434-428f-aa42-17190c321005",
+    "type": "question",
+    "content": {
+      "prompt": "Which ocean is the largest on Earth?",
+      "instruction": "Answer: Pacific Ocean"
+    },
+    "categories": ["trivia"],
+    "editions": ["general"],
+    "visual": {
+      "primary_category": "trivia"
+    },
+    "response_style": "discussion",
+    "answer_length": "short",
+    "experience_level": ["beginner", "experienced"],
+    "audience": ["general"],
+    "group_familiarity": ["new-group", "friends"],
+    "sensitivity": "low",
+    "credit": {
+      "name": "Anonymous",
+      "display": false
+    },
+    "source": "original",
+    "status": "approved",
+    "active": true,
+    "added_to_catalog_at": "2026-08-07T00:00:00Z",
+    "updated_at": "2026-08-07T00:00:00Z",
+    "content_version": 1
+  },
+  {
+    "card_uuid": "3ee64689-8642-42c6-9b30-17190c321006",
+    "type": "question",
+    "content": {
+      "prompt": "What language has the most native speakers worldwide?",
+      "instruction": "Answer: Mandarin Chinese"
+    },
+    "categories": ["trivia"],
+    "editions": ["general"],
+    "visual": {
+      "primary_category": "trivia"
+    },
+    "response_style": "discussion",
+    "answer_length": "short",
+    "experience_level": ["beginner", "experienced"],
+    "audience": ["general"],
+    "group_familiarity": ["new-group", "friends"],
+    "sensitivity": "low",
+    "credit": {
+      "name": "Anonymous",
+      "display": false
+    },
+    "source": "original",
+    "status": "approved",
+    "active": true,
+    "added_to_catalog_at": "2026-08-07T00:00:00Z",
+    "updated_at": "2026-08-07T00:00:00Z",
+    "content_version": 1
+  }
+]

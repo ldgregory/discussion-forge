@@ -161,6 +161,21 @@ const TRAIL_TALK_PACK = Object.freeze({
 });
 
 /*
+ * Small bundled trivia pack used to demonstrate and test
+ * card-pack switching.
+ */
+const SAMPLE_TRIVIA_PACK = Object.freeze({
+  id: "sample-trivia",
+
+  paths: {
+    manifest: "data/sample-trivia/manifest.json",
+    cards: "data/sample-trivia/cards.json",
+    categories: "data/sample-trivia/categories.json",
+    editions: "data/sample-trivia/editions.json",
+  },
+});
+
+/*
  * Registry of bundled card packs.
  *
  * The registry owns the default pack selection and all
@@ -169,7 +184,7 @@ const TRAIL_TALK_PACK = Object.freeze({
 const CARD_PACK_REGISTRY = Object.freeze({
   defaultCardPackId: "trail-talk",
 
-  packs: [TRAIL_TALK_PACK],
+  packs: [TRAIL_TALK_PACK, SAMPLE_TRIVIA_PACK],
 });
 
 /* =========================================================

@@ -1,0 +1,10 @@
+[
+  {
+    "id": "trivia",
+    "name": "General Trivia",
+    "short_name": "Trivia",
+    "icon": "❓",
+    "color": "#59636E",
+    "active": true
+  }
+]
