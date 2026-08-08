@@ -4,8 +4,8 @@
  * Generic conversation deck generation application.
  *
  * This module owns application configuration, catalog
- * validation, deck generation, rendering, user
- * interaction, manifest creation, and startup.
+ * loading, deck generation, rendering, user interaction,
+ * manifest creation, and startup.
  ******************************************************/
 
 /* =========================================================
@@ -24,6 +24,10 @@ import {
 import { getTheme, themes } from "../themes/index.js";
 import { validateCardPackManifest } from "./validators/card-pack-validator.js";
 import { validateCard } from "./validators/card-validator.js";
+import { validateCategory } from "./validators/category-validator.js";
+import { validateEdition } from "./validators/edition-validator.js";
+import { validateCatalogIntegrity } from "./validators/catalog-integrity-validator.js";
+import { validateThemeDefinition } from "./validators/theme-validator.js";
 
 /* =========================================================
  * Version and deck-identity contracts
@@ -101,43 +105,11 @@ const RANDOM_SEED_LENGTH = 10;
  * ========================================================= */
 
 const LIMITS = Object.freeze({
-  /*
-   * Catalog and application limits.
-   */
   maxCards: 5000,
   maxCategories: 100,
   maxEditions: 100,
   maxDeckSize: 250,
   maxSeedLength: 128,
-  maxCategoryIdLength: 64,
-  maxEditionIdLength: 64,
-  maxThemeIdLength: 64,
-  maxIsoTimestampLength: 40,
-  maxColorValueLength: 32,
-  maxDescriptionLength: 500,
-  maxCardTypeLength: 32,
-  maxCardStatusLength: 32,
-  maxCardResponseStyleLength: 32,
-  maxCardAnswerLength: 32,
-  maxCardSensitivityLength: 32,
-  maxCardSourceLength: 48,
-  maxCardPrimaryCategoryLength: 64,
-
-  /*
-   * Card content limits.
-   *
-   * These values preserve readability and layout on a
-   * standard poker-size conversation card.
-   */
-  maxPromptLength: 140,
-  maxInstructionLength: 120,
-  maxCategoryNameLength: 32,
-  maxIconNameLength: 16,
-  maxCardBackTitleLength: 40,
-  maxCardBackTaglineLength: 80,
-  maxCardBackBrandLength: 64,
-  maxCardPackIdLength: 64,
-  maxCardPackDisplayNameLength: 100,
 });
 
 /* =========================================================
@@ -188,72 +160,6 @@ const CARD_PACK_REGISTRY = Object.freeze({
 
   packs: [TRAIL_TALK_PACK, SAMPLE_TRIVIA_PACK],
 });
-
-/* =========================================================
- * Catalog allowlists
- * ========================================================= */
-
-const ALLOWED_CARD_TYPES = new Set([
-  "question",
-  "story",
-  "lightning",
-  "wildcard",
-]);
-
-const ALLOWED_CARD_STATUSES = new Set([
-  "draft",
-  "pending",
-  "approved",
-  "rejected",
-  "retired",
-]);
-
-const ALLOWED_RESPONSE_STYLES = new Set([
-  "discussion",
-  "story",
-  "quick",
-  "challenge",
-]);
-
-const ALLOWED_ANSWER_LENGTHS = new Set(["short", "medium", "long"]);
-
-const ALLOWED_EXPERIENCE_LEVELS = new Set(["beginner", "experienced"]);
-
-const ALLOWED_AUDIENCES = new Set(["general"]);
-
-const ALLOWED_GROUP_FAMILIARITY = new Set(["new-group", "friends"]);
-
-const ALLOWED_SENSITIVITY_LEVELS = new Set(["low", "medium", "high"]);
-
-const ALLOWED_SOURCES = new Set(["original", "community"]);
-
-/* =========================================================
- * Validation patterns
- * ========================================================= */
-
-/*
- * Lowercase kebab-case identifiers used by categories,
- * editions, themes, and other trusted registry values.
- */
-const ID_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
-
-/*
- * UUID validation accepts RFC-compatible UUID versions
- * 1 through 8 and the standard variant bits.
- */
-const UUID_PATTERN =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-
-/*
- * Theme package versions currently use stable semantic
- * versions without prerelease or build suffixes.
- */
-const SEMVER_PATTERN = /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/;
-
-/*
- * Six-digit hexadecimal color values used by catalog data.
- */
-const HEX_COLOR_PATTERN = /^#[0-9a-f]{6}$/i;
 
 /* =========================================================
  * Mutable application state
@@ -366,181 +272,8 @@ function setStatus(message) {
 }
 
 /* =========================================================
- * Generic validation helpers
+ * Catalog loading safeguards
  * ========================================================= */
-
-/*
- * These helpers validate and normalize untrusted values
- * before application code stores or renders them.
- *
- * They throw descriptive errors rather than returning
- * partially valid data.
- */
-
-/*
- * Return true only for non-null, non-array objects.
- */
-function isPlainObject(value) {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
-}
-
-/*
- * Require a plain object and return it unchanged.
- */
-function requireObject(value, fieldName) {
-  if (!isPlainObject(value)) {
-    throw new TypeError(`${fieldName} must be an object.`);
-  }
-
-  return value;
-}
-
-/*
- * Require, trim, constrain, and optionally pattern-check
- * a string.
- */
-function requireString(
-  value,
-  fieldName,
-  { minLength = 1, maxLength = 500, pattern = null } = {},
-) {
-  if (typeof value !== "string") {
-    throw new TypeError(`${fieldName} must be a string.`);
-  }
-
-  const normalized = value.trim();
-
-  if (normalized.length < minLength) {
-    throw new RangeError(
-      `${fieldName} must contain at least ${minLength} character(s).`,
-    );
-  }
-
-  if (normalized.length > maxLength) {
-    throw new RangeError(`${fieldName} cannot exceed ${maxLength} characters.`);
-  }
-
-  if (pattern && !pattern.test(normalized)) {
-    throw new TypeError(`${fieldName} has an invalid format.`);
-  }
-
-  return normalized;
-}
-
-/*
- * Normalize an absent optional string to null.
- *
- * Present values receive the same validation as required
- * strings.
- */
-function optionalString(value, fieldName, { maxLength = 500 } = {}) {
-  if (value === undefined || value === null || value === "") {
-    return null;
-  }
-
-  return requireString(value, fieldName, {
-    minLength: 1,
-    maxLength,
-  });
-}
-
-/*
- * Require an actual Boolean value.
- *
- * Truthy and falsy substitutes such as 1, 0, or strings
- * are intentionally rejected.
- */
-function requireBoolean(value, fieldName) {
-  if (typeof value !== "boolean") {
-    throw new TypeError(`${fieldName} must be true or false.`);
-  }
-
-  return value;
-}
-
-/*
- * Require an integer greater than zero.
- */
-function requirePositiveInteger(value, fieldName) {
-  if (!Number.isInteger(value) || value < 1) {
-    throw new TypeError(`${fieldName} must be a positive integer.`);
-  }
-
-  return value;
-}
-
-/*
- * Require a non-empty, size-limited array of validated
- * strings.
- */
-function requireStringArray(
-  value,
-  fieldName,
-  { maxItems = 100, itemPattern = null } = {},
-) {
-  if (!Array.isArray(value)) {
-    throw new TypeError(`${fieldName} must be an array.`);
-  }
-
-  if (value.length === 0) {
-    throw new RangeError(`${fieldName} cannot be empty.`);
-  }
-
-  if (value.length > maxItems) {
-    throw new RangeError(
-      `${fieldName} cannot contain more than ${maxItems} items.`,
-    );
-  }
-
-  return value.map((item, index) =>
-    requireString(item, `${fieldName}[${index}]`, {
-      minLength: 1,
-      maxLength: 100,
-      pattern: itemPattern,
-    }),
-  );
-}
-
-/*
- * Require an array whose normalized string values all
- * appear in a trusted allowlist.
- */
-function requireAllowedStringArray(value, fieldName, allowedValues) {
-  const items = requireStringArray(value, fieldName, {
-    maxItems: allowedValues.size,
-    itemPattern: ID_PATTERN,
-  });
-
-  items.forEach((item) => {
-    if (!allowedValues.has(item)) {
-      throw new TypeError(
-        `${fieldName} contains an unsupported value: "${item}".`,
-      );
-    }
-  });
-
-  return items;
-}
-
-/*
- * Require a parseable timestamp and return it as a Date.
- *
- * Callers normalize accepted timestamps with toISOString()
- * before storing them.
- */
-function requireIsoTimestamp(value, fieldName) {
-  const timestamp = requireString(value, fieldName, {
-    maxLength: LIMITS.maxIsoTimestampLength,
-  });
-
-  const parsed = new Date(timestamp);
-
-  if (Number.isNaN(parsed.getTime())) {
-    throw new TypeError(`${fieldName} must be a valid ISO timestamp.`);
-  }
-
-  return parsed;
-}
 
 /*
  * Require a catalog array and enforce its maximum number
@@ -558,156 +291,6 @@ function requireCatalogArray(value, catalogName, maxItems) {
   }
 
   return value;
-}
-
-/* =========================================================
- * Catalog record validation
- * ========================================================= */
-
-/*
- * These functions convert untrusted JSON records into
- * normalized application records.
- *
- * Only the properties explicitly returned by each validator
- * are preserved. Unknown properties are discarded.
- */
-
-/* ---------------------------------------------------------
- * Category records
- * --------------------------------------------------------- */
-
-/*
- * Validate and normalize one category catalog record.
- */
-function validateCategory(rawCategory, index) {
-  const category = requireObject(rawCategory, `categories[${index}]`);
-
-  return {
-    id: requireString(category.id, `categories[${index}].id`, {
-      maxLength: LIMITS.maxCategoryIdLength,
-      pattern: ID_PATTERN,
-    }),
-
-    name: requireString(category.name, `categories[${index}].name`, {
-      maxLength: LIMITS.maxCategoryNameLength,
-    }),
-
-    short_name: optionalString(
-      category.short_name,
-      `categories[${index}].short_name`,
-      {
-        maxLength: LIMITS.maxCategoryNameLength,
-      },
-    ),
-
-    icon: requireString(category.icon, `categories[${index}].icon`, {
-      maxLength: LIMITS.maxIconNameLength,
-    }),
-
-    color: requireString(category.color, `categories[${index}].color`, {
-      maxLength: LIMITS.maxColorValueLength,
-      pattern: HEX_COLOR_PATTERN,
-    }),
-
-    active: requireBoolean(category.active, `categories[${index}].active`),
-  };
-}
-
-/* ---------------------------------------------------------
- * Edition records
- * --------------------------------------------------------- */
-
-/*
- * Validate and normalize one edition catalog record.
- */
-function validateEdition(rawEdition, index) {
-  const edition = requireObject(rawEdition, `editions[${index}]`);
-
-  return {
-    id: requireString(edition.id, `editions[${index}].id`, {
-      maxLength: LIMITS.maxEditionIdLength,
-      pattern: ID_PATTERN,
-    }),
-
-    name: requireString(edition.name, `editions[${index}].name`, {
-      maxLength: LIMITS.maxCategoryNameLength,
-    }),
-
-    description: optionalString(
-      edition.description,
-      `editions[${index}].description`,
-      {
-        maxLength: LIMITS.maxDescriptionLength,
-      },
-    ),
-
-    active: requireBoolean(edition.active, `editions[${index}].active`),
-  };
-}
-
-/* ---------------------------------------------------------
- * Catalog-wide identity checks
- * --------------------------------------------------------- */
-
-/*
- * Require a unique value for the selected identity property
- * across an entire validated catalog.
- */
-function assertUniqueIds(records, collectionName, keyName) {
-  const seen = new Set();
-
-  records.forEach((record, index) => {
-    const value = record[keyName];
-
-    if (seen.has(value)) {
-      throw new Error(
-        `${collectionName}[${index}].${keyName} duplicates "${value}".`,
-      );
-    }
-
-    seen.add(value);
-  });
-}
-
-/* ---------------------------------------------------------
- * Catalog relationship checks
- * --------------------------------------------------------- */
-
-/*
- * Validate references between cards, categories, and
- * editions after all individual records are trusted.
- *
- * This prevents cards from referencing missing catalog
- * records or using an undeclared primary category.
- */
-function validateCatalogRelationships(cards, categories, editions) {
-  const categoryIds = new Set(categories.map((category) => category.id));
-
-  const editionIds = new Set(editions.map((edition) => edition.id));
-
-  cards.forEach((card, index) => {
-    card.categories.forEach((categoryId) => {
-      if (!categoryIds.has(categoryId)) {
-        throw new Error(
-          `cards[${index}] references unknown category "${categoryId}".`,
-        );
-      }
-    });
-
-    card.editions.forEach((editionId) => {
-      if (!editionIds.has(editionId)) {
-        throw new Error(
-          `cards[${index}] references unknown edition "${editionId}".`,
-        );
-      }
-    });
-
-    if (!card.categories.includes(card.visual.primary_category)) {
-      throw new Error(
-        `cards[${index}].visual.primary_category must also appear in the card's categories array.`,
-      );
-    }
-  });
 }
 
 /* =========================================================
@@ -819,16 +402,10 @@ async function loadCardPack(cardPackId) {
   );
 
   /*
-   * Enforce catalog-wide identity uniqueness.
+   * Validate relationships and uniqueness across the trusted
+   * catalog records.
    */
-  assertUniqueIds(categories, "categories", "id");
-  assertUniqueIds(editions, "editions", "id");
-  assertUniqueIds(cards, "cards", "card_uuid");
-
-  /*
-   * Validate references between trusted records.
-   */
-  validateCatalogRelationships(cards, categories, editions);
+  validateCatalogIntegrity(cards, categories, editions);
 
   return {
     cardPack,
@@ -1095,67 +672,6 @@ function loadThemeStylesheet(themeId) {
  * provides safe fallback behavior when optional assets are
  * unavailable.
  */
-
-/* ---------------------------------------------------------
- * Theme definition validation
- * --------------------------------------------------------- */
-
-/*
- * Validate one trusted theme definition exported by the
- * theme registry.
- *
- * Theme packages are application code rather than user
- * content, but validating them here produces descriptive
- * failures and keeps the contract centralized.
- */
-function validateThemeDefinition(theme) {
-  if (!isPlainObject(theme)) {
-    return false;
-  }
-
-  return (
-    typeof theme.id === "string" &&
-    ID_PATTERN.test(theme.id) &&
-    typeof theme.name === "string" &&
-    theme.name.length > 0 &&
-    theme.name.length <= LIMITS.maxCategoryNameLength &&
-    typeof theme.version === "string" &&
-    SEMVER_PATTERN.test(theme.version) &&
-    typeof theme.author === "string" &&
-    theme.author.length > 0 &&
-    theme.author.length <= LIMITS.maxCategoryNameLength &&
-    typeof theme.description === "string" &&
-    theme.description.length > 0 &&
-    theme.description.length <= 240 &&
-    typeof theme.license === "string" &&
-    theme.license.length > 0 &&
-    theme.license.length <= 64 &&
-    typeof theme.className === "string" &&
-    ID_PATTERN.test(theme.className) &&
-    theme.className === `theme-${theme.id}` &&
-    typeof theme.stylesheet === "string" &&
-    theme.stylesheet === `themes/${theme.id}/theme.css` &&
-    theme.stylesheet.length > 0 &&
-    theme.stylesheet.length <= 200 &&
-    theme.stylesheet.startsWith("themes/") &&
-    theme.stylesheet.endsWith("/theme.css") &&
-    !theme.stylesheet.includes("..") &&
-    !theme.stylesheet.includes("\\") &&
-    !theme.stylesheet.includes(":") &&
-    !theme.stylesheet.startsWith("/") &&
-    typeof theme.assetRoot === "string" &&
-    typeof theme.assetRoot === "string" &&
-    theme.assetRoot === `themes/${theme.id}/assets` &&
-    theme.assetRoot.length > 0 &&
-    theme.assetRoot.length <= 200 &&
-    theme.assetRoot.startsWith("themes/") &&
-    theme.assetRoot.endsWith("/assets") &&
-    !theme.assetRoot.includes("..") &&
-    !theme.assetRoot.includes("\\") &&
-    !theme.assetRoot.includes(":") &&
-    !theme.assetRoot.startsWith("/")
-  );
-}
 
 /* ---------------------------------------------------------
  * Theme selector
