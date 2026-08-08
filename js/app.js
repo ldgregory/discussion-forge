@@ -22,6 +22,7 @@ import {
 } from "./utils.js";
 
 import { getTheme, themes } from "../themes/index.js";
+import { validateCardPackManifest } from "./validators/card-pack-validator.js";
 
 /* =========================================================
  * Version and deck-identity contracts
@@ -550,72 +551,6 @@ function requireCatalogArray(value, catalogName, maxItems) {
   return value;
 }
 
-/* ---------------------------------------------------------
- * Card-pack manifest
- * --------------------------------------------------------- */
-
-/*
- * Validate and normalize the active card pack metadata used
- * by the runtime.
- *
- * Only explicitly returned properties enter trusted
- * application state. Additional manifest fields remain
- * available for future validation work but are not trusted
- * or consumed here.
- */
-function validateCardPackManifest(rawManifest) {
-  const manifest = requireObject(rawManifest, "manifest");
-
-  const cardBack = requireObject(manifest.card_back, "manifest.card_back");
-
-  if (!Array.isArray(cardBack.tagline)) {
-    throw new TypeError("manifest.card_back.tagline must be an array.");
-  }
-
-  if (cardBack.tagline.length > 2) {
-    throw new RangeError(
-      "manifest.card_back.tagline may contain at most two lines.",
-    );
-  }
-
-  return {
-    id: requireString(manifest.id, "manifest.id", {
-      maxLength: LIMITS.maxCategoryIdLength,
-      pattern: ID_PATTERN,
-    }),
-
-    displayName: requireString(manifest.display_name, "manifest.display_name", {
-      maxLength: LIMITS.maxDescriptionLength,
-    }),
-
-    version: requireString(manifest.version, "manifest.version", {
-      maxLength: 32,
-      pattern: SEMVER_PATTERN,
-    }),
-
-    cardBack: {
-      title: requireString(cardBack.title, "manifest.card_back.title", {
-        maxLength: LIMITS.maxCardBackTitleLength,
-      }),
-
-      tagline: [0, 1].map((index) =>
-        requireString(
-          cardBack.tagline[index] ?? "",
-          `manifest.card_back.tagline[${index}]`,
-          {
-            minLength: 0,
-            maxLength: LIMITS.maxCardBackTaglineLength,
-          },
-        ),
-      ),
-
-      brand: requireString(cardBack.brand, "manifest.card_back.brand", {
-        maxLength: LIMITS.maxCardBackBrandLength,
-      }),
-    },
-  };
-}
-
 /* =========================================================
  * Catalog record validation
  * ========================================================= */
@@ -1087,6 +1022,10 @@ async function loadCardPack(cardPackId) {
    * Validate card-pack metadata consumed by the runtime.
    */
   const cardPack = validateCardPackManifest(rawPackManifest);
+
+  if (cardPack.id !== registeredCardPack.id) {
+    throw new Error(`Card-pack manifest ID "${cardPack.id}" does not match registered ID "${registeredCardPack.id}".`,);
+  }
 
   /*
    * Validate and normalize catalog records.
