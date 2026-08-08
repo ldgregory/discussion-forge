@@ -53,7 +53,7 @@
 
 ---
 
-## Low Priority
+## Low Priority / Post-v1.0
 
 ### Advanced deck settings
 
@@ -87,6 +87,60 @@ Requirements for advanced filters:
 - Include filters in deterministic Deck ID inputs whenever they can change the generated card set.
 - Preserve builder state only where doing so is safe and meaningful across pack changes.
 - Clear or invalidate generated output when an advanced filter changes in a way that makes existing output stale.
+
+### Flashcards
+
+Add a first-class `flash-card` card type for study and learning card packs.
+
+- [ ] Define the `flash-card` data contract and required/optional fields.
+- [ ] Render the question or study prompt on the front and the answer on the back.
+- [ ] Remove decorative front imagery for flashcards so the available face area is prioritized for readable study content.
+- [ ] Treat the answer side as functional study content rather than a conventional themed card back.
+- [ ] Determine which theme responsibilities still apply to flashcards, such as typography, borders, category treatment, print guides, and general presentation, without allowing decorative card-back identity to interfere with the answer.
+- [ ] Preserve category and edition support so flashcard packs can be filtered and organized using the existing card-pack model.
+- [ ] Ensure preview, print, Quick List, deterministic identity, and generated manifests understand the `flash-card` type.
+- [ ] Consider future study modes such as reversible question/answer cards without making them part of the initial flashcard implementation.
+
+### Card-pack creator toolkit
+
+Create a non-developer-friendly authoring workflow that lets card-pack creators work in a validated spreadsheet instead of manually writing JSON.
+
+- [ ] Create a downloadable card-pack authoring workbook with:
+  - Sheet 1: Instructions
+  - Sheet 2: Manifest
+  - Sheet 3: Editions
+  - Sheet 4: Categories
+  - Sheet 5: Cards / Questions
+- [ ] Organize data columns with required fields first and optional fields continuing to the right.
+- [ ] Use workbook validation and dropdowns wherever practical for controlled values.
+- [ ] Build Cards-sheet edition and category choices from the values entered on the Editions and Categories sheets.
+- [ ] Define a portable, macro-free convention for multi-value fields such as cards belonging to multiple editions or categories.
+- [ ] Flag missing required values, invalid IDs, invalid controlled values, and useful length limits within the workbook where practical.
+- [ ] Avoid requiring creators to supply mechanical metadata that the creator can safely generate, such as card UUIDs and generated timestamps.
+- [ ] Treat the workbook as a human-friendly authoring schema rather than requiring a one-to-one representation of runtime JSON.
+
+Create a **Discussion Forge Card Pack Creator** that accepts the completed workbook and produces a validated distributable package.
+
+- [ ] Validate workbook structure and schema before conversion.
+- [ ] Validate cross-sheet references and relationships.
+- [ ] Normalize authoring values into the strict Discussion Forge runtime schema.
+- [ ] Present actionable validation errors and warnings before package generation.
+- [ ] Generate `manifest.json`, `editions.json`, `categories.json`, and `cards.json`.
+- [ ] Package generated files under a web-root-compatible hierarchy:
+
+```text
+data/
+└── <card-pack-id>/
+    ├── manifest.json
+    ├── editions.json
+    ├── categories.json
+    └── cards.json
+```
+
+- [ ] Generate a downloadable `.zip` containing the correct folder hierarchy.
+- [ ] Keep theme creation optional so a valid card pack can use existing Discussion Forge themes without requiring theme-design knowledge.
+- [ ] Consider optional theme-authoring support that can generate the expected `themes/<theme-id>/` hierarchy and requisite files/assets.
+- [ ] Reuse the same validation contracts as the Discussion Forge runtime wherever practical so creator validation and runtime validation cannot silently diverge.
 
 ### Card-pack ecosystem
 
