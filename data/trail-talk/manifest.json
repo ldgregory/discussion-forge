@@ -33,7 +33,7 @@
 
   "editions": ["core", "campfire", "recovery"],
 
-  "categories": ["gear-vehicle", "story-time", "lightning-round", "wild-cards"],
+  "categories": ["gear","story-time","lightning","wildcard"],
 
   "card_count": 32
 }
