@@ -53,9 +53,9 @@ Card packs provide metadata, cards, categories, editions, and card-back identity
 
 Current development version:
 
-**0.2.0-alpha3**
+**0.3.0-alpha1**
 
-Current development is focused on strengthening the card-pack contract, compatibility validation, theme decoupling, contributor documentation, and deployment hardening.
+Current development is focused on strengthening card-pack validation, removing validation cruft from the application runtime, validating pack compatibility and dependencies, and preparing the project for a stable v1.0 release.
 
 ---
 
