@@ -21,6 +21,7 @@ Trail Talk is the canonical bundled conversation pack. Sample Trivia is included
 - Interactive front/back deck preview
 - Quick List output
 - Trusted theme package support
+- Modular validation for card packs, catalogs, catalog relationships, and themes
 - Downloadable deck manifests
 - Offline operation
 - Browser-based deployment with no application server required
@@ -29,13 +30,20 @@ Trail Talk is the canonical bundled conversation pack. Sample Trivia is included
 
 ## Architecture
 
-Discussion Forge separates application behavior, conversation content, and visual presentation.
+Discussion Forge separates application behavior, conversation content, validation, and visual presentation.
 
 ```text
 Discussion Forge
 ├── Card Pack Registry
 │   ├── Trail Talk
 │   └── Sample Trivia
+├── Validation Layer
+│   ├── Card-pack manifest
+│   ├── Cards
+│   ├── Categories
+│   ├── Editions
+│   ├── Catalog integrity
+│   └── Themes
 ├── Active Card Pack
 ├── Validated Catalog
 │   ├── cards
@@ -45,7 +53,7 @@ Discussion Forge
 └── Deck Generation and Rendering
 ```
 
-Card packs provide metadata, cards, categories, editions, and card-back identity. Themes provide trusted presentation assets and styles. The application validates pack data before publishing it into runtime state.
+Card packs provide metadata, cards, categories, editions, and card-back identity. Themes provide trusted presentation assets and styles. Dedicated validator modules establish trust before pack or theme data is consumed by the runtime, while `app.js` remains responsible for loading, orchestration, deck generation, rendering, and interaction.
 
 ---
 
@@ -55,7 +63,7 @@ Current development version:
 
 **0.3.0-alpha1**
 
-Current development is focused on strengthening card-pack validation, removing validation cruft from the application runtime, validating pack compatibility and dependencies, and preparing the project for a stable v1.0 release.
+The validator architecture has been separated from the application runtime. Current development is focused on completing card-pack manifest compatibility and dependency enforcement, regression testing, remaining application/card-pack terminology cleanup, and release hardening for a stable v1.0 release.
 
 ---
 
