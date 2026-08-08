@@ -2,41 +2,40 @@
 
 ## High Priority
 
-### Discussion Forge / card-pack separation
-
-- [ ] Complete application-owned branding cleanup:
-  - `index.html` page title, heading, metadata, and noscript text
-  - `README.md` application description
-  - `SECURITY.md` project terminology
-  - `PROJECT.md` application terminology
-  - `CHANGELOG.md` current header wording only
-  - `css/styles.css` file-level comment
-  - `js/app.js` remaining Trail Talk-specific runtime comments
-  - `js/utils.js` generic encoding comment
-  - `themes/index.js` registry wording
-- [ ] Include active card-pack identity in generated deck manifests.
-- [ ] Include active card-pack ID and version in deterministic deck identity.
-- [ ] Add a card-pack selector to the builder.
-- [ ] Populate the selector from `CARD_PACK_REGISTRY` rather than hardcoded UI options.
-- [ ] Switch packs through `activateCardPack(cardPackId)` and rebuild pack-dependent controls.
-- [ ] Clear generated preview, print output, and stale manifest data when the active card pack changes.
-- [ ] Validate that a loaded pack manifest ID matches its registry ID.
-
 ### Card-pack runtime and validation
 
+- [ ] Validate that a loaded pack manifest ID matches its registry ID.
 - [ ] Expand `validateCardPackManifest()` beyond the currently consumed runtime fields.
 - [ ] Validate pack compatibility using `minimum_application_version`.
 - [ ] Validate pack dependencies before activation.
 - [ ] Report card-pack validation failures with the originating pack ID.
 - [ ] Decide whether registry entries should be deeply frozen or otherwise protected from accidental mutation.
-- [ ] Preserve fail-closed activation: a failed pack load must leave the previously active trusted state intact.
+- [ ] Decide whether `sample-trivia` remains bundled as a visible example pack, moves to developer/test fixtures, or becomes documentation-only sample content.
 
-### Theme decoupling
+### Application / card-pack decoupling cleanup
 
+- [ ] Complete remaining application-owned branding and terminology cleanup:
+  - `README.md`
+  - `SECURITY.md`
+  - `PROJECT.md`
+  - `CHANGELOG.md`
+  - `CARD-PACK.md`
+  - `THEMES.md`
+  - `css/styles.css` file-level comments
+  - `js/app.js` remaining Trail Talk-specific comments that describe application behavior rather than the Trail Talk pack
+  - `js/utils.js` generic encoding comments
+  - `themes/index.js` registry wording
 - [ ] Decide whether bundled themes are generic Discussion Forge themes or Trail Talk-specific themes.
 - [ ] Replace fixed Trail Talk text references in theme comments and documentation with semantic names where appropriate.
 - [ ] Rename `THEMES.md` to `THEME-PACK.md`.
-- [ ] Generalize the theme specification wording around the application/pack ownership model.
+- [ ] Generalize the theme specification wording around the application/card-pack ownership model.
+
+### Documentation synchronization
+
+- [ ] Update `CARD-PACK.md` for the now-implemented multi-pack runtime and selector model while preserving Trail Talk as the canonical example pack.
+- [ ] Document the card-pack registration contract and directory structure, including the relationship between registry ID and manifest ID.
+- [ ] Document pack-switch behavior: validated load, activation, pack-dependent control refresh, and stale generated-output clearing.
+- [ ] Create `ARCHITECTURE.md` now that the application/card-pack separation has stabilized.
 
 ---
 
@@ -44,7 +43,7 @@
 
 ### Builder evolution
 
-Expand the deck builder with additional generation filters only after the card-pack selector and activation flow are stable.
+Expand the deck builder with additional generation filters after card-pack manifest validation and compatibility handling are complete.
 
 Potential controls:
 
@@ -61,19 +60,18 @@ Requirements for each new filter:
 - UI control
 - Input validation
 - Manifest support
-- Deterministic Deck ID participation
+- Deterministic Deck ID participation where generation results can change
 - Builder state persistence
 
 ### Preview and rendering
 
-- [ ] Make preview cards visually match printed cards more closely.
-- [ ] Keep the print renderer completely independent of interactive preview styles.
-- [ ] Refactor `renderPreviewCard()` so it can return a fully interactive card rather than a passive preview.
 - [ ] Add subtle category banner patterns.
+- [ ] Add regression tests or a repeatable manual test checklist to ensure preview and printable output continue to use the same canonical card renderers.
 
 ### Generation UX
 
 - [ ] If deck generation fails for any reason, clear existing preview and print output so stale output never represents invalid or changed builder settings.
+- [ ] Consider displaying active card-pack name/version in the preview summary so generated output is visually attributable before manifest download.
 
 ### Security
 
@@ -81,11 +79,10 @@ Requirements for each new filter:
 - [ ] Add Content Security Policy deployment guidance.
 - [ ] Create standalone validation tooling for submitted card packs before approval.
 
-### Documentation
+### Contribution workflow
 
-- [ ] Create `ARCHITECTURE.md` after the current identity/card-pack refactor stabilizes.
-- [ ] Create `CONTRIBUTING.md` after the pack contribution workflow stabilizes.
-- [ ] Update `CARD-PACK.md` to use generic application terminology while preserving Trail Talk as the canonical example pack.
+- [ ] Create `CONTRIBUTING.md` after the pack contribution workflow and validation requirements stabilize.
+- [ ] Define a repeatable acceptance checklist for bundled/community card packs.
 
 ---
 
@@ -98,6 +95,7 @@ Requirements for each new filter:
 - [ ] Pack provenance details in generated manifests.
 - [ ] Additional compatibility/version negotiation beyond the minimum application version.
 - [ ] Consider whether card-pack discovery should eventually move from static registration to a data-driven registry.
+- [ ] Consider whether selector display labels should come from registry metadata, preloaded manifest metadata, or the current humanized pack ID.
 
 ### Features
 
