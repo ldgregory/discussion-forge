@@ -585,16 +585,16 @@ function requireTheme(themeId) {
 }
 
 /*
- * Return the canonical Trail Blue fallback icon.
+ * Return the default theme fallback icon.
  *
  * This is the second stage of the application's icon
  * fallback chain:
  *
- * Theme SVG
+ * Selected theme SVG
  *     ↓
- * Trail Blue SVG
+ * Default theme SVG
  *     ↓
- * Emoji
+ * Catalog emoji
  */
 function buildDefaultThemeIconPath(category) {
   const defaultTheme = requireTheme(DEFAULT_THEME_ID);
