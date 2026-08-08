@@ -286,8 +286,8 @@ export function bytesToHex(bytes) {
 }
 
 /*
- * Encode bytes using Trail Talk's human-readable
- * 32-character alphabet.
+ * Encode bytes using the application's human-readable
+ * 32-character Base32 alphabet.
  *
  * This encoding does not include padding characters.
  */

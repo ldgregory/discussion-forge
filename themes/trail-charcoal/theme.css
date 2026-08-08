@@ -12,7 +12,7 @@
  * ========================================================= */
 
 /*
- * Display font used for the TRAIL TALK title.
+ * Display font used for the card-back title.
  *
  * The font file is stored locally in the theme package,
  * allowing consistent rendering without a remote service.
@@ -58,13 +58,9 @@
 }
 
 /*
- * Shared text color for all card-back identity text.
+ * Shared text color for all card-pack-owned identity text.
  *
- * This affects:
- * - TRAIL TALK
- * - Real Questions. Real Connections.
- * - Overlanding Atlas
- *
+ * This affects the card-back title, tagline, and brand.
  * It does not affect the SVG artwork or card background.
  */
 .card-back.theme-trail-charcoal
@@ -84,7 +80,7 @@
 /*
  * Main title row:
  *
- * star + TRAIL TALK + star
+ * decorative star + card-pack title + decorative star
  *
  * The title is a flex container so the two decorative
  * pseudo-elements remain horizontally aligned with the text.
@@ -110,7 +106,7 @@
 }
 
 /*
- * Decorative red stars on either side of TRAIL TALK.
+ * Decorative red stars on either side of the card-pack title.
  *
  * The star SVG acts as a mask. The background color below
  * determines the visible color of both stars.

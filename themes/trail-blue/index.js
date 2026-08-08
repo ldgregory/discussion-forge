@@ -1,10 +1,10 @@
 /*
  * Trail Blue
  *
- * The canonical Trail Talk theme.
+ * The default bundled Discussion Forge theme.
  *
- * This package defines the visual appearance of the application,
- * including its colors, typography, artwork, and icons.
+ * This package defines visual presentation including colors,
+ * typography, artwork, and icons.
  */
 
 export const theme = Object.freeze({
@@ -20,9 +20,7 @@ export const theme = Object.freeze({
    */
   version: "1.0.0",
   author: "Overlanding Atlas",
-  description:
-    "The canonical Trail Talk theme with navy card backs, " +
-    "expedition-inspired artwork, and colorful category banners.",
+  description: "A trail-inspired theme with navy card backs, expedition-inspired artwork, and colorful category banners.",
   license: "Apache-2.0",
 
   /*

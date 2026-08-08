@@ -1,10 +1,10 @@
 /*
  * Trail Charcoal
  *
- * A darker alternative to the canonical Trail Talk theme.
+ * A darker bundled Discussion Forge theme.
  *
- * This package defines the visual appearance of the application,
- * including its colors, typography, artwork, and icons.
+ * This package defines visual presentation including colors,
+ * typography, artwork, and icons.
  */
 
 export const theme = Object.freeze({
@@ -20,9 +20,7 @@ export const theme = Object.freeze({
    */
   version: "1.0.0",
   author: "Overlanding Atlas",
-  description:
-    "A darker Trail Talk theme with charcoal styling " +
-    "and high-contrast card artwork.",
+  description: "A trail-inspired theme with charcoal styling and high-contrast card artwork.",
   license: "Apache-2.0",
 
   /*
