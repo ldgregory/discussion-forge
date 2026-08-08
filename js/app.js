@@ -4,8 +4,8 @@
  * Generic conversation deck generation application.
  *
  * This module owns application configuration, catalog
- * validation, deck generation, rendering, user
- * interaction, manifest creation, and startup.
+ * loading, deck generation, rendering, user interaction,
+ * manifest creation, and startup.
  ******************************************************/
 
 /* =========================================================
@@ -27,6 +27,7 @@ import { validateCard } from "./validators/card-validator.js";
 import { validateCategory } from "./validators/category-validator.js";
 import { validateEdition } from "./validators/edition-validator.js";
 import { validateCatalogIntegrity } from "./validators/catalog-integrity-validator.js";
+import { validateThemeDefinition } from "./validators/theme-validator.js";
 
 /* =========================================================
  * Version and deck-identity contracts
@@ -104,19 +105,11 @@ const RANDOM_SEED_LENGTH = 10;
  * ========================================================= */
 
 const LIMITS = Object.freeze({
-  /*
-   * Catalog and application limits.
-   */
   maxCards: 5000,
   maxCategories: 100,
   maxEditions: 100,
   maxDeckSize: 250,
   maxSeedLength: 128,
-
-  /*
-   * Theme metadata limits.
-   */
-  maxThemeNameLength: 32,
 });
 
 /* =========================================================
@@ -167,22 +160,6 @@ const CARD_PACK_REGISTRY = Object.freeze({
 
   packs: [TRAIL_TALK_PACK, SAMPLE_TRIVIA_PACK],
 });
-
-/* =========================================================
- * Validation patterns
- * ========================================================= */
-
-/*
- * Lowercase kebab-case identifiers used by categories,
- * editions, themes, and other trusted registry values.
- */
-const ID_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
-
-/*
- * Theme package versions currently use stable semantic
- * versions without prerelease or build suffixes.
- */
-const SEMVER_PATTERN = /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/;
 
 /* =========================================================
  * Mutable application state
@@ -295,23 +272,8 @@ function setStatus(message) {
 }
 
 /* =========================================================
- * Generic validation helpers
+ * Catalog loading safeguards
  * ========================================================= */
-
-/*
- * These helpers validate and normalize untrusted values
- * before application code stores or renders them.
- *
- * They throw descriptive errors rather than returning
- * partially valid data.
- */
-
-/*
- * Return true only for non-null, non-array objects.
- */
-function isPlainObject(value) {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
-}
 
 /*
  * Require a catalog array and enforce its maximum number
@@ -710,67 +672,6 @@ function loadThemeStylesheet(themeId) {
  * provides safe fallback behavior when optional assets are
  * unavailable.
  */
-
-/* ---------------------------------------------------------
- * Theme definition validation
- * --------------------------------------------------------- */
-
-/*
- * Validate one trusted theme definition exported by the
- * theme registry.
- *
- * Theme packages are application code rather than user
- * content, but validating them here produces descriptive
- * failures and keeps the contract centralized.
- */
-function validateThemeDefinition(theme) {
-  if (!isPlainObject(theme)) {
-    return false;
-  }
-
-  return (
-    typeof theme.id === "string" &&
-    ID_PATTERN.test(theme.id) &&
-    typeof theme.name === "string" &&
-    theme.name.length > 0 &&
-    theme.name.length <= LIMITS.maxThemeNameLength &&
-    typeof theme.version === "string" &&
-    SEMVER_PATTERN.test(theme.version) &&
-    typeof theme.author === "string" &&
-    theme.author.length > 0 &&
-    theme.author.length <= LIMITS.maxThemeNameLength &&
-    typeof theme.description === "string" &&
-    theme.description.length > 0 &&
-    theme.description.length <= 240 &&
-    typeof theme.license === "string" &&
-    theme.license.length > 0 &&
-    theme.license.length <= 64 &&
-    typeof theme.className === "string" &&
-    ID_PATTERN.test(theme.className) &&
-    theme.className === `theme-${theme.id}` &&
-    typeof theme.stylesheet === "string" &&
-    theme.stylesheet === `themes/${theme.id}/theme.css` &&
-    theme.stylesheet.length > 0 &&
-    theme.stylesheet.length <= 200 &&
-    theme.stylesheet.startsWith("themes/") &&
-    theme.stylesheet.endsWith("/theme.css") &&
-    !theme.stylesheet.includes("..") &&
-    !theme.stylesheet.includes("\\") &&
-    !theme.stylesheet.includes(":") &&
-    !theme.stylesheet.startsWith("/") &&
-    typeof theme.assetRoot === "string" &&
-    typeof theme.assetRoot === "string" &&
-    theme.assetRoot === `themes/${theme.id}/assets` &&
-    theme.assetRoot.length > 0 &&
-    theme.assetRoot.length <= 200 &&
-    theme.assetRoot.startsWith("themes/") &&
-    theme.assetRoot.endsWith("/assets") &&
-    !theme.assetRoot.includes("..") &&
-    !theme.assetRoot.includes("\\") &&
-    !theme.assetRoot.includes(":") &&
-    !theme.assetRoot.startsWith("/")
-  );
-}
 
 /* ---------------------------------------------------------
  * Theme selector
