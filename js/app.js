@@ -306,6 +306,8 @@ const ui = Object.freeze({
 
   deckSizeInput: requireElement("deck-size"),
 
+  builderSelectionSummary: requireElement("builder-selection-summary"),
+
   availableCardCount: requireElement("available-card-count"),
 
   selectedEditionCount: requireElement("selected-edition-count"),
@@ -1232,7 +1234,10 @@ function renderBuilderSelectionSummary() {
 
   const eligibleCards = getEligibleCards(editions, categories);
 
-  ui.availableCardCount.textContent = String(eligibleCards.length);
+  const hasShortage = requested > eligibleCards.length;
+
+  ui.availableCardCount.classList.toggle("builder-summary-warning", hasShortage);
+  ui.builderSelectionSummary.classList.toggle("builder-summary-shortage", hasShortage);
   ui.selectedEditionCount.textContent = String(editions.length);
   ui.selectedCategoryCount.textContent = String(categories.length);
 

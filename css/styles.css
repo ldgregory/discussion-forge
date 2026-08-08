@@ -264,8 +264,14 @@ button.primary {
 
 @media (max-width: 900px) {
   .control-grid,
-  .content-option-grid {
+  .content-option-grid,
+  .builder-selection-summary {
     grid-template-columns: 1fr;
+  }
+
+  .builder-heading-row {
+    align-items: stretch;
+    flex-direction: column;
   }
 }
 
