@@ -13,6 +13,9 @@ const SEMVER_PATTERN =
 const ISO_DATE_PATTERN =
   /^\d{4}-\d{2}-\d{2}$/;
 
+const SUPPORTED_SCHEMA_VERSION = 1;
+const SUPPORTED_PACK_TYPE = "cards";
+
 const LIMITS = Object.freeze({
   maxCardPackIdLength: 64,
   maxCardPackDisplayNameLength: 100,
@@ -203,15 +206,36 @@ export function validateCardPackManifest(rawManifest) {
     tagline.push("");
   }
 
-  return {
-    schemaVersion: requirePositiveInteger(
-      manifest.schema_version,
-      "manifest.schema_version",
-    ),
+const schemaVersion = requirePositiveInteger(
+  manifest.schema_version,
+  "manifest.schema_version",
+);
 
-    packType: requireString(manifest.pack_type, "manifest.pack_type", {
-      maxLength: 32,
-    }),
+if (schemaVersion !== SUPPORTED_SCHEMA_VERSION) {
+  throw new Error(
+    `Unsupported card-pack schema version: ${schemaVersion}. ` +
+      `Discussion Forge supports schema version ${SUPPORTED_SCHEMA_VERSION}.`,
+  );
+}
+
+const packType = requireString(
+  manifest.pack_type,
+  "manifest.pack_type",
+  {
+    maxLength: 32,
+  },
+);
+
+if (packType !== SUPPORTED_PACK_TYPE) {
+  throw new Error(
+    `Unsupported card-pack type: "${packType}". ` +
+      `Discussion Forge supports "${SUPPORTED_PACK_TYPE}".`,
+  );
+}
+
+  return {
+    schemaVersion,
+    packType,
 
     id: requireString(manifest.id, "manifest.id", {
       maxLength: LIMITS.maxCardPackIdLength,
