@@ -405,7 +405,12 @@ async function loadCardPack(cardPackId) {
    * Validate relationships and uniqueness across the trusted
    * catalog records.
    */
-  validateCatalogIntegrity(cards, categories, editions);
+  validateCatalogIntegrity(
+  cards,
+  categories,
+  editions,
+  cardPack,
+  );
 
   return {
     cardPack,
