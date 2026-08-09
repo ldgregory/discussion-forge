@@ -16,6 +16,7 @@ import {
   bytesToHex,
   chunkArray,
   compareSemver,
+  deepFreeze,
   encodeBase32,
   randomCode,
   seededShuffle,
@@ -124,7 +125,7 @@ const LIMITS = Object.freeze({
  * Additional installed card packs will eventually
  * register themselves using the same structure.
  */
-const TRAIL_TALK_PACK = Object.freeze({
+  const TRAIL_TALK_PACK = deepFreeze({
   id: "trail-talk",
 
   paths: {
@@ -139,7 +140,7 @@ const TRAIL_TALK_PACK = Object.freeze({
  * Small bundled trivia pack used to demonstrate and test
  * card-pack switching.
  */
-const SAMPLE_TRIVIA_PACK = Object.freeze({
+const SAMPLE_TRIVIA_PACK = deepFreeze({
   id: "sample-trivia",
 
   paths: {
@@ -156,7 +157,7 @@ const SAMPLE_TRIVIA_PACK = Object.freeze({
  * The registry owns the default pack selection and all
  * card-pack definitions available to the application.
  */
-const CARD_PACK_REGISTRY = Object.freeze({
+const CARD_PACK_REGISTRY = deepFreeze({
   defaultCardPackId: "trail-talk",
 
   packs: [TRAIL_TALK_PACK, SAMPLE_TRIVIA_PACK],

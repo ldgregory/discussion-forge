@@ -149,6 +149,28 @@ export function seededShuffle(items, seedText) {
   return copy;
 }
 
+/*
+ * Recursively freeze an object and all nested object values.
+ *
+ * This is intended for trusted application configuration,
+ * not mutable runtime state.
+ */
+export function deepFreeze(value) {
+  if (
+    value === null ||
+    typeof value !== "object" ||
+    Object.isFrozen(value)
+  ) {
+    return value;
+  }
+
+  Reflect.ownKeys(value).forEach((key) => {
+    deepFreeze(value[key]);
+  });
+
+  return Object.freeze(value);
+}
+
 /* =========================================================
  * Version comparison
  * ========================================================= */
