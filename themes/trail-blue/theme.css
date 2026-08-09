@@ -213,6 +213,18 @@
  * ========================================================= */
 
 /*
+ * Generic category banner.
+ *
+ * Provides a neutral fallback treatment for categories that do not
+ * have a theme-specific visual treatment. Category-specific rules
+ * below override the color and pattern where appropriate.
+ */
+.theme-trail-blue
+  .card-band {
+  background-color: #17456f;
+}
+
+/*
  * Gear & Vehicle banner.
  *
  * Alternating angled tread lugs suggest an all-terrain tire
