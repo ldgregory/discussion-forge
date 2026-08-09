@@ -125,7 +125,7 @@ const LIMITS = Object.freeze({
  * Additional installed card packs will eventually
  * register themselves using the same structure.
  */
-  const TRAIL_TALK_PACK = deepFreeze({
+const TRAIL_TALK_PACK = deepFreeze({
   id: "trail-talk",
 
   paths: {
@@ -464,6 +464,7 @@ async function loadCardPack(cardPackId) {
   });
 
   return {
+    cardPack,
     catalog,
   };
 }
