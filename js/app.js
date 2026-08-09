@@ -326,6 +326,32 @@ function requireCardPack(cardPackId) {
   return cardPack;
 }
 
+/*
+ * Require every dependency declared by a validated card-pack
+ * manifest to exist in the installed card-pack registry.
+ *
+ * Self-dependencies are rejected because a pack cannot
+ * satisfy its own prerequisite.
+ */
+function validateCardPackDependencies(cardPack) {
+  const registeredIds = new Set(
+    CARD_PACK_REGISTRY.packs.map((registeredCardPack) => registeredCardPack.id),
+  );
+
+  cardPack.dependencies.forEach((dependencyId) => {
+    if (dependencyId === cardPack.id) {
+      throw new Error(`Card pack "${cardPack.id}" cannot depend on itself.`);
+    }
+
+    if (!registeredIds.has(dependencyId)) {
+      throw new Error(
+        `Card pack "${cardPack.id}" requires unavailable dependency ` +
+          `"${dependencyId}".`,
+      );
+    }
+  });
+}
+
 /* ---------------------------------------------------------
  * JSON transport
  * --------------------------------------------------------- */
@@ -398,6 +424,12 @@ async function loadCardPack(cardPackId) {
         `the current version is ${APPLICATION.version}.`,
     );
   }
+
+  /*
+   * Ensure every declared card-pack dependency is installed
+   * and available before activating this pack.
+   */
+  validateCardPackDependencies(cardPack);
 
   /*
    * Validate and normalize catalog records.
