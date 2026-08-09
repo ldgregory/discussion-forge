@@ -47,7 +47,7 @@ const DECK_IDENTITY_SCHEMA_VERSION = 2;
  * Discussion Forge application version recorded in
  * generated deck manifests and compatibility metadata.
  */
-const GENERATOR_VERSION = "0.3.0-alpha1";
+const GENERATOR_VERSION = "0.4.0";
 
 /*
  * Number of Base32 characters exposed as the human-readable
