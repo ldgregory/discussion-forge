@@ -1,13 +1,5 @@
 # TODO
 
-## High Priority
-
-### Documentation synchronization
-
-- [ ] Create `ARCHITECTURE.md` now that the application/card-pack separation and validator boundaries have stabilized.
-
----
-
 ## Medium Priority
 
 ### Preview and rendering
