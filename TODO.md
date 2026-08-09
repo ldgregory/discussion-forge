@@ -4,7 +4,6 @@
 
 ### Preview and rendering
 
-- [ ] Add subtle category banner patterns.
 - [ ] Add regression tests or a repeatable manual test checklist to ensure preview and printable output continue to use the same canonical card renderers.
 
 ### Generation UX
