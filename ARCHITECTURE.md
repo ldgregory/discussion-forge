@@ -511,7 +511,7 @@ The deterministic Deck ID and SHA-256 fingerprint are derived from a canonical i
 
 The payload currently includes the deck-identity schema version, generator version, active card-pack ID and version, generation seed, selected editions and categories, requested card count, and the ordered identities/content versions of generated cards.
 
-The current deck-identity schema version is `2`.
+The deck-identity schema version is an application-owned versioned constant. Its current value is defined in the implementation and should not be duplicated here.
 
 The human-readable Deck ID is a shortened representation intended for printed and conversational use. The full fingerprint preserves the stronger machine-readable identity.
 
