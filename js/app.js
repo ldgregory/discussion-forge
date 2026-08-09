@@ -403,7 +403,9 @@ async function loadCardPack(cardPackId) {
   /*
    * Validate card-pack metadata consumed by the runtime.
    */
-  const cardPack = validateCardPackManifest(rawPackManifest);
+  const cardPack = withCardPackValidationContext(registeredCardPack.id, () =>
+    validateCardPackManifest(rawPackManifest),
+  );
 
   if (cardPack.id !== registeredCardPack.id) {
     throw new Error(
@@ -434,37 +436,52 @@ async function loadCardPack(cardPackId) {
   /*
    * Validate and normalize catalog records.
    */
-  const categories = requireCatalogArray(
-    rawCategories,
-    "categories",
-    LIMITS.maxCategories,
-  ).map(validateCategory);
+  const catalog = withCardPackValidationContext(registeredCardPack.id, () => {
+    const categories = requireCatalogArray(
+      rawCategories,
+      "categories",
+      LIMITS.maxCategories,
+    ).map(validateCategory);
 
-  const editions = requireCatalogArray(
-    rawEditions,
-    "editions",
-    LIMITS.maxEditions,
-  ).map(validateEdition);
+    const editions = requireCatalogArray(
+      rawEditions,
+      "editions",
+      LIMITS.maxEditions,
+    ).map(validateEdition);
 
-  const cards = requireCatalogArray(rawCards, "cards", LIMITS.maxCards).map(
-    validateCard,
-  );
+    const cards = requireCatalogArray(rawCards, "cards", LIMITS.maxCards).map(
+      validateCard,
+    );
 
-  /*
-   * Validate relationships and uniqueness across the trusted
-   * catalog records.
-   */
-  validateCatalogIntegrity(cards, categories, editions, cardPack);
+    validateCatalogIntegrity(cards, categories, editions, cardPack);
 
-  return {
-    cardPack,
-
-    catalog: {
+    return {
       cards,
       categories,
       editions,
-    },
+    };
+  });
+
+  return {
+    catalog,
   };
+}
+
+/*
+ * Add the originating registered card-pack ID to validation
+ * failures without requiring individual validators to know
+ * anything about the card-pack registry.
+ */
+function withCardPackValidationContext(cardPackId, validationCallback) {
+  try {
+    return validationCallback();
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+
+    throw new Error(`Card pack "${cardPackId}" failed validation: ${message}`, {
+      cause: error,
+    });
+  }
 }
 
 /* ---------------------------------------------------------
