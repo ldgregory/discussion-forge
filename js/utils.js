@@ -13,9 +13,7 @@ const MAX_CODE_LENGTH = 64;
  * Ambiguous characters such as I, O, 0, and 1 are
  * intentionally omitted.
  */
-const BASE32_ALPHABET =
-  "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-
+const BASE32_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 
 /* =========================================================
  * Array utilities
@@ -27,14 +25,9 @@ const BASE32_ALPHABET =
  *
  * The original array is not modified.
  */
-export function chunkArray(
-  items,
-  chunkSize,
-) {
+export function chunkArray(items, chunkSize) {
   if (!Array.isArray(items)) {
-    throw new TypeError(
-      "chunkArray items must be an array.",
-    );
+    throw new TypeError("chunkArray items must be an array.");
   }
 
   if (items.length > MAX_ARRAY_LENGTH) {
@@ -55,22 +48,12 @@ export function chunkArray(
 
   const chunks = [];
 
-  for (
-    let index = 0;
-    index < items.length;
-    index += chunkSize
-  ) {
-    chunks.push(
-      items.slice(
-        index,
-        index + chunkSize,
-      ),
-    );
+  for (let index = 0; index < items.length; index += chunkSize) {
+    chunks.push(items.slice(index, index + chunkSize));
   }
 
   return chunks;
 }
-
 
 /* =========================================================
  * Deterministic deck generation
@@ -83,38 +66,20 @@ export function chunkArray(
  * not for cryptographic security.
  */
 function xmur3(text) {
-  let hash =
-    1779033703 ^ text.length;
+  let hash = 1779033703 ^ text.length;
 
-  for (
-    let index = 0;
-    index < text.length;
-    index++
-  ) {
-    hash = Math.imul(
-      hash ^ text.charCodeAt(index),
-      3432918353,
-    );
+  for (let index = 0; index < text.length; index++) {
+    hash = Math.imul(hash ^ text.charCodeAt(index), 3432918353);
 
-    hash =
-      (hash << 13) |
-      (hash >>> 19);
+    hash = (hash << 13) | (hash >>> 19);
   }
 
   return function nextHash() {
-    hash = Math.imul(
-      hash ^ (hash >>> 16),
-      2246822507,
-    );
+    hash = Math.imul(hash ^ (hash >>> 16), 2246822507);
 
-    hash = Math.imul(
-      hash ^ (hash >>> 13),
-      3266489909,
-    );
+    hash = Math.imul(hash ^ (hash >>> 13), 3266489909);
 
-    return (
-      (hash ^= hash >>> 16) >>> 0
-    );
+    return (hash ^= hash >>> 16) >>> 0;
   };
 }
 
@@ -125,37 +90,18 @@ function xmur3(text) {
  * This is intentionally not a cryptographic PRNG.
  */
 function mulberry32(seed) {
-  let currentSeed =
-    seed >>> 0;
+  let currentSeed = seed >>> 0;
 
   return function nextRandom() {
-    currentSeed =
-      (
-        currentSeed +
-        0x6d2b79f5
-      ) >>> 0;
+    currentSeed = (currentSeed + 0x6d2b79f5) >>> 0;
 
-    let value =
-      currentSeed;
+    let value = currentSeed;
 
-    value = Math.imul(
-      value ^ (value >>> 15),
-      value | 1,
-    );
+    value = Math.imul(value ^ (value >>> 15), value | 1);
 
-    value ^=
-      value +
-      Math.imul(
-        value ^ (value >>> 7),
-        value | 61,
-      );
+    value ^= value + Math.imul(value ^ (value >>> 7), value | 61);
 
-    return (
-      (
-        value ^
-        (value >>> 14)
-      ) >>> 0
-    ) / 4294967296;
+    return ((value ^ (value >>> 14)) >>> 0) / 4294967296;
   };
 }
 
@@ -167,14 +113,9 @@ function mulberry32(seed) {
  *
  * The original array is not modified.
  */
-export function seededShuffle(
-  items,
-  seedText,
-) {
+export function seededShuffle(items, seedText) {
   if (!Array.isArray(items)) {
-    throw new TypeError(
-      "seededShuffle items must be an array.",
-    );
+    throw new TypeError("seededShuffle items must be an array.");
   }
 
   if (items.length > MAX_ARRAY_LENGTH) {
@@ -184,9 +125,7 @@ export function seededShuffle(
   }
 
   if (typeof seedText !== "string") {
-    throw new TypeError(
-      "seededShuffle seedText must be a string.",
-    );
+    throw new TypeError("seededShuffle seedText must be a string.");
   }
 
   if (seedText.length > MAX_SEED_LENGTH) {
@@ -195,37 +134,65 @@ export function seededShuffle(
     );
   }
 
-  const seedFactory =
-    xmur3(seedText);
+  const seedFactory = xmur3(seedText);
 
-  const random =
-    mulberry32(seedFactory());
+  const random = mulberry32(seedFactory());
 
-  const copy =
-    [...items];
+  const copy = [...items];
 
-  for (
-    let index = copy.length - 1;
-    index > 0;
-    index--
-  ) {
-    const randomIndex =
-      Math.floor(
-        random() * (index + 1),
-      );
+  for (let index = copy.length - 1; index > 0; index--) {
+    const randomIndex = Math.floor(random() * (index + 1));
 
-    [
-      copy[index],
-      copy[randomIndex],
-    ] = [
-      copy[randomIndex],
-      copy[index],
-    ];
+    [copy[index], copy[randomIndex]] = [copy[randomIndex], copy[index]];
   }
 
   return copy;
 }
 
+/* =========================================================
+ * Version comparison
+ * ========================================================= */
+
+/*
+ * Compare two stable semantic versions in MAJOR.MINOR.PATCH
+ * form.
+ *
+ * Returns:
+ * - negative when left < right
+ * - zero when left === right
+ * - positive when left > right
+ */
+export function compareSemver(left, right) {
+  const parseVersion = (value, fieldName) => {
+    if (typeof value !== "string") {
+      throw new TypeError(`${fieldName} must be a string.`);
+    }
+
+    const parts = value.split(".");
+
+    if (
+      parts.length !== 3 ||
+      parts.some((part) => !/^(0|[1-9]\d*)$/.test(part))
+    ) {
+      throw new TypeError(
+        `${fieldName} must use MAJOR.MINOR.PATCH semantic version format.`,
+      );
+    }
+
+    return parts.map(Number);
+  };
+
+  const leftParts = parseVersion(left, "left version");
+  const rightParts = parseVersion(right, "right version");
+
+  for (let index = 0; index < 3; index += 1) {
+    if (leftParts[index] !== rightParts[index]) {
+      return leftParts[index] - rightParts[index];
+    }
+  }
+
+  return 0;
+}
 
 /* =========================================================
  * Cryptographic hashing and encoding
@@ -236,29 +203,19 @@ export function seededShuffle(
  */
 export async function sha256Bytes(value) {
   if (typeof value !== "string") {
-    throw new TypeError(
-      "sha256Bytes value must be a string.",
-    );
+    throw new TypeError("sha256Bytes value must be a string.");
   }
 
   if (
     !globalThis.crypto?.subtle ||
-    typeof globalThis.crypto.subtle.digest !==
-      "function"
+    typeof globalThis.crypto.subtle.digest !== "function"
   ) {
-    throw new Error(
-      "SHA-256 is not available in this browser context.",
-    );
+    throw new Error("SHA-256 is not available in this browser context.");
   }
 
-  const encoded =
-    new TextEncoder().encode(value);
+  const encoded = new TextEncoder().encode(value);
 
-  const digest =
-    await globalThis.crypto.subtle.digest(
-      "SHA-256",
-      encoded,
-    );
+  const digest = await globalThis.crypto.subtle.digest("SHA-256", encoded);
 
   return new Uint8Array(digest);
 }
@@ -271,18 +228,12 @@ export async function sha256Bytes(value) {
  */
 export function bytesToHex(bytes) {
   if (!(bytes instanceof Uint8Array)) {
-    throw new TypeError(
-      "bytesToHex requires a Uint8Array.",
-    );
+    throw new TypeError("bytesToHex requires a Uint8Array.");
   }
 
-  return Array.from(
-    bytes,
-    (byte) =>
-      byte
-        .toString(16)
-        .padStart(2, "0"),
-  ).join("");
+  return Array.from(bytes, (byte) => byte.toString(16).padStart(2, "0")).join(
+    "",
+  );
 }
 
 /*
@@ -293,9 +244,7 @@ export function bytesToHex(bytes) {
  */
 export function encodeBase32(bytes) {
   if (!(bytes instanceof Uint8Array)) {
-    throw new TypeError(
-      "encodeBase32 requires a Uint8Array.",
-    );
+    throw new TypeError("encodeBase32 requires a Uint8Array.");
   }
 
   let buffer = 0;
@@ -303,42 +252,29 @@ export function encodeBase32(bytes) {
   let result = "";
 
   for (const byte of bytes) {
-    buffer =
-      (buffer << 8) | byte;
+    buffer = (buffer << 8) | byte;
 
     bitCount += 8;
 
     while (bitCount >= 5) {
       bitCount -= 5;
 
-      result +=
-        BASE32_ALPHABET[
-          (buffer >>> bitCount) &
-            0x1f
-        ];
+      result += BASE32_ALPHABET[(buffer >>> bitCount) & 0x1f];
     }
 
     /*
      * Retain only the unconsumed bits so the
      * bit buffer remains bounded.
      */
-    buffer &=
-      (1 << bitCount) - 1;
+    buffer &= (1 << bitCount) - 1;
   }
 
   if (bitCount > 0) {
-    result +=
-      BASE32_ALPHABET[
-        (
-          buffer <<
-          (5 - bitCount)
-        ) & 0x1f
-      ];
+    result += BASE32_ALPHABET[(buffer << (5 - bitCount)) & 0x1f];
   }
 
   return result;
 }
-
 
 /* =========================================================
  * Secure random identifiers
@@ -353,11 +289,7 @@ export function encodeBase32(bytes) {
  * integer, modulo selection introduces no bias.
  */
 export function randomCode(length = 6) {
-  if (
-    !Number.isInteger(length) ||
-    length < 1 ||
-    length > MAX_CODE_LENGTH
-  ) {
+  if (!Number.isInteger(length) || length < 1 || length > MAX_CODE_LENGTH) {
     throw new RangeError(
       `Code length must be a whole number between 1 and ${MAX_CODE_LENGTH}.`,
     );
@@ -365,29 +297,19 @@ export function randomCode(length = 6) {
 
   if (
     !globalThis.crypto ||
-    typeof globalThis.crypto.getRandomValues !==
-      "function"
+    typeof globalThis.crypto.getRandomValues !== "function"
   ) {
-    throw new Error(
-      "A secure random-number generator is not available.",
-    );
+    throw new Error("A secure random-number generator is not available.");
   }
 
-  const randomValues =
-    new Uint32Array(length);
+  const randomValues = new Uint32Array(length);
 
-  globalThis.crypto.getRandomValues(
-    randomValues,
-  );
+  globalThis.crypto.getRandomValues(randomValues);
 
   let result = "";
 
   for (const value of randomValues) {
-    result +=
-      BASE32_ALPHABET[
-        value %
-          BASE32_ALPHABET.length
-      ];
+    result += BASE32_ALPHABET[value % BASE32_ALPHABET.length];
   }
 
   return result;

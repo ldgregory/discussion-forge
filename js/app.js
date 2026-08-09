@@ -15,6 +15,7 @@
 import {
   bytesToHex,
   chunkArray,
+  compareSemver,
   encodeBase32,
   randomCode,
   seededShuffle,
@@ -379,7 +380,23 @@ async function loadCardPack(cardPackId) {
   const cardPack = validateCardPackManifest(rawPackManifest);
 
   if (cardPack.id !== registeredCardPack.id) {
-    throw new Error(`Card-pack manifest ID "${cardPack.id}" does not match registered ID "${registeredCardPack.id}".`,);
+    throw new Error(
+      `Card-pack manifest ID "${cardPack.id}" does not match registered ID "${registeredCardPack.id}".`,
+    );
+  }
+
+  /*
+   * Reject packs that require a newer Discussion Forge
+   * application version than the current runtime.
+   */
+  if (
+    compareSemver(APPLICATION.version, cardPack.minimumApplicationVersion) < 0
+  ) {
+    throw new Error(
+      `Card pack "${cardPack.id}" requires Discussion Forge ` +
+        `${cardPack.minimumApplicationVersion} or later, but ` +
+        `the current version is ${APPLICATION.version}.`,
+    );
   }
 
   /*
@@ -405,12 +422,7 @@ async function loadCardPack(cardPackId) {
    * Validate relationships and uniqueness across the trusted
    * catalog records.
    */
-  validateCatalogIntegrity(
-  cards,
-  categories,
-  editions,
-  cardPack,
-  );
+  validateCatalogIntegrity(cards, categories, editions, cardPack);
 
   return {
     cardPack,
@@ -767,8 +779,14 @@ function renderBuilderSelectionSummary() {
 
   const hasShortage = requested > eligibleCards.length;
 
-  ui.availableCardCount.classList.toggle("builder-summary-warning", hasShortage);
-  ui.builderSelectionSummary.classList.toggle("builder-summary-shortage", hasShortage);
+  ui.availableCardCount.classList.toggle(
+    "builder-summary-warning",
+    hasShortage,
+  );
+  ui.builderSelectionSummary.classList.toggle(
+    "builder-summary-shortage",
+    hasShortage,
+  );
 }
 
 /* ---------------------------------------------------------
@@ -2163,7 +2181,6 @@ function registerEventListeners() {
   ui.cardPackSelect.addEventListener("change", handleCardPackChange);
 
   ui.themeSelect.addEventListener("change", handleThemeChange);
-
 }
 
 registerEventListeners();
