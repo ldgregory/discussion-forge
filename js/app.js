@@ -15,6 +15,8 @@
 import {
   bytesToHex,
   chunkArray,
+  compareSemver,
+  deepFreeze,
   encodeBase32,
   randomCode,
   seededShuffle,
@@ -47,7 +49,7 @@ const DECK_IDENTITY_SCHEMA_VERSION = 2;
  * Discussion Forge application version recorded in
  * generated deck manifests and compatibility metadata.
  */
-const GENERATOR_VERSION = "0.3.0-alpha1";
+const GENERATOR_VERSION = "0.4.0";
 
 /*
  * Number of Base32 characters exposed as the human-readable
@@ -123,7 +125,7 @@ const LIMITS = Object.freeze({
  * Additional installed card packs will eventually
  * register themselves using the same structure.
  */
-const TRAIL_TALK_PACK = Object.freeze({
+const TRAIL_TALK_PACK = deepFreeze({
   id: "trail-talk",
 
   paths: {
@@ -138,7 +140,7 @@ const TRAIL_TALK_PACK = Object.freeze({
  * Small bundled trivia pack used to demonstrate and test
  * card-pack switching.
  */
-const SAMPLE_TRIVIA_PACK = Object.freeze({
+const SAMPLE_TRIVIA_PACK = deepFreeze({
   id: "sample-trivia",
 
   paths: {
@@ -155,7 +157,7 @@ const SAMPLE_TRIVIA_PACK = Object.freeze({
  * The registry owns the default pack selection and all
  * card-pack definitions available to the application.
  */
-const CARD_PACK_REGISTRY = Object.freeze({
+const CARD_PACK_REGISTRY = deepFreeze({
   defaultCardPackId: "trail-talk",
 
   packs: [TRAIL_TALK_PACK, SAMPLE_TRIVIA_PACK],
@@ -325,6 +327,32 @@ function requireCardPack(cardPackId) {
   return cardPack;
 }
 
+/*
+ * Require every dependency declared by a validated card-pack
+ * manifest to exist in the installed card-pack registry.
+ *
+ * Self-dependencies are rejected because a pack cannot
+ * satisfy its own prerequisite.
+ */
+function validateCardPackDependencies(cardPack) {
+  const registeredIds = new Set(
+    CARD_PACK_REGISTRY.packs.map((registeredCardPack) => registeredCardPack.id),
+  );
+
+  cardPack.dependencies.forEach((dependencyId) => {
+    if (dependencyId === cardPack.id) {
+      throw new Error(`Card pack "${cardPack.id}" cannot depend on itself.`);
+    }
+
+    if (!registeredIds.has(dependencyId)) {
+      throw new Error(
+        `Card pack "${cardPack.id}" requires unavailable dependency ` +
+          `"${dependencyId}".`,
+      );
+    }
+  });
+}
+
 /* ---------------------------------------------------------
  * JSON transport
  * --------------------------------------------------------- */
@@ -376,46 +404,86 @@ async function loadCardPack(cardPackId) {
   /*
    * Validate card-pack metadata consumed by the runtime.
    */
-  const cardPack = validateCardPackManifest(rawPackManifest);
+  const cardPack = withCardPackValidationContext(registeredCardPack.id, () =>
+    validateCardPackManifest(rawPackManifest),
+  );
 
   if (cardPack.id !== registeredCardPack.id) {
-    throw new Error(`Card-pack manifest ID "${cardPack.id}" does not match registered ID "${registeredCardPack.id}".`,);
+    throw new Error(
+      `Card-pack manifest ID "${cardPack.id}" does not match registered ID "${registeredCardPack.id}".`,
+    );
   }
+
+  /*
+   * Reject packs that require a newer Discussion Forge
+   * application version than the current runtime.
+   */
+  if (
+    compareSemver(APPLICATION.version, cardPack.minimumApplicationVersion) < 0
+  ) {
+    throw new Error(
+      `Card pack "${cardPack.id}" requires Discussion Forge ` +
+        `${cardPack.minimumApplicationVersion} or later, but ` +
+        `the current version is ${APPLICATION.version}.`,
+    );
+  }
+
+  /*
+   * Ensure every declared card-pack dependency is installed
+   * and available before activating this pack.
+   */
+  validateCardPackDependencies(cardPack);
 
   /*
    * Validate and normalize catalog records.
    */
-  const categories = requireCatalogArray(
-    rawCategories,
-    "categories",
-    LIMITS.maxCategories,
-  ).map(validateCategory);
+  const catalog = withCardPackValidationContext(registeredCardPack.id, () => {
+    const categories = requireCatalogArray(
+      rawCategories,
+      "categories",
+      LIMITS.maxCategories,
+    ).map(validateCategory);
 
-  const editions = requireCatalogArray(
-    rawEditions,
-    "editions",
-    LIMITS.maxEditions,
-  ).map(validateEdition);
+    const editions = requireCatalogArray(
+      rawEditions,
+      "editions",
+      LIMITS.maxEditions,
+    ).map(validateEdition);
 
-  const cards = requireCatalogArray(rawCards, "cards", LIMITS.maxCards).map(
-    validateCard,
-  );
+    const cards = requireCatalogArray(rawCards, "cards", LIMITS.maxCards).map(
+      validateCard,
+    );
 
-  /*
-   * Validate relationships and uniqueness across the trusted
-   * catalog records.
-   */
-  validateCatalogIntegrity(cards, categories, editions);
+    validateCatalogIntegrity(cards, categories, editions, cardPack);
 
-  return {
-    cardPack,
-
-    catalog: {
+    return {
       cards,
       categories,
       editions,
-    },
+    };
+  });
+
+  return {
+    cardPack,
+    catalog,
   };
+}
+
+/*
+ * Add the originating registered card-pack ID to validation
+ * failures without requiring individual validators to know
+ * anything about the card-pack registry.
+ */
+function withCardPackValidationContext(cardPackId, validationCallback) {
+  try {
+    return validationCallback();
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+
+    throw new Error(`Card pack "${cardPackId}" failed validation: ${message}`, {
+      cause: error,
+    });
+  }
 }
 
 /* ---------------------------------------------------------
@@ -762,8 +830,14 @@ function renderBuilderSelectionSummary() {
 
   const hasShortage = requested > eligibleCards.length;
 
-  ui.availableCardCount.classList.toggle("builder-summary-warning", hasShortage);
-  ui.builderSelectionSummary.classList.toggle("builder-summary-shortage", hasShortage);
+  ui.availableCardCount.classList.toggle(
+    "builder-summary-warning",
+    hasShortage,
+  );
+  ui.builderSelectionSummary.classList.toggle(
+    "builder-summary-shortage",
+    hasShortage,
+  );
 }
 
 /* ---------------------------------------------------------
@@ -2158,7 +2232,6 @@ function registerEventListeners() {
   ui.cardPackSelect.addEventListener("change", handleCardPackChange);
 
   ui.themeSelect.addEventListener("change", handleThemeChange);
-
 }
 
 registerEventListeners();

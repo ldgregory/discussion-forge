@@ -213,33 +213,128 @@
  * ========================================================= */
 
 /*
+ * Generic category banner.
+ *
+ * Provides a neutral fallback treatment for categories that do not
+ * have a theme-specific visual treatment. Category-specific rules
+ * below override the color and pattern where appropriate.
+ */
+.theme-trail-blue
+  .card-band {
+  background-color: #17456f;
+}
+
+/*
  * Gear & Vehicle banner.
+ *
+ * Alternating angled tread lugs suggest an all-terrain tire
+ * without introducing continuous lines or a woven pattern.
  */
 .theme-trail-blue
   .category-gear {
   background-color: #3f6b45;
+
+  background-image:
+    linear-gradient(
+      60deg,
+      transparent 42%,
+      rgb(255 255 255 / 9%) 42%,
+      rgb(255 255 255 / 9%) 58%,
+      transparent 58%
+    ),
+    linear-gradient(
+      -60deg,
+      transparent 42%,
+      rgb(255 255 255 / 7%) 42%,
+      rgb(255 255 255 / 7%) 58%,
+      transparent 58%
+    );
+
+  background-size:
+    28px 18px,
+    28px 18px;
+
+  background-position:
+    0 0,
+    14px 9px;
 }
+
 
 /*
  * Story Time banner.
+ *
+ * Broad radial arcs suggest firelight, warmth, and stories
+ * spreading outward around a campfire.
  */
 .theme-trail-blue
   .category-story-time {
   background-color: #76528b;
+
+  background-image:
+    repeating-radial-gradient(
+      circle at 18% 115%,
+      transparent 0,
+      transparent 13px,
+      rgb(255 255 255 / 8%) 14px,
+      rgb(255 255 255 / 8%) 16px,
+      transparent 17px,
+      transparent 29px
+    );
 }
+
 
 /*
  * Lightning Round banner.
+ *
+ * Narrow diagonal streaks create a restrained sense of
+ * speed and forward motion.
  */
 .theme-trail-blue
   .category-lightning {
   background-color: #59636e;
+
+  background-image:
+    repeating-linear-gradient(
+      118deg,
+      transparent 0,
+      transparent 15px,
+      rgb(255 255 255 / 9%) 15px,
+      rgb(255 255 255 / 9%) 17px,
+      transparent 17px,
+      transparent 29px
+    );
 }
+
 
 /*
  * Wild Card banner.
+ *
+ * Discrete offset diamond marks reference playing-card
+ * geometry without creating a continuous lattice.
  */
 .theme-trail-blue
   .category-wildcard {
   background-color: #a33a2b;
+
+  background-image:
+    radial-gradient(
+      ellipse at center,
+      rgb(255 255 255 / 10%) 0,
+      rgb(255 255 255 / 10%) 22%,
+      transparent 24%
+    ),
+    radial-gradient(
+      ellipse at center,
+      rgb(255 255 255 / 8%) 0,
+      rgb(255 255 255 / 8%) 22%,
+      transparent 24%
+    );
+
+  background-size:
+    22px 14px,
+    22px 14px;
+
+  background-position:
+    0 0,
+    11px 7px;
 }

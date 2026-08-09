@@ -1,28 +1,9 @@
 # TODO
 
-## High Priority
-
-### Card-pack runtime and validation
-
-- [ ] Expand `validateCardPackManifest()` beyond the currently consumed runtime fields.
-- [ ] Validate pack compatibility using `minimum_application_version`.
-- [ ] Validate pack dependencies before activation.
-- [ ] Report card-pack validation failures with the originating pack ID.
-- [ ] Add automated regression tests for manifest, card, category, edition, catalog-integrity, and theme validators.
-- [ ] Decide whether registry entries should be deeply frozen or otherwise protected from accidental mutation.
-- [ ] Decide whether `sample-trivia` remains bundled as a visible example pack, moves to developer/test fixtures, or becomes documentation-only sample content.
-
-### Documentation synchronization
-
-- [ ] Create `ARCHITECTURE.md` now that the application/card-pack separation and validator boundaries have stabilized.
-
----
-
 ## Medium Priority
 
 ### Preview and rendering
 
-- [ ] Add subtle category banner patterns.
 - [ ] Add regression tests or a repeatable manual test checklist to ensure preview and printable output continue to use the same canonical card renderers.
 
 ### Generation UX
@@ -44,6 +25,16 @@
 ---
 
 ## Low Priority / Post-v1.0
+
+### Sample Trivia demonstration pack
+
+Retain `sample-trivia` as a bundled example card pack that demonstrates the Discussion Forge card-pack format and provides controlled sample content for exercising application features.
+
+- [ ] Expand the Sample Trivia catalog beyond the initial small demonstration set.
+- [ ] Deliberately vary optional card metadata such as experience level, audience, sensitivity, response style, answer length, and group familiarity.
+- [ ] Ensure metadata combinations are diverse enough to exercise dynamic Advanced Deck Settings discovery and filtering.
+- [ ] Keep the pack small enough to remain understandable as reference content for prospective card-pack authors.
+- [ ] Use Sample Trivia to demonstrate card-pack capabilities without introducing Trail Talk-specific assumptions into application behavior.
 
 ### Advanced deck settings
 

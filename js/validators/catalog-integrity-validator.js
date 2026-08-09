@@ -65,10 +65,58 @@ function validateCatalogRelationships(cards, categories, editions) {
  * Validate catalog-wide integrity after all individual
  * records have been validated and normalized.
  */
-export function validateCatalogIntegrity(cards, categories, editions) {
+export function validateCatalogIntegrity(
+  cards,
+  categories,
+  editions,
+  cardPack,
+) {
   assertUniqueIds(categories, "categories", "id");
   assertUniqueIds(editions, "editions", "id");
   assertUniqueIds(cards, "cards", "card_uuid");
 
   validateCatalogRelationships(cards, categories, editions);
+
+  if (cardPack.cardCount !== cards.length) {
+    throw new Error(
+      `manifest.card_count declares ${cardPack.cardCount} cards, ` +
+        `but ${cards.length} cards were loaded.`,
+    );
+  }
+
+  const actualEditionIds = new Set(
+    editions.map((edition) => edition.id),
+  );
+
+  cardPack.editions.forEach((editionId) => {
+    if (!actualEditionIds.has(editionId)) {
+      throw new Error(
+        `manifest.editions references missing edition "${editionId}".`,
+      );
+    }
+  });
+
+  if (actualEditionIds.size !== cardPack.editions.length) {
+    throw new Error(
+      "manifest.editions does not match the loaded edition catalog.",
+    );
+  }
+
+  const actualCategoryIds = new Set(
+    categories.map((category) => category.id),
+  );
+
+  cardPack.categories.forEach((categoryId) => {
+    if (!actualCategoryIds.has(categoryId)) {
+      throw new Error(
+        `manifest.categories references missing category "${categoryId}".`,
+      );
+    }
+  });
+
+  if (actualCategoryIds.size !== cardPack.categories.length) {
+    throw new Error(
+      "manifest.categories does not match the loaded category catalog.",
+    );
+  }
 }
