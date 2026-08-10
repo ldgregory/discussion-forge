@@ -2118,9 +2118,7 @@ function downloadManifest() {
  * Generate a new secure, human-readable seed and place it
  * into the builder control.
  */
-function handleRandomSeed() {
-  ui.seedInput.value = randomCode(RANDOM_SEED_LENGTH);
-}
+function handleRandomSeed() {ui.seedInput.value = randomCode(RANDOM_SEED_LENGTH); handleBuilderConfigurationChange();}
 
 /*
  * Open the browser's print dialog.
@@ -2133,7 +2131,13 @@ function handlePrint() {
  * Refresh builder statistics when edition or category
  * selections change.
  */
-function handleBuilderSelectionChange() {
+function handleBuilderConfigurationChange() {
+  clearGeneratedOutput({
+    state,
+    previewOutput: ui.previewOutput,
+    printOutput: ui.printOutput,
+  });
+
   renderBuilderSelectionSummary();
 }
 
@@ -2236,11 +2240,13 @@ function registerEventListeners() {
 
   ui.outputMode.addEventListener("change", handleOutputModeChange);
 
-  ui.deckSizeInput.addEventListener("input", renderBuilderSelectionSummary);
+  ui.deckSizeInput.addEventListener("input", handleBuilderConfigurationChange);
 
-  ui.editionOptions.addEventListener("change", handleBuilderSelectionChange);
+  ui.seedInput.addEventListener("input", handleBuilderConfigurationChange);
 
-  ui.categoryOptions.addEventListener("change", handleBuilderSelectionChange);
+  ui.editionOptions.addEventListener("change", handleBuilderConfigurationChange,);
+
+  ui.categoryOptions.addEventListener("change", handleBuilderConfigurationChange,);
 
   ui.cardPackSelect.addEventListener("change", handleCardPackChange);
 
