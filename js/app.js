@@ -1109,6 +1109,8 @@ async function generateDeck() {
      * Require at least one edition and one category.
      */
     if (editions.length === 0 || categories.length === 0) {
+      clearGeneratedOutput();
+
       setStatus("Select at least one edition and one category.");
 
       return;
@@ -1193,6 +1195,13 @@ async function generateDeck() {
      */
     renderOutput();
   } catch (error) {
+    /*
+     * A failed generation attempt invalidates any previously
+     * generated deck because it no longer represents the
+     * current builder configuration.
+     */
+    clearGeneratedOutput();
+
     /*
      * Fail visibly without exposing an uncaught generation error
      * to the user.
