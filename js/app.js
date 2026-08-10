@@ -1615,19 +1615,6 @@ function renderBackCard({
 }
 
 /*
- * Clear all generated deck state and rendered output.
- *
- * This resets the application after generation errors
- * or when the current builder configuration produces
- * no playable cards.
- */
-clearGeneratedOutput({
-  state,
-  previewOutput: ui.previewOutput,
-  printOutput: ui.printOutput,
-});
-
-/*
  * Render one interactive preview card.
  *
  * Preview cards reuse the canonical front and back renderers
