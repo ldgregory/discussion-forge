@@ -78,6 +78,120 @@
 
 ## Low Priority / Post-v1.0
 
+### Survival Craft Trail Talk edition
+
+Create a `survival-craft` Trail Talk edition focused on outdoor skills, preparedness, self-reliance, emergency decision-making, and deliberately playful survival hypotheticals. Keep it conversational rather than turning it into a survival-skills examination.
+
+Use this edition as an early real-world project for the Card-pack Creator Toolkit workbook so the spreadsheet authoring workflow is exercised against meaningful multi-category, multi-edition, and advanced-metadata content.
+
+#### Proposed new categories
+
+- **Craft** (`craft`) — fire, navigation, shelter, water, knots, weather awareness, wild plants, primitive skills, and fieldcraft.
+- **Hunting** (`hunting`) — hunting skills, bows, game processing, food procurement, traps, and snares.
+- **Safety** (`safety`) — first aid, emergency preparedness, survival equipment, contingency planning, and risk awareness.
+- **Zombie Apocalypse** (`zombie-apocalypse`) — intentionally ridiculous disaster/survival hypotheticals intended primarily for fun and group discussion.
+- Reuse existing **Story Time**, **Lightning Round**, and **Wild Card** categories where those interaction styles are the card's primary presentation.
+
+Cards may belong to more than one category. Preserve a single `visual.primary_category` for banner/icon presentation while additional categories provide semantic filtering. Cards may likewise belong to both an existing Trail Talk edition and `survival-craft` rather than being removed from their useful existing editions.
+
+#### Proposed Survival Craft cards
+
+Wording below is the working editorial wording to carry into the creator workbook.
+
+**Craft / fieldcraft**
+
+- [ ] Can you start a fire with only flint and steel? — categories: `craft`.
+- [ ] Can you confidently determine your direction of travel without a compass, GPS, or phone? — categories: `craft`.
+- [ ] Can you build a shelter from natural materials? — categories: `craft`.
+- [ ] Can you confidently identify wild plants that are safe to eat? — categories: `craft`.
+- [ ] Could you build a functional trap or snare if you had to? — categories: `craft`, `hunting`.
+- [ ] Can you navigate with a paper topographic map and compass? — categories: `craft`.
+- [ ] Could you find and make water safe to drink if your carried water were gone? — categories: `craft`, `safety`.
+- [ ] Can you tie three knots you would trust with your safety or equipment? — categories: `craft`, `safety`.
+- [ ] Could you keep yourself warm overnight without a tent? — categories: `craft`, `safety`.
+- [ ] Can you recognize the signs of approaching dangerous weather? — categories: `craft`, `safety`.
+
+**Hunting / food procurement**
+
+- [ ] Can you hunt with a bow? — categories: `hunting`.
+- [ ] Can you make a functional bow? — categories: `hunting`, `craft`.
+- [ ] Do you know how to skin and dress game? — categories: `hunting`.
+
+**Safety / preparedness**
+
+- [ ] Do you know basic first aid? — categories: `safety`.
+- [ ] Do you know advanced first aid? — categories: `safety`; candidate experienced-level card.
+- [ ] What's the one emergency item you think most people forget to carry? — categories: `safety`.
+- [ ] Have you ever used your first-aid training in a real situation? — categories: `safety`, `story-time`.
+- [ ] What emergency skill do you know you need to learn but haven't yet? — categories: `safety`.
+- [ ] If your vehicle became completely disabled tonight, how long could you comfortably stay where you are? — categories: `safety`; also candidate for `recovery` edition membership.
+
+**Story Time**
+
+- [ ] Have you ever gotten lost in the outdoors? — categories: `story-time`, `craft`.
+- [ ] Have you ever had to improvise a repair to get yourself home? — categories: `story-time`, `safety`.
+- [ ] What's the closest you've come to running out of something essential? — categories: `story-time`, `safety`.
+- [ ] Tell us about a time the weather forced you to completely change your plans. — categories: `story-time`, `safety`.
+- [ ] What's a mistake you made outdoors that you'll never make again? — categories: `story-time`, `safety`.
+
+**Lightning Round**
+
+- [ ] Do you know how to find the North Star at night? — categories: `lightning`, `craft`.
+- [ ] What survival gear do you have in your vehicle? — categories: `lightning`, `safety`.
+- [ ] What survival gear do you have in your pack? — categories: `lightning`, `safety`.
+- [ ] You are stuck on a deserted island. What three non-survival items do you bring for comfort? — categories: `lightning`.
+- [ ] You must bring one fictional character with you to survive a month in the woods. Who do you pick, and do they help or just annoy you? — categories: `lightning`.
+- [ ] Your only weapon in a disaster is the last item you touched with your left hand. What is your weapon? — categories: `lightning`, `zombie-apocalypse`.
+- [ ] You are very hungry. Do you eat a large bowl of crunchy bugs or one mystery roadkill stew? — categories: `lightning`.
+- [ ] You can only eat one single food item for the next five years of survival. What do you pick? — categories: `lightning`.
+- [ ] You have an endless supply of one condiment to make gross survival food taste better. Do you choose ketchup, hot sauce, or ranch? — categories: `lightning`.
+- [ ] Knife or hatchet? — categories: `lightning`, `craft`.
+- [ ] Lighter or ferro rod? — categories: `lightning`, `craft`.
+- [ ] Map or compass? — categories: `lightning`, `craft`.
+- [ ] Water or shelter? — categories: `lightning`, `craft`.
+- [ ] Fire or sleeping bag? — categories: `lightning`, `craft`.
+- [ ] Signal mirror or whistle? — categories: `lightning`, `safety`.
+- [ ] One gallon of water or one extra gallon of fuel? — categories: `lightning`, `safety`.
+
+**Zombie Apocalypse**
+
+- [ ] You can pick three people in this group to join your zombie apocalypse team. Who is the first person you cut, and who is your MVP? — categories: `zombie-apocalypse`; candidate `friends`-only and medium sensitivity.
+- [ ] Do you hide out in an abandoned Costco, a high-security prison, or your vehicle in the deep forest? — categories: `zombie-apocalypse`.
+- [ ] The vehicle you're driving right now is your apocalypse vehicle. What's its biggest weakness? — categories: `zombie-apocalypse`, `safety`.
+- [ ] You get one unlimited resource: fuel, clean water, food, or ammunition. Which one? — categories: `zombie-apocalypse`, `lightning`.
+- [ ] Someone in your group gets bitten but insists it's "probably nothing." What's the group policy? — categories: `zombie-apocalypse`.
+- [ ] You can raid one store before leaving civilization. Which store? — categories: `zombie-apocalypse`, `lightning`.
+- [ ] Your apocalypse base has electricity but no running water, or running water but no electricity. Which do you choose? — categories: `zombie-apocalypse`, `lightning`.
+- [ ] You hear another group approaching your camp after dark. Hide, make contact, or leave? — categories: `zombie-apocalypse`.
+
+#### Existing Trail Talk cards to add to the Survival Craft edition
+
+Do not automatically remove these from their current editions. Add `survival-craft` as an additional edition where appropriate so the same canonical card can serve multiple deck contexts.
+
+- [ ] What is the closest you have come to calling for help? — existing `recovery`, `campfire`; add `survival-craft`; semantic categories could include `story-time`, `safety`.
+- [ ] Tell us about a trip you had to abandon. — existing `recovery`, `campfire`; add `survival-craft`; semantic categories could include `story-time`, `safety`.
+- [ ] Tell us about the closest call you have had damaging your vehicle. — existing `recovery`; add `survival-craft`; semantic categories could include `story-time`, `safety`.
+- [ ] What obstacle made you seriously question your choices? — existing `recovery`, `campfire`; add `survival-craft`; semantic categories could include `story-time`, `safety`.
+- [ ] What recovery lesson did you learn the hard way? — existing `recovery`; add `survival-craft`; semantic categories could include `story-time`, `safety`.
+- [ ] Tell us about weather that completely changed your plans. — existing `campfire`, `recovery`; add `survival-craft`; semantic categories could include `story-time`, `safety`.
+- [ ] Tell us about a repair you improvised well enough to get home. — existing `recovery`, `campfire`; add `survival-craft`; semantic categories could include `story-time`, `safety`.
+- [ ] What is the closest you have come to running out of something essential? — existing `recovery`, `campfire`; add `survival-craft`; semantic categories could include `story-time`, `safety`.
+- [ ] What mistake have you made outdoors that you will never make again? — existing `campfire`, `recovery`; add `survival-craft`; semantic categories could include `story-time`, `safety`.
+- [ ] What would make you turn around even if the trail were technically passable? — existing `core`, `recovery`; add `survival-craft`; semantic categories could include `safety`.
+- [ ] What emergency item do you think most people forget to carry? — existing `core`, `recovery`; add `survival-craft`; semantic categories could include `safety`.
+- [ ] If your vehicle became completely disabled tonight, how long could you comfortably stay where you are? — if already present in the canonical catalog when this edition is built, add `survival-craft`; categories: `safety`; preserve `recovery` where applicable.
+
+Potential secondary cross-edition candidates to evaluate during workbook authoring rather than automatically migrate: `Maps or GPS?`, `Winch or traction boards?`, `Snow or sand?`, `What do you carry that most people do not?`, and `What piece of gear has earned your trust the hard way?`.
+
+#### Survival Craft metadata / schema considerations
+
+- [ ] Use deliberately varied advanced metadata so Survival Craft exercises Advanced Deck Settings well: experience level, group familiarity, sensitivity, response style, answer length, and card type.
+- [ ] Consider experienced-only metadata for advanced first aid, game processing, hunting, and other questions where an experienced filter is meaningful.
+- [ ] Keep playful hypotheticals broadly accessible while using `friends` and/or medium sensitivity where a prompt could put group members on the spot.
+- [ ] Evaluate adding `skill` or `self-assessment` as a future `response_style` rather than forcing capability questions into `discussion` or `challenge`; prefer `skill` if a generic reusable style is added.
+- [ ] Preserve multi-category semantics in the creator workbook and generated JSON while retaining one `visual.primary_category` for presentation.
+- [ ] Use the creator workbook to test the portable multi-value convention for cards belonging to multiple categories and editions.
+
 ### Sample Trivia demonstration pack
 
 Retain `sample-trivia` as a bundled example card pack that demonstrates the Discussion Forge card-pack format and provides controlled sample content for exercising application features.
