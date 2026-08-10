@@ -2,13 +2,8 @@
 
 ## Medium Priority
 
-### Preview and rendering
-
-- [ ] Add regression tests or a repeatable manual test checklist to ensure preview and printable output continue to use the same canonical card renderers.
-
 ### Generation UX
 
-- [ ] If deck generation fails for any reason, clear existing preview and print output so stale output never represents invalid or changed builder settings.
 - [ ] Consider displaying active card-pack name/version in the preview summary so generated output is visually attributable before manifest download.
 
 ### Security
