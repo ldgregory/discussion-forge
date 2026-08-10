@@ -16,7 +16,6 @@
  * - Category banner colors
  * ========================================================= */
 
-
 /* =========================================================
  * Design tokens
  * ========================================================= */
@@ -28,7 +27,6 @@
   --border: #b7b09f;
   --accent: #365f43;
 }
-
 
 /* =========================================================
  * Global document styles
@@ -75,7 +73,6 @@ h1 {
   margin: 0.2rem 0;
 }
 
-
 /* =========================================================
  * JavaScript-disabled message
  * ========================================================= */
@@ -90,7 +87,6 @@ h1 {
 
   font-weight: 600;
 }
-
 
 /* =========================================================
  * Deck-builder controls
@@ -343,7 +339,6 @@ button.primary {
   display: none;
 }
 
-
 /* =========================================================
  * Preview status panel
  * ========================================================= */
@@ -528,8 +523,7 @@ button.primary {
       transparent 2px
     );
 
-  background-size:
-    14px 14px;
+  background-size: 14px 14px;
 
   background-position:
     0 0,
@@ -621,7 +615,6 @@ button.primary {
   font-size: 0.62rem;
   font-weight: 600;
 }
-
 
 /* =========================================================
  * Shared card-back layout
@@ -717,7 +710,6 @@ button.primary {
   margin: 0.12in 0 0;
 }
 
-
 /* =========================================================
  * Quick List output
  * ========================================================= */
@@ -762,17 +754,13 @@ button.primary {
   margin: 0;
 }
 
-
 /* =========================================================
  * Interactive screen preview
  * ========================================================= */
 
 .preview-card-grid {
   display: grid;
-  grid-template-columns: repeat(
-    auto-fit,
-    2.4in
-  );
+  grid-template-columns: repeat(auto-fit, 2.4in);
   justify-content: center;
   gap: 0.35in;
 }
@@ -784,10 +772,7 @@ button.primary {
   perspective: 1000px;
   cursor: pointer;
 
-  filter:
-    drop-shadow(
-      0 4px 7px rgb(0 0 0 / 18%)
-    );
+  filter: drop-shadow(0 4px 7px rgb(0 0 0 / 18%));
 
   transition:
     transform 0.15s ease,
@@ -798,10 +783,7 @@ button.primary {
 .preview-card:focus-visible {
   transform: translateY(-4px);
 
-  filter:
-    drop-shadow(
-      0 9px 12px rgb(0 0 0 / 25%)
-    );
+  filter: drop-shadow(0 9px 12px rgb(0 0 0 / 25%));
 }
 
 .preview-card:focus-visible {
@@ -819,8 +801,7 @@ button.primary {
   transition: transform 0.45s ease;
 }
 
-.preview-card.is-flipped
-  .preview-card-inner {
+.preview-card.is-flipped .preview-card-inner {
   transform: rotateY(180deg);
 }
 
@@ -840,8 +821,7 @@ button.primary {
  * Screen preview cards should look like finished cards,
  * not manufacturing templates.
  */
-.preview-card
-  .play-card {
+.preview-card .play-card {
   position: absolute;
   inset: 0;
 
@@ -869,14 +849,11 @@ button.primary {
 
 @media (max-width: 800px) {
   .preview-status-details {
-    grid-template-columns: repeat(
-      2,
-      minmax(0, 1fr)
-    );
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
-@media (max-width: 600px) {
+@media (max-width: 500px) {
   .card-grid {
     grid-template-columns: 2.4in;
   }
@@ -891,7 +868,6 @@ button.primary {
     grid-template-columns: 1fr;
   }
 }
-
 
 /* =========================================================
  * Printing
