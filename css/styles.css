@@ -312,6 +312,13 @@ button.primary {
   color: #5f4300;
 }
 
+.builder-status-error {
+  background: #f8d7da;
+  border-color: #c86b73;
+
+  color: #721c24;
+}
+
 .builder-status:empty {
   display: none;
 }
