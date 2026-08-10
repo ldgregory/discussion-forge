@@ -443,6 +443,18 @@ button.primary {
 }
 
 /*
+ * Preserve physical card positions on partial duplex sheets.
+ *
+ * These placeholders are used only by the print renderer so
+ * mirrored card backs remain aligned with their corresponding
+ * fronts.
+ */
+.print-card-placeholder {
+  width: 2.4in;
+  height: 3.35in;
+}
+
+/*
  * Shared physical card dimensions.
  *
  * Theme packages may change visual presentation but should

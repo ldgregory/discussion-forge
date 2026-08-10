@@ -1208,7 +1208,9 @@ async function generateDeck() {
      * deck state.
      */
     renderOutput();
-    const previewFocusTarget = ui.previewOutput.querySelector("[data-preview-focus-target]",);
+    const previewFocusTarget = ui.previewOutput.querySelector(
+      "[data-preview-focus-target]",
+    );
     previewFocusTarget?.focus();
   } catch (error) {
     /*
@@ -2055,8 +2057,36 @@ function renderPrintOutput() {
 
     backGrid.className = "card-grid";
 
-    cards.forEach(() => {
-      backGrid.appendChild(renderBackCard());
+    /*
+     * Mirror each three-card row horizontally for long-edge
+     * duplex printing.
+     *
+     * Front positions:
+     *
+     *   1  2  3
+     *   4  5  6
+     *
+     * Back-page positions sent to the printer:
+     *
+     *   3  2  1
+     *   6  5  4
+     *
+     * Empty positions must be preserved on partial sheets so
+     * every back remains physically aligned with its front.
+     */
+    const backPositions = [2, 1, 0, 5, 4, 3];
+
+    backPositions.forEach((cardIndex) => {
+      if (cardIndex < cards.length) {
+        backGrid.appendChild(renderBackCard());
+      } else {
+        const emptyPosition = document.createElement("div");
+
+        emptyPosition.className = "print-card-placeholder";
+        emptyPosition.setAttribute("aria-hidden", "true");
+
+        backGrid.appendChild(emptyPosition);
+      }
     });
 
     backPage.appendChild(backGrid);
@@ -2130,17 +2160,17 @@ function downloadManifest() {
  * Generate a new secure, human-readable seed and place it
  * into the builder control.
  */
-function handleRandomSeed() {ui.seedInput.value = randomCode(RANDOM_SEED_LENGTH); handleBuilderConfigurationChange();}
+function handleRandomSeed() {
+  ui.seedInput.value = randomCode(RANDOM_SEED_LENGTH);
+  handleBuilderConfigurationChange();
+}
 
 /*
  * Open the browser's print dialog.
  */
 function handlePrint() {
   if (state.generated.length === 0 || !state.manifest) {
-    setStatus(
-      "Generate a valid deck before printing.",
-      "warning",
-    );
+    setStatus("Generate a valid deck before printing.", "warning");
 
     return;
   }
@@ -2269,9 +2299,15 @@ function registerEventListeners() {
 
   ui.seedInput.addEventListener("input", handleBuilderConfigurationChange);
 
-  ui.editionOptions.addEventListener("change", handleBuilderConfigurationChange,);
+  ui.editionOptions.addEventListener(
+    "change",
+    handleBuilderConfigurationChange,
+  );
 
-  ui.categoryOptions.addEventListener("change", handleBuilderConfigurationChange,);
+  ui.categoryOptions.addEventListener(
+    "change",
+    handleBuilderConfigurationChange,
+  );
 
   ui.cardPackSelect.addEventListener("change", handleCardPackChange);
 
