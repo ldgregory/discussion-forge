@@ -292,20 +292,6 @@ button.primary {
   min-height: 1.2em;
 }
 
-@media (max-width: 900px) {
-  .control-grid,
-  .content-option-grid,
-  .builder-selection-summary {
-    grid-template-columns: 1fr;
-  }
-
-  .builder-heading-row {
-    align-items: stretch;
-    flex-direction: column;
-  }
-}
-
-
 /* =========================================================
  * Output containers
  * ========================================================= */
@@ -415,26 +401,6 @@ button.primary {
   font-size: 0.82rem;
 }
 
-@media (max-width: 800px) {
-  .preview-status-details {
-    grid-template-columns: repeat(
-      2,
-      minmax(0, 1fr)
-    );
-  }
-}
-
-@media (max-width: 480px) {
-  .preview-status-heading {
-    align-items: flex-start;
-  }
-
-  .preview-status-details {
-    grid-template-columns: 1fr;
-  }
-}
-
-
 /* =========================================================
  * Shared card grid and card geometry
  * ========================================================= */
@@ -489,21 +455,6 @@ button.primary {
   border: 1px dashed rgb(0 0 0 / 28%);
   border-radius: 50%;
 }
-
-@media (max-width: 900px) {
-  .control-grid,
-  .content-option-grid,
-  .builder-selection-summary {
-    grid-template-columns: 1fr;
-  }
-}
-
-@media (max-width: 600px) {
-  .card-grid {
-    grid-template-columns: 2.4in;
-  }
-}
-
 
 /* =========================================================
  * Shared card-front layout
@@ -869,11 +820,52 @@ button.primary {
   overflow: hidden;
 }
 
-
 /* =========================================================
- * Printed-page configuration
+ * Responsive / mobile layout
  * ========================================================= */
 
+@media (max-width: 900px) {
+  .control-grid,
+  .content-option-grid,
+  .builder-selection-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .builder-heading-row {
+    align-items: stretch;
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 800px) {
+  .preview-status-details {
+    grid-template-columns: repeat(
+      2,
+      minmax(0, 1fr)
+    );
+  }
+}
+
+@media (max-width: 600px) {
+  .card-grid {
+    grid-template-columns: 2.4in;
+  }
+}
+
+@media (max-width: 480px) {
+  .preview-status-heading {
+    align-items: flex-start;
+  }
+
+  .preview-status-details {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+/* =========================================================
+ * Printing
+ * ========================================================= */
 @page {
   size: Letter portrait;
   margin: 0.22in;
