@@ -1208,6 +1208,8 @@ async function generateDeck() {
      * deck state.
      */
     renderOutput();
+    const previewFocusTarget = ui.previewOutput.querySelector("[data-preview-focus-target]",);
+    previewFocusTarget?.focus();
   } catch (error) {
     /*
      * A failed generation attempt invalidates any previously
@@ -1754,6 +1756,9 @@ function renderPreviewStatus() {
 
   const heading = document.createElement("h2");
 
+  heading.tabIndex = -1;
+  heading.dataset.previewFocusTarget = "";
+
   heading.textContent = `Deck ${state.manifest.deck_id}`;
 
   headingText.append(eyebrow, heading);
@@ -1926,6 +1931,13 @@ function renderQuickList(container) {
     const article = document.createElement("article");
 
     article.className = "list-item";
+
+    article.tabIndex = 0;
+
+    article.setAttribute(
+      "aria-label",
+      `Card ${card.deck_position} of ${state.generated.length}: ${card.content.prompt}`,
+    );
 
     const metadata = document.createElement("div");
 
@@ -2187,7 +2199,11 @@ async function handleCardPackChange(event) {
   try {
     await activateCardPack(requestedCardPackId);
 
-    clearGeneratedOutput();
+    clearGeneratedOutput({
+      state,
+      previewOutput: ui.previewOutput,
+      printOutput: ui.printOutput,
+    });
 
     setStatus(`Loaded card pack: ${state.activeCardPack.displayName}.`);
   } catch (error) {
@@ -2267,7 +2283,11 @@ registerEventListeners();
 loadData().catch((error) => {
   console.error(error);
 
-  clearGeneratedOutput();
+  clearGeneratedOutput({
+    state,
+    previewOutput: ui.previewOutput,
+    printOutput: ui.printOutput,
+  });
 
   setStatus(
     "The card catalog could not be loaded safely. " +
