@@ -2124,6 +2124,15 @@ function handleRandomSeed() {ui.seedInput.value = randomCode(RANDOM_SEED_LENGTH)
  * Open the browser's print dialog.
  */
 function handlePrint() {
+  if (state.generated.length === 0 || !state.manifest) {
+    setStatus(
+      "Generate a valid deck before printing.",
+      "warning",
+    );
+
+    return;
+  }
+
   window.print();
 }
 
