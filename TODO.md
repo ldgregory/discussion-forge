@@ -4,19 +4,19 @@
 
 ### Generation UX
 
-- [ ] Finish semantic live-status classifications so success/info messages use the success treatment, validation/warning messages use the warning treatment, and actual load/runtime failures use the error treatment.
-- [ ] Classify deck-size validation messages such as `Deck size must be between 1 and 250.` as warnings rather than runtime errors.
-- [ ] Review every remaining `setStatus()` call so no message accidentally inherits an inappropriate severity.
-- [ ] Add automated coverage for status classification where practical.
+- [x] Finish semantic live-status classifications so success/info messages use the success treatment, validation/warning messages use the warning treatment, and actual load/runtime failures use the error treatment.
+- [x] Classify deck-size validation messages such as `Deck size must be between 1 and 250.` as warnings rather than runtime errors.
+- [x] Review every remaining `setStatus()` call so no message accidentally inherits an inappropriate severity.
+- [x] Add automated coverage for status classification where practical.
 
 ### Bundled-content validation
 
-- [ ] Add an integration test that loads and validates the actual bundled Trail Talk pack rather than only validator fixtures.
-- [ ] Add equivalent integration validation for the Sample Trivia pack.
-- [ ] Validate bundled themes during automated tests.
-- [ ] Run catalog-integrity validation against the real bundled catalogs.
-- [ ] Fail automated validation when a pack manifest `card_count` disagrees with the validated card catalog.
-- [ ] Add a release-level validation path that can answer: "Do the files we are actually about to ship form a valid Discussion Forge installation?"
+- [x] Add an integration test that loads and validates the actual bundled Trail Talk pack rather than only validator fixtures.
+- [x] Add equivalent integration validation for the Sample Trivia pack.
+- [x] Validate bundled themes during automated tests, including existence of their declared stylesheet and asset root.
+- [x] Run catalog-integrity validation against the real bundled catalogs.
+- [x] Fail automated validation when a pack manifest `card_count` disagrees with the validated card catalog.
+- [x] Add a release-level validation path that can answer: "Do the files we are actually about to ship form a valid Discussion Forge installation?"
 
 ### v1.0 release acceptance
 

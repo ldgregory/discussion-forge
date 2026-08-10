@@ -31,6 +31,7 @@ import { validateEdition } from "./validators/edition-validator.js";
 import { validateCatalogIntegrity } from "./validators/catalog-integrity-validator.js";
 import { validateThemeDefinition } from "./validators/theme-validator.js";
 import { clearGeneratedOutput } from "./generated-output.js";
+import { updateBuilderStatus } from "./builder-status.js";
 
 /* =========================================================
  * Version and deck-identity contracts
@@ -271,11 +272,7 @@ function requireElement(id) {
  * updates are also announced by assistive technology.
  */
 function setStatus(message, type = "success") {
-  ui.status.textContent = message;
-
-  ui.status.classList.toggle("builder-status-warning", type === "warning");
-
-  ui.status.classList.toggle("builder-status-error", type === "error");
+  updateBuilderStatus(ui.status, message, type);
 }
 
 /* =========================================================
