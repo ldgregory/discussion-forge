@@ -1,10 +1,67 @@
 # TODO
 
+## High Priority / v1.0
+
+### Generation UX
+
+- [ ] Finish semantic live-status classifications so success/info messages use the success treatment, validation/warning messages use the warning treatment, and actual load/runtime failures use the error treatment.
+- [ ] Classify deck-size validation messages such as `Deck size must be between 1 and 250.` as warnings rather than runtime errors.
+- [ ] Review every remaining `setStatus()` call so no message accidentally inherits an inappropriate severity.
+- [ ] Add automated coverage for status classification where practical.
+
+### Bundled-content validation
+
+- [ ] Add an integration test that loads and validates the actual bundled Trail Talk pack rather than only validator fixtures.
+- [ ] Add equivalent integration validation for the Sample Trivia pack.
+- [ ] Validate bundled themes during automated tests.
+- [ ] Run catalog-integrity validation against the real bundled catalogs.
+- [ ] Fail automated validation when a pack manifest `card_count` disagrees with the validated card catalog.
+- [ ] Add a release-level validation path that can answer: "Do the files we are actually about to ship form a valid Discussion Forge installation?"
+
+### v1.0 release acceptance
+
+- [ ] Create and execute a v1.0 release checklist covering:
+  - `node --check`
+  - `npm test`
+  - clean browser console
+  - Trail Blue browser preview
+  - Trail Charcoal browser preview
+  - Quick List
+  - card flipping and keyboard behavior
+  - deterministic generation
+  - manifest download
+  - stale-output clearing
+  - 100% print scale
+  - duplex long-edge alignment
+  - print backgrounds enabled
+  - browser headers/footers disabled
+  - physical card dimensions
+  - punch-safe area
+- [ ] Perform a final keyboard-only accessibility pass.
+- [ ] Perform a final narrow/mobile-layout pass.
+- [ ] Perform a final print/PDF regression pass.
+
+---
+
 ## Medium Priority
 
 ### Generation UX
 
 - [ ] Consider displaying active card-pack name/version in the preview summary so generated output is visually attributable before manifest download.
+
+### Deck generation limits
+
+- [ ] Document the purpose of `maxDeckSize` and why a defensive generated-deck limit exists independently of catalog-size limits.
+- [ ] Revisit whether 250 remains the appropriate application-wide maximum after v1.0 testing.
+- [ ] Consider whether a future maximum should remain application-wide, be pack-defined, or be derived from the number of eligible cards.
+- [ ] Keep catalog-size limits and generated-deck-size limits conceptually and operationally separate.
+
+### Documentation
+
+- [ ] Ensure the README clearly distinguishes Discussion Forge (application) from Trail Talk (bundled content pack).
+- [ ] Document the card-pack/theme trust boundary and validation pipeline.
+- [ ] Document the print settings exposed by the UI and the known-good physical print workflow.
+- [ ] Document deterministic Deck ID behavior, including which configuration changes alter Deck ID inputs.
 
 ### Security
 
@@ -50,6 +107,7 @@ Potential dynamic filters include:
 - Icebreaker mode
 - Time available
 - Group size (optional)
+- Conversation depth (distinct from sensitivity: a reflective question can be deep without being sensitive)
 
 Requirements for advanced filters:
 
