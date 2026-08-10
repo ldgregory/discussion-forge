@@ -277,6 +277,17 @@ button.primary {
   margin-top: 1rem;
 }
 
+.print-settings {
+  margin: 0.75rem 0 0;
+
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+.print-settings strong {
+  font-weight: 800;
+}
+
 .status {
   min-height: 1.2em;
 }
