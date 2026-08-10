@@ -1110,7 +1110,11 @@ async function generateDeck() {
      * Require at least one edition and one category.
      */
     if (editions.length === 0 || categories.length === 0) {
-      clearGeneratedOutput();
+      clearGeneratedOutput({
+        state,
+        previewOutput: ui.previewOutput,
+        printOutput: ui.printOutput,
+      });
 
       setStatus("Select at least one edition and one category.");
 
@@ -1128,7 +1132,11 @@ async function generateDeck() {
      * playable cards.
      */
     if (eligible.length === 0) {
-      clearGeneratedOutput();
+      clearGeneratedOutput({
+        state,
+        previewOutput: ui.previewOutput,
+        printOutput: ui.printOutput,
+      });
 
       setStatus("No cards match the selected editions and categories.");
 
@@ -1201,7 +1209,11 @@ async function generateDeck() {
      * generated deck because it no longer represents the
      * current builder configuration.
      */
-    clearGeneratedOutput();
+    clearGeneratedOutput({
+      state,
+      previewOutput: ui.previewOutput,
+      printOutput: ui.printOutput,
+    });
 
     /*
      * Fail visibly without exposing an uncaught generation error
