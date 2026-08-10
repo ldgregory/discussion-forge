@@ -7,7 +7,7 @@
 - [x] Finish semantic live-status classifications so success/info messages use the success treatment, validation/warning messages use the warning treatment, and actual load/runtime failures use the error treatment.
 - [x] Classify deck-size validation messages such as `Deck size must be between 1 and 250.` as warnings rather than runtime errors.
 - [x] Review every remaining `setStatus()` call so no message accidentally inherits an inappropriate severity.
-- [ ] Add automated coverage for status classification where practical.
+- [x] Add automated coverage for status classification where practical.
 
 ### Bundled-content validation
 
