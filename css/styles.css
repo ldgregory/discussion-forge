@@ -123,10 +123,10 @@ h1 {
 }
 
 .builder-heading-row {
-  display: flex;
+  display: grid;
+  grid-template-columns: auto minmax(18rem, 1fr) auto;
   align-items: center;
-  justify-content: space-between;
-  gap: 1.5rem;
+  gap: 1rem;
 
   margin-bottom: 1rem;
 }
@@ -290,6 +290,30 @@ button.primary {
 
 .status {
   min-height: 1.2em;
+}
+
+.builder-status {
+  margin: 0;
+  padding: 0.7rem 1rem;
+
+  background: #eef5ef;
+  border: 1px solid #a9c2ad;
+  border-radius: 8px;
+
+  color: #294632;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.builder-status-warning {
+  background: #fff3cd;
+  border-color: #d9a62e;
+
+  color: #5f4300;
+}
+
+.builder-status:empty {
+  display: none;
 }
 
 /* =========================================================
@@ -830,10 +854,9 @@ button.primary {
   .builder-selection-summary {
     grid-template-columns: 1fr;
   }
-
   .builder-heading-row {
+    grid-template-columns: 1fr;
     align-items: stretch;
-    flex-direction: column;
   }
 }
 

@@ -270,8 +270,13 @@ function requireElement(id) {
  * The status element uses aria-live in index.html, so concise
  * updates are also announced by assistive technology.
  */
-function setStatus(message) {
+function setStatus(message, type = "success") {
   ui.status.textContent = message;
+
+  ui.status.classList.toggle(
+    "builder-status-warning",
+    type === "warning",
+  );
 }
 
 /* =========================================================
@@ -1116,7 +1121,7 @@ async function generateDeck() {
         printOutput: ui.printOutput,
       });
 
-      setStatus("Select at least one edition and one category.");
+      setStatus("Select at least one edition and one category.",  "warning",);
 
       return;
     }
@@ -1138,7 +1143,7 @@ async function generateDeck() {
         printOutput: ui.printOutput,
       });
 
-      setStatus("No cards match the selected editions and categories.");
+      setStatus("No cards match the selected editions and categories.", "warning",);
 
       return;
     }
