@@ -30,6 +30,7 @@ import { validateCategory } from "./validators/category-validator.js";
 import { validateEdition } from "./validators/edition-validator.js";
 import { validateCatalogIntegrity } from "./validators/catalog-integrity-validator.js";
 import { validateThemeDefinition } from "./validators/theme-validator.js";
+import { clearGeneratedOutput } from "./generated-output.js";
 
 /* =========================================================
  * Version and deck-identity contracts
@@ -269,8 +270,12 @@ function requireElement(id) {
  * The status element uses aria-live in index.html, so concise
  * updates are also announced by assistive technology.
  */
-function setStatus(message) {
+function setStatus(message, type = "success") {
   ui.status.textContent = message;
+
+  ui.status.classList.toggle("builder-status-warning", type === "warning");
+
+  ui.status.classList.toggle("builder-status-error", type === "error");
 }
 
 /* =========================================================
@@ -1109,7 +1114,13 @@ async function generateDeck() {
      * Require at least one edition and one category.
      */
     if (editions.length === 0 || categories.length === 0) {
-      setStatus("Select at least one edition and one category.");
+      clearGeneratedOutput({
+        state,
+        previewOutput: ui.previewOutput,
+        printOutput: ui.printOutput,
+      });
+
+      setStatus("Select at least one edition and one category.", "warning");
 
       return;
     }
@@ -1125,9 +1136,16 @@ async function generateDeck() {
      * playable cards.
      */
     if (eligible.length === 0) {
-      clearGeneratedOutput();
+      clearGeneratedOutput({
+        state,
+        previewOutput: ui.previewOutput,
+        printOutput: ui.printOutput,
+      });
 
-      setStatus("No cards match the selected editions and categories.");
+      setStatus(
+        "No cards match the selected editions and categories.",
+        "warning",
+      );
 
       return;
     }
@@ -1185,6 +1203,7 @@ async function generateDeck() {
       chosen.length < requested
         ? `Only ${chosen.length} eligible cards were available.`
         : `Generated ${chosen.length} playable cards.`,
+      chosen.length < requested ? "warning" : "success",
     );
 
     /*
@@ -1193,6 +1212,17 @@ async function generateDeck() {
      */
     renderOutput();
   } catch (error) {
+    /*
+     * A failed generation attempt invalidates any previously
+     * generated deck because it no longer represents the
+     * current builder configuration.
+     */
+    clearGeneratedOutput({
+      state,
+      previewOutput: ui.previewOutput,
+      printOutput: ui.printOutput,
+    });
+
     /*
      * Fail visibly without exposing an uncaught generation error
      * to the user.
@@ -1203,6 +1233,7 @@ async function generateDeck() {
       error instanceof Error
         ? error.message
         : "The deck could not be generated.",
+      "warning",
     );
   }
 }
@@ -1602,21 +1633,6 @@ function renderBackCard({
   article.appendChild(content);
 
   return article;
-}
-
-/*
- * Clear all generated deck state and rendered output.
- *
- * This resets the application after generation errors
- * or when the current builder configuration produces
- * no playable cards.
- */
-function clearGeneratedOutput() {
-  state.generated = [];
-  state.manifest = null;
-
-  ui.previewOutput.replaceChildren();
-  ui.printOutput.replaceChildren();
 }
 
 /*
@@ -2052,7 +2068,7 @@ function renderPrintOutput() {
  */
 function downloadManifest() {
   if (!state.manifest) {
-    setStatus("Generate a deck first.");
+    setStatus("Generate a deck first.", "warning");
 
     return;
   }
@@ -2169,7 +2185,7 @@ async function handleCardPackChange(event) {
 
     event.target.value = previousCardPackId;
 
-    setStatus("The selected card pack could not be loaded safely.");
+    setStatus("The selected card pack could not be loaded safely.", "error");
   }
 }
 
@@ -2199,7 +2215,7 @@ function handleThemeChange(event) {
   } catch (error) {
     console.error(error);
 
-    setStatus("The selected theme is not available.");
+    setStatus("The selected theme is not available.", "error");
 
     event.target.value = state.themeId;
   }
@@ -2244,5 +2260,6 @@ loadData().catch((error) => {
   setStatus(
     "The card catalog could not be loaded safely. " +
       "Check the browser console for details.",
+    "error",
   );
 });

@@ -39,7 +39,18 @@
         <div class="builder-heading-row">
           <h2 id="builder-title">Build Your Deck</h2>
 
-          <div id="builder-selection-summary" class="builder-selection-summary" aria-live="polite">
+          <p
+            id="status"
+            class="status builder-status"
+            aria-live="polite"
+            aria-atomic="true"
+          ></p>
+
+          <div
+            id="builder-selection-summary"
+            class="builder-selection-summary"
+            aria-live="polite"
+          >
             <div>
               <span class="builder-summary-label">Available cards</span>
               <strong id="available-card-count">0</strong>
@@ -153,7 +164,13 @@
           </button>
         </div>
 
-        <p id="status" class="status" aria-live="polite" aria-atomic="true"></p>
+        <p class="print-settings">
+          <strong>Print settings:</strong>
+          Scale 100% ·
+          Double-sided, flip on long edge ·
+          Print backgrounds on ·
+          Headers and footers off
+        </p>
       </section>
 
       <section

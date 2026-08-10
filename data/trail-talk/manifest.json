@@ -4,7 +4,7 @@
 
   "id": "trail-talk",
   "display_name": "Trail Talk Canonical Deck",
-  "version": "1.0.0",
+  "version": "1.1.0",
 
   "author": {
     "name": "Atlas",
@@ -13,7 +13,7 @@
     "github": ""
   },
 
-  "released_at": "2026-08-02",
+  "released_at": "2026-08-10",
 
   "description": "The canonical Trail Talk conversation deck designed to encourage meaningful conversations on the trail and around the campfire while helping travelers learn more about one another.",
 
@@ -33,7 +33,7 @@
 
   "editions": ["core", "campfire", "recovery"],
 
-  "categories": ["gear","story-time","lightning","wildcard"],
+  "categories": ["gear", "story-time", "lightning", "wildcard"],
 
-  "card_count": 32
+  "card_count": 84
 }

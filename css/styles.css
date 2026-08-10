@@ -123,10 +123,10 @@ h1 {
 }
 
 .builder-heading-row {
-  display: flex;
+  display: grid;
+  grid-template-columns: max-content minmax(24rem, 1fr) max-content;
   align-items: center;
-  justify-content: space-between;
-  gap: 1.5rem;
+  gap: 1rem;
 
   margin-bottom: 1rem;
 }
@@ -277,23 +277,51 @@ button.primary {
   margin-top: 1rem;
 }
 
+.print-settings {
+  margin: 0.75rem 0 0;
+
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+.print-settings strong {
+  font-weight: 800;
+}
+
 .status {
   min-height: 1.2em;
 }
 
-@media (max-width: 900px) {
-  .control-grid,
-  .content-option-grid,
-  .builder-selection-summary {
-    grid-template-columns: 1fr;
-  }
+.builder-status {
+  margin: 0;
+  padding: 0.7rem 1rem;
 
-  .builder-heading-row {
-    align-items: stretch;
-    flex-direction: column;
-  }
+  background: #eef5ef;
+  border: 1px solid #a9c2ad;
+  border-radius: 8px;
+
+  color: #294632;
+  font-size: 0.9rem;
+  font-weight: 700;
 }
 
+.builder-status-warning {
+  background: #fff3cd;
+  border-color: #d9a62e;
+
+  color: #5f4300;
+}
+
+.builder-status-error {
+  background: #f8d7da;
+  border-color: #c86b73;
+
+  color: #721c24;
+}
+
+.builder-status:empty {
+  visibility: hidden;
+}
 
 /* =========================================================
  * Output containers
@@ -404,26 +432,6 @@ button.primary {
   font-size: 0.82rem;
 }
 
-@media (max-width: 800px) {
-  .preview-status-details {
-    grid-template-columns: repeat(
-      2,
-      minmax(0, 1fr)
-    );
-  }
-}
-
-@media (max-width: 480px) {
-  .preview-status-heading {
-    align-items: flex-start;
-  }
-
-  .preview-status-details {
-    grid-template-columns: 1fr;
-  }
-}
-
-
 /* =========================================================
  * Shared card grid and card geometry
  * ========================================================= */
@@ -478,21 +486,6 @@ button.primary {
   border: 1px dashed rgb(0 0 0 / 28%);
   border-radius: 50%;
 }
-
-@media (max-width: 900px) {
-  .control-grid,
-  .content-option-grid,
-  .builder-selection-summary {
-    grid-template-columns: 1fr;
-  }
-}
-
-@media (max-width: 600px) {
-  .card-grid {
-    grid-template-columns: 2.4in;
-  }
-}
-
 
 /* =========================================================
  * Shared card-front layout
@@ -858,11 +851,51 @@ button.primary {
   overflow: hidden;
 }
 
-
 /* =========================================================
- * Printed-page configuration
+ * Responsive / mobile layout
  * ========================================================= */
 
+@media (max-width: 900px) {
+  .control-grid,
+  .content-option-grid,
+  .builder-selection-summary {
+    grid-template-columns: 1fr;
+  }
+  .builder-heading-row {
+    grid-template-columns: 1fr;
+    align-items: stretch;
+  }
+}
+
+@media (max-width: 800px) {
+  .preview-status-details {
+    grid-template-columns: repeat(
+      2,
+      minmax(0, 1fr)
+    );
+  }
+}
+
+@media (max-width: 600px) {
+  .card-grid {
+    grid-template-columns: 2.4in;
+  }
+}
+
+@media (max-width: 480px) {
+  .preview-status-heading {
+    align-items: flex-start;
+  }
+
+  .preview-status-details {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+/* =========================================================
+ * Printing
+ * ========================================================= */
 @page {
   size: Letter portrait;
   margin: 0.22in;
