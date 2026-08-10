@@ -30,6 +30,7 @@ import { validateCategory } from "./validators/category-validator.js";
 import { validateEdition } from "./validators/edition-validator.js";
 import { validateCatalogIntegrity } from "./validators/catalog-integrity-validator.js";
 import { validateThemeDefinition } from "./validators/theme-validator.js";
+import {clearGeneratedOutput } from "./generated-output.js";
 
 /* =========================================================
  * Version and deck-identity contracts
@@ -1620,13 +1621,11 @@ function renderBackCard({
  * or when the current builder configuration produces
  * no playable cards.
  */
-function clearGeneratedOutput() {
-  state.generated = [];
-  state.manifest = null;
-
-  ui.previewOutput.replaceChildren();
-  ui.printOutput.replaceChildren();
-}
+clearGeneratedOutput({
+  state,
+  previewOutput: ui.previewOutput,
+  printOutput: ui.printOutput,
+});
 
 /*
  * Render one interactive preview card.
