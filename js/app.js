@@ -51,7 +51,7 @@ const DECK_IDENTITY_SCHEMA_VERSION = 2;
  * Discussion Forge application version recorded in
  * generated deck manifests and compatibility metadata.
  */
-const GENERATOR_VERSION = "0.4.0";
+const GENERATOR_VERSION = "1.0.0";
 
 /*
  * Number of Base32 characters exposed as the human-readable
@@ -1208,6 +1208,10 @@ async function generateDeck() {
      * deck state.
      */
     renderOutput();
+    const previewFocusTarget = ui.previewOutput.querySelector(
+      "[data-preview-focus-target]",
+    );
+    previewFocusTarget?.focus();
   } catch (error) {
     /*
      * A failed generation attempt invalidates any previously
@@ -1754,6 +1758,9 @@ function renderPreviewStatus() {
 
   const heading = document.createElement("h2");
 
+  heading.tabIndex = -1;
+  heading.dataset.previewFocusTarget = "";
+
   heading.textContent = `Deck ${state.manifest.deck_id}`;
 
   headingText.append(eyebrow, heading);
@@ -1783,6 +1790,21 @@ function renderPreviewStatus() {
   );
 
   header.append(headingRow, details);
+
+  /*
+   * Explain the interactive card-preview behavior where users
+   * encounter it. The tip is omitted in Quick List mode because
+   * list items are not interactive card previews.
+   */
+  if (ui.outputMode.value !== "list") {
+    const previewTip = document.createElement("p");
+
+    previewTip.className = "preview-status-tip";
+    previewTip.textContent =
+      "Preview tip: Select a card to flip it over and view the back.";
+
+    header.appendChild(previewTip);
+  }
 
   return header;
 }
@@ -1927,6 +1949,13 @@ function renderQuickList(container) {
 
     article.className = "list-item";
 
+    article.tabIndex = 0;
+
+    article.setAttribute(
+      "aria-label",
+      `Card ${card.deck_position} of ${state.generated.length}: ${card.content.prompt}`,
+    );
+
     const metadata = document.createElement("div");
 
     metadata.className = "list-meta";
@@ -2043,8 +2072,36 @@ function renderPrintOutput() {
 
     backGrid.className = "card-grid";
 
-    cards.forEach(() => {
-      backGrid.appendChild(renderBackCard());
+    /*
+     * Mirror each three-card row horizontally for long-edge
+     * duplex printing.
+     *
+     * Front positions:
+     *
+     *   1  2  3
+     *   4  5  6
+     *
+     * Back-page positions sent to the printer:
+     *
+     *   3  2  1
+     *   6  5  4
+     *
+     * Empty positions must be preserved on partial sheets so
+     * every back remains physically aligned with its front.
+     */
+    const backPositions = [2, 1, 0, 5, 4, 3];
+
+    backPositions.forEach((cardIndex) => {
+      if (cardIndex < cards.length) {
+        backGrid.appendChild(renderBackCard());
+      } else {
+        const emptyPosition = document.createElement("div");
+
+        emptyPosition.className = "print-card-placeholder";
+        emptyPosition.setAttribute("aria-hidden", "true");
+
+        backGrid.appendChild(emptyPosition);
+      }
     });
 
     backPage.appendChild(backGrid);
@@ -2120,12 +2177,19 @@ function downloadManifest() {
  */
 function handleRandomSeed() {
   ui.seedInput.value = randomCode(RANDOM_SEED_LENGTH);
+  handleBuilderConfigurationChange();
 }
 
 /*
  * Open the browser's print dialog.
  */
 function handlePrint() {
+  if (state.generated.length === 0 || !state.manifest) {
+    setStatus("Generate a valid deck before printing.", "warning");
+
+    return;
+  }
+
   window.print();
 }
 
@@ -2133,7 +2197,13 @@ function handlePrint() {
  * Refresh builder statistics when edition or category
  * selections change.
  */
-function handleBuilderSelectionChange() {
+function handleBuilderConfigurationChange() {
+  clearGeneratedOutput({
+    state,
+    previewOutput: ui.previewOutput,
+    printOutput: ui.printOutput,
+  });
+
   renderBuilderSelectionSummary();
 }
 
@@ -2174,7 +2244,11 @@ async function handleCardPackChange(event) {
   try {
     await activateCardPack(requestedCardPackId);
 
-    clearGeneratedOutput();
+    clearGeneratedOutput({
+      state,
+      previewOutput: ui.previewOutput,
+      printOutput: ui.printOutput,
+    });
 
     setStatus(`Loaded card pack: ${state.activeCardPack.displayName}.`);
   } catch (error) {
@@ -2236,11 +2310,19 @@ function registerEventListeners() {
 
   ui.outputMode.addEventListener("change", handleOutputModeChange);
 
-  ui.deckSizeInput.addEventListener("input", renderBuilderSelectionSummary);
+  ui.deckSizeInput.addEventListener("input", handleBuilderConfigurationChange);
 
-  ui.editionOptions.addEventListener("change", handleBuilderSelectionChange);
+  ui.seedInput.addEventListener("input", handleBuilderConfigurationChange);
 
-  ui.categoryOptions.addEventListener("change", handleBuilderSelectionChange);
+  ui.editionOptions.addEventListener(
+    "change",
+    handleBuilderConfigurationChange,
+  );
+
+  ui.categoryOptions.addEventListener(
+    "change",
+    handleBuilderConfigurationChange,
+  );
 
   ui.cardPackSelect.addEventListener("change", handleCardPackChange);
 
@@ -2252,7 +2334,11 @@ registerEventListeners();
 loadData().catch((error) => {
   console.error(error);
 
-  clearGeneratedOutput();
+  clearGeneratedOutput({
+    state,
+    previewOutput: ui.previewOutput,
+    printOutput: ui.printOutput,
+  });
 
   setStatus(
     "The card catalog could not be loaded safely. " +

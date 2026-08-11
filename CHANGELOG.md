@@ -8,30 +8,49 @@ The project follows a Keep a Changelog–style format during development.
 
 ## [Unreleased]
 
+---
+
+## [1.0.0] - 2026-08-10
+
 ### Added
 
 - Dedicated category-record validator module.
 - Dedicated edition-record validator module.
 - Dedicated catalog-integrity validator for cross-catalog uniqueness and relationship checks.
 - Dedicated theme-definition validator module.
+- Integration validation for the actual bundled Trail Talk and Sample Trivia card packs.
+- Bundled-theme integration validation, including declared stylesheet and asset-root existence checks.
+- Automated semantic builder-status tests.
 - Live builder statistics for available cards and selected editions/categories.
 - Visual warning when the requested deck size exceeds the currently available card count.
+- Preview guidance explaining that Poker Cards can be selected to flip and inspect the card back.
 - Advanced Deck Settings accordion placeholder for future metadata-driven filters.
 
 ### Changed
 
+- Set the Discussion Forge application and generated-manifest version to `1.0.0`.
 - Removed obsolete validation helpers, allowlists, patterns, and limits from `app.js` after validator extraction.
 - Reframed `app.js` around loading, orchestration, deck generation, rendering, interaction, and trusted-state publication rather than record validation.
 - Reorganized the builder into content-selection and builder-option columns.
 - Moved live deck-selection statistics beside the Build Your Deck heading.
+- Improved responsive card-preview layout so two-column previews remain usable on wider narrow-screen layouts before collapsing to one column.
+- Expanded README documentation for application/card-pack separation, trust boundaries, deterministic deck identity, and the known-good print workflow.
 
 ### Fixed
+
+- Generated output now clears immediately when builder configuration changes make an existing deck stale.
+- Card-pack switching now clears generated output with the complete required state/output context instead of raising a runtime error.
+- Print / Save PDF now refuses to print when no valid generated deck exists and reports a visible warning instead of opening a blank print job.
+- Keyboard flow after generation now reaches generated preview content rather than leaving Quick List users with no discoverable path into the generated results.
+- Partial duplex sheets now preserve physical card positions so fronts and backs remain aligned for non-six-card page groups.
+- Builder status messages consistently distinguish successful operations, validation warnings, and actual runtime/load errors.
 
 ### Security
 
 - Catalog record, catalog-integrity, and theme validation now have explicit module boundaries.
 - Theme resource-path validation remains constrained to trusted relative theme namespaces after extraction from `app.js`.
 - Cross-catalog category, edition, primary-category, and identity checks remain fail closed before replacement catalog state is published.
+- Bundled-content integration tests now verify that the files being shipped form internally consistent card packs and theme packages.
 
 ---
 

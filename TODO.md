@@ -20,26 +20,26 @@
 
 ### v1.0 release acceptance
 
-- [ ] Create and execute a v1.0 release checklist covering:
-  - `node --check`
-  - `npm test`
-  - clean browser console
-  - Trail Blue browser preview
-  - Trail Charcoal browser preview
-  - Quick List
-  - card flipping and keyboard behavior
-  - deterministic generation
-  - manifest download
-  - stale-output clearing
-  - 100% print scale
-  - duplex long-edge alignment
-  - print backgrounds enabled
-  - browser headers/footers disabled
-  - physical card dimensions
-  - punch-safe area
-- [ ] Perform a final keyboard-only accessibility pass.
-- [ ] Perform a final narrow/mobile-layout pass.
-- [ ] Perform a final print/PDF regression pass.
+- [x] Create and execute a v1.0 release checklist covering:
+  - [x] `node --check`
+  - [x] `npm test`
+  - [x] clean browser console
+  - [x] Trail Blue browser preview
+  - [x] Trail Charcoal browser preview
+  - [x] Quick List
+  - [x] card flipping and keyboard behavior
+  - [x] deterministic generation
+  - [x] manifest download
+  - [x] stale-output clearing
+  - [x] 100% print scale
+  - [x] duplex long-edge alignment
+  - [x] print backgrounds enabled
+  - [x] browser headers/footers disabled
+  - [x] physical card dimensions
+  - [x] punch-safe area
+- [x] Perform a final keyboard-only accessibility pass.
+- [x] Perform a final narrow/mobile-layout pass.
+- [x] Perform a final print/PDF regression pass.
 
 ---
 
