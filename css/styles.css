@@ -427,6 +427,21 @@ button.primary {
   font-size: 0.82rem;
 }
 
+/*
+ * Brief guidance for the interactive card preview.
+ * This is rendered only in Poker Cards mode.
+ */
+.preview-status-tip {
+  margin: 0.8rem 0 0;
+  padding-top: 0.75rem;
+
+  color: #596154;
+  border-top: 1px solid var(--border);
+
+  font-size: 0.85rem;
+  font-style: italic;
+}
+
 /* =========================================================
  * Shared card grid and card geometry
  * ========================================================= */

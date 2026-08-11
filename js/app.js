@@ -1791,6 +1791,21 @@ function renderPreviewStatus() {
 
   header.append(headingRow, details);
 
+  /*
+   * Explain the interactive card-preview behavior where users
+   * encounter it. The tip is omitted in Quick List mode because
+   * list items are not interactive card previews.
+   */
+  if (ui.outputMode.value !== "list") {
+    const previewTip = document.createElement("p");
+
+    previewTip.className = "preview-status-tip";
+    previewTip.textContent =
+      "Preview tip: Select a card to flip it over and view the back.";
+
+    header.appendChild(previewTip);
+  }
+
   return header;
 }
 
