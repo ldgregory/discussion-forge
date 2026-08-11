@@ -119,11 +119,11 @@ Quick List mode bypasses poker-card sheet rendering and prints the generated lis
 
 ## Current Status
 
-Current development version:
+Current stable version:
 
-**0.4.0**
+**1.0.0**
 
-The `release/v1.0` branch is in release hardening for the first stable **1.0.0** release. The validator architecture, bundled-content integration validation, keyboard/accessibility pass, responsive-layout pass, deterministic-generation checks, manifest checks, and physical duplex-print acceptance testing have been completed for the release candidate.
+Discussion Forge 1.0.0 is the first stable release. The release completed bundled-content integration validation, keyboard/accessibility testing, narrow/mobile-layout testing, deterministic-generation and manifest reproducibility checks, stale-output protection testing, and physical duplex-print acceptance testing, including partial-sheet front/back alignment.
 
 ---
 
