@@ -8,6 +8,10 @@ The project follows a Keep a Changelog–style format during development.
 
 ## [Unreleased]
 
+---
+
+## [1.0.0] - 2026-08-10
+
 ### Added
 
 - Dedicated category-record validator module.
@@ -24,6 +28,7 @@ The project follows a Keep a Changelog–style format during development.
 
 ### Changed
 
+- Set the Discussion Forge application and generated-manifest version to `1.0.0`.
 - Removed obsolete validation helpers, allowlists, patterns, and limits from `app.js` after validator extraction.
 - Reframed `app.js` around loading, orchestration, deck generation, rendering, interaction, and trusted-state publication rather than record validation.
 - Reorganized the builder into content-selection and builder-option columns.
